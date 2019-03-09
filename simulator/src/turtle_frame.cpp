@@ -35,9 +35,9 @@
 #include <cstdlib>
 #include <ctime>
 
-#define DEFAULT_BG_R 0x00
-#define DEFAULT_BG_G 0xff
-#define DEFAULT_BG_B 0x00
+#define DEFAULT_BG_R 0x32
+#define DEFAULT_BG_G 0xCD
+#define DEFAULT_BG_B 0x32
 
 namespace turtlesim
 {
