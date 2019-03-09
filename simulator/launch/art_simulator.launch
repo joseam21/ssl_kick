@@ -1,0 +1,8 @@
+<launch>
+  <node name="spawn_robots" pkg="controls" type="Simulator.py" />
+  <node name="path_picker" pkg="contours" type="PathPicker.py" args="$(arg picture_path) 10 10" />
+  <node name="turtlesim_node" pkg="turtlesim" type="turtlesim_node" />
+  <node name="planner" pkg="controls" type="Planner.py" />
+  <node name="collisions" pkg="controls" type="Collisions.py" />
+  <node name="follower" pkg="controls" type="Follower.py" />
+</launch>
