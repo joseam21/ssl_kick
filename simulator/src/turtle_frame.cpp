@@ -66,38 +66,38 @@ TurtleFrame::TurtleFrame(QWidget* parent, Qt::WindowFlags f)
 
   QVector<QString> turtles;
   turtles.append("robot.png");
-  // turtles.append("robotB00.png");
-  // turtles.append("robotB01.png");
-  // turtles.append("robotB02.png");
-  // turtles.append("robotB03.png");
-  // turtles.append("robotB04.png");
-  // turtles.append("robotB05.png");
-  // turtles.append("robotB06.png");
-  // turtles.append("robotB07.png");
-  // turtles.append("robotB08.png");
-  // turtles.append("robotB09.png");
-  // turtles.append("robotB10.png");
-  // turtles.append("robotB11.png");
-  // turtles.append("robotB12.png");
-  // turtles.append("robotB13.png");
-  // turtles.append("robotB14.png");
-  // turtles.append("robotB15.png");
-  // turtles.append("robotY00.png");
-  // turtles.append("robotY01.png");
-  // turtles.append("robotY02.png");
-  // turtles.append("robotY03.png");
-  // turtles.append("robotY04.png");
-  // turtles.append("robotY05.png");
-  // turtles.append("robotY06.png");
-  // turtles.append("robotY07.png");
-  // turtles.append("robotY08.png");
-  // turtles.append("robotY09.png");
-  // turtles.append("robotY10.png");
-  // turtles.append("robotY11.png");
-  // turtles.append("robotY12.png");
-  // turtles.append("robotY13.png");
-  // turtles.append("robotY14.png");
-  // turtles.append("robotY15.png");
+  turtles.append("robotB00.png");
+  turtles.append("robotB01.png");
+  turtles.append("robotB02.png");
+  turtles.append("robotB03.png");
+  turtles.append("robotB04.png");
+  turtles.append("robotB05.png");
+  turtles.append("robotB06.png");
+  turtles.append("robotB07.png");
+  turtles.append("robotB08.png");
+  turtles.append("robotB09.png");
+  turtles.append("robotB10.png");
+  turtles.append("robotB11.png");
+  turtles.append("robotB12.png");
+  turtles.append("robotB13.png");
+  turtles.append("robotB14.png");
+  turtles.append("robotB15.png");
+  turtles.append("robotY00.png");
+  turtles.append("robotY01.png");
+  turtles.append("robotY02.png");
+  turtles.append("robotY03.png");
+  turtles.append("robotY04.png");
+  turtles.append("robotY05.png");
+  turtles.append("robotY06.png");
+  turtles.append("robotY07.png");
+  turtles.append("robotY08.png");
+  turtles.append("robotY09.png");
+  turtles.append("robotY10.png");
+  turtles.append("robotY11.png");
+  turtles.append("robotY12.png");
+  turtles.append("robotY13.png");
+  turtles.append("robotY14.png");
+  turtles.append("robotY15.png");
 
   QString images_path = (ros::package::getPath("simulator") + "/images/").c_str();
   for (int i = 0; i < turtles.size(); ++i)
@@ -140,9 +140,9 @@ TurtleFrame::~TurtleFrame()
   delete update_timer_;
 }
 
-bool TurtleFrame::spawnCallback(turtlesim::Spawn::Request& req, turtlesim::Spawn::Response& res)
+bool TurtleFrame::spawnCallback(simulator::Spawn::Request& req, simulator::Spawn::Response& res)
 {
-  std::string name = spawnTurtle(req.name, req.x, req.y, req.theta, req.idx);
+  std::string name = spawnTurtle(req.name, req.x, req.y, req.theta, 0);
   if (name.empty())
   {
     ROS_ERROR("A turtled named [%s] already exists", req.name.c_str());
