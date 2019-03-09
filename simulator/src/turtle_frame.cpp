@@ -65,9 +65,9 @@ TurtleFrame::TurtleFrame(QWidget* parent, Qt::WindowFlags f)
   nh_.setParam("background_b", DEFAULT_BG_B);
 
   QVector<QString> turtles;
-  turtles.append("robot.png")
+  turtles.append("robot.png");
 
-  QString images_path = (ros::package::getPath("turtlesim") + "/images/").c_str();
+  QString images_path = (ros::package::getPath("simulator") + "/images/").c_str();
   for (int i = 0; i < turtles.size(); ++i)
   {
     QImage img;
