@@ -66,6 +66,38 @@ TurtleFrame::TurtleFrame(QWidget* parent, Qt::WindowFlags f)
 
   QVector<QString> turtles;
   turtles.append("robot.png");
+  // turtles.append("robotB00.png");
+  // turtles.append("robotB01.png");
+  // turtles.append("robotB02.png");
+  // turtles.append("robotB03.png");
+  // turtles.append("robotB04.png");
+  // turtles.append("robotB05.png");
+  // turtles.append("robotB06.png");
+  // turtles.append("robotB07.png");
+  // turtles.append("robotB08.png");
+  // turtles.append("robotB09.png");
+  // turtles.append("robotB10.png");
+  // turtles.append("robotB11.png");
+  // turtles.append("robotB12.png");
+  // turtles.append("robotB13.png");
+  // turtles.append("robotB14.png");
+  // turtles.append("robotB15.png");
+  // turtles.append("robotY00.png");
+  // turtles.append("robotY01.png");
+  // turtles.append("robotY02.png");
+  // turtles.append("robotY03.png");
+  // turtles.append("robotY04.png");
+  // turtles.append("robotY05.png");
+  // turtles.append("robotY06.png");
+  // turtles.append("robotY07.png");
+  // turtles.append("robotY08.png");
+  // turtles.append("robotY09.png");
+  // turtles.append("robotY10.png");
+  // turtles.append("robotY11.png");
+  // turtles.append("robotY12.png");
+  // turtles.append("robotY13.png");
+  // turtles.append("robotY14.png");
+  // turtles.append("robotY15.png");
 
   QString images_path = (ros::package::getPath("simulator") + "/images/").c_str();
   for (int i = 0; i < turtles.size(); ++i)
@@ -88,7 +120,7 @@ TurtleFrame::TurtleFrame(QWidget* parent, Qt::WindowFlags f)
 
   width_in_meters_ = (width() - 1) / meter_;
   height_in_meters_ = (height() - 1) / meter_;
-  spawnTurtle("", width_in_meters_ / 2.0, height_in_meters_ / 2.0, 0);
+  //spawnTurtle("", width_in_meters_ / 2.0, height_in_meters_ / 2.0, 0, 0);
 
   // spawn all available turtle types
   if(false)
@@ -110,7 +142,7 @@ TurtleFrame::~TurtleFrame()
 
 bool TurtleFrame::spawnCallback(turtlesim::Spawn::Request& req, turtlesim::Spawn::Response& res)
 {
-  std::string name = spawnTurtle(req.name, req.x, req.y, req.theta);
+  std::string name = spawnTurtle(req.name, req.x, req.y, req.theta, req.idx);
   if (name.empty())
   {
     ROS_ERROR("A turtled named [%s] already exists", req.name.c_str());
@@ -140,11 +172,6 @@ bool TurtleFrame::killCallback(turtlesim::Kill::Request& req, turtlesim::Kill::R
 bool TurtleFrame::hasTurtle(const std::string& name)
 {
   return turtles_.find(name) != turtles_.end();
-}
-
-std::string TurtleFrame::spawnTurtle(const std::string& name, float x, float y, float angle)
-{
-  return spawnTurtle(name, x, y, angle, rand() % turtle_images_.size());
 }
 
 std::string TurtleFrame::spawnTurtle(const std::string& name, float x, float y, float angle, size_t index)
@@ -252,7 +279,7 @@ bool TurtleFrame::resetCallback(std_srvs::Empty::Request&, std_srvs::Empty::Resp
   ROS_INFO("Resetting turtlesim.");
   turtles_.clear();
   id_counter_ = 0;
-  spawnTurtle("", width_in_meters_ / 2.0, height_in_meters_ / 2.0, 0);
+  //spawnTurtle("", width_in_meters_ / 2.0, height_in_meters_ / 2.0, 0, 0);
   clear();
   return true;
 }
