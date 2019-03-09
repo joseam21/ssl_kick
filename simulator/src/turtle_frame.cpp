@@ -44,13 +44,13 @@ namespace turtlesim
 
 TurtleFrame::TurtleFrame(QWidget* parent, Qt::WindowFlags f)
 : QFrame(parent, f)
-, path_image_(500, 500, QImage::Format_ARGB32)
+, path_image_(0.9*1040, 0.9*740, QImage::Format_ARGB32)
 , path_painter_(&path_image_)
 , frame_count_(0)
 , id_counter_(0)
 {
-  setFixedSize(500, 500);
-  setWindowTitle("TurtleSim");
+  setFixedSize(0.9*1040, 0.9*740);
+  setWindowTitle("RoboCup Soccer 2020");
 
   srand(time(NULL));
 
@@ -65,39 +65,38 @@ TurtleFrame::TurtleFrame(QWidget* parent, Qt::WindowFlags f)
   nh_.setParam("background_b", DEFAULT_BG_B);
 
   QVector<QString> turtles;
-  turtles.append("robot.png");
-  turtles.append("robotB00.png");
-  turtles.append("robotB01.png");
-  turtles.append("robotB02.png");
-  turtles.append("robotB03.png");
-  turtles.append("robotB04.png");
-  turtles.append("robotB05.png");
-  turtles.append("robotB06.png");
-  turtles.append("robotB07.png");
-  turtles.append("robotB08.png");
-  turtles.append("robotB09.png");
-  turtles.append("robotB10.png");
-  turtles.append("robotB11.png");
-  turtles.append("robotB12.png");
-  turtles.append("robotB13.png");
-  turtles.append("robotB14.png");
-  turtles.append("robotB15.png");
-  turtles.append("robotY00.png");
-  turtles.append("robotY01.png");
-  turtles.append("robotY02.png");
-  turtles.append("robotY03.png");
-  turtles.append("robotY04.png");
-  turtles.append("robotY05.png");
-  turtles.append("robotY06.png");
-  turtles.append("robotY07.png");
-  turtles.append("robotY08.png");
-  turtles.append("robotY09.png");
-  turtles.append("robotY10.png");
-  turtles.append("robotY11.png");
-  turtles.append("robotY12.png");
-  turtles.append("robotY13.png");
-  turtles.append("robotY14.png");
-  turtles.append("robotY15.png");
+  turtles.append("robotb00.png");
+  turtles.append("robotb01.png");
+  turtles.append("robotb02.png");
+  turtles.append("robotb03.png");
+  turtles.append("robotb04.png");
+  turtles.append("robotb05.png");
+  turtles.append("robotb06.png");
+  turtles.append("robotb07.png");
+  turtles.append("robotb08.png");
+  turtles.append("robotb09.png");
+  turtles.append("robotb10.png");
+  turtles.append("robotb11.png");
+  turtles.append("robotb12.png");
+  turtles.append("robotb13.png");
+  turtles.append("robotb14.png");
+  turtles.append("robotb15.png");
+  turtles.append("roboty00.png");
+  turtles.append("roboty01.png");
+  turtles.append("roboty02.png");
+  turtles.append("roboty03.png");
+  turtles.append("roboty04.png");
+  turtles.append("roboty05.png");
+  turtles.append("roboty06.png");
+  turtles.append("roboty07.png");
+  turtles.append("roboty08.png");
+  turtles.append("roboty09.png");
+  turtles.append("roboty10.png");
+  turtles.append("roboty11.png");
+  turtles.append("roboty12.png");
+  turtles.append("roboty13.png");
+  turtles.append("roboty14.png");
+  turtles.append("roboty15.png");
 
   QString images_path = (ros::package::getPath("simulator") + "/images/").c_str();
   for (int i = 0; i < turtles.size(); ++i)
@@ -120,7 +119,7 @@ TurtleFrame::TurtleFrame(QWidget* parent, Qt::WindowFlags f)
 
   width_in_meters_ = (width() - 1) / meter_;
   height_in_meters_ = (height() - 1) / meter_;
-  //spawnTurtle("", width_in_meters_ / 2.0, height_in_meters_ / 2.0, 0, 0);
+  spawnTurtle("", width_in_meters_ / 2.0, height_in_meters_ / 2.0, 0, 0);
 
   // spawn all available turtle types
   if(false)
@@ -142,7 +141,7 @@ TurtleFrame::~TurtleFrame()
 
 bool TurtleFrame::spawnCallback(simulator::Spawn::Request& req, simulator::Spawn::Response& res)
 {
-  std::string name = spawnTurtle(req.name, req.x, req.y, req.theta, 0);
+  std::string name = spawnTurtle(req.name, req.x, req.y, req.theta, req.idx);
   if (name.empty())
   {
     ROS_ERROR("A turtled named [%s] already exists", req.name.c_str());
