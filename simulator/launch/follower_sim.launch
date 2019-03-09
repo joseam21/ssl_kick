@@ -1,5 +1,0 @@
-<launch>
-  <node name="spawn_robots" pkg="controls" type="Simulator.py" />
-  <node name="turtlesim_node" pkg="turtlesim" type="turtlesim_node" />
-  <node name="follower" pkg="controls" type="TurtleFollower.py" />
-</launch>
