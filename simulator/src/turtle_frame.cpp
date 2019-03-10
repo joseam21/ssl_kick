@@ -119,7 +119,7 @@ TurtleFrame::TurtleFrame(QWidget* parent, Qt::WindowFlags f)
 
   width_in_meters_ = (width() - 1) / meter_;
   height_in_meters_ = (height() - 1) / meter_;
-  spawnTurtle("", width_in_meters_ / 2.0, height_in_meters_ / 2.0, 0, 0);
+  //spawnTurtle("", width_in_meters_ / 2.0, height_in_meters_ / 2.0, 0, 0);
 
   // spawn all available turtle types
   if(false)
