@@ -71,7 +71,7 @@ class Buttons:
             if self.state[i] == ON:
                 self.toggle(i)
             self.state[i] = OFF
-            self.x[i] = 15
+            self.x[i] = 20
             self.y[i] = 3*(i - 16) + 1
 
         # then add all robots back onto field in starting positions:
@@ -86,7 +86,6 @@ class Buttons:
         self.started = True
 
     def toggle(self, robot_idx):
-        rospy.logwarn(robot_idx)
         if self.state[robot_idx] == OFF:
             # somehow "press"/hold down button (color it green or something)
             self.name[robot_idx] = self.spawn_service(x = self.x[robot_idx],
