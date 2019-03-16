@@ -44,12 +44,12 @@ namespace turtlesim
 
 TurtleFrame::TurtleFrame(QWidget* parent, Qt::WindowFlags f)
 : QFrame(parent, f)
-, path_image_(0.9*1040, 0.9*740, QImage::Format_ARGB32)
+, path_image_(0.6*1040, 0.6*740, QImage::Format_ARGB32)
 , path_painter_(&path_image_)
 , frame_count_(0)
 , id_counter_(0)
 {
-  setFixedSize(0.9*1040, 0.9*740);
+  setFixedSize(0.6*1040, 0.6*740);
   setWindowTitle("RoboCup Soccer 2020");
 
   srand(time(NULL));

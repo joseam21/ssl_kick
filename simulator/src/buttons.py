@@ -44,7 +44,7 @@ class Buttons:
             self.robot_buttons[i] = Button(frame, text = str(i), command = make_toggler(i))
             self.robot_buttons[i].grid(column = 1, row = i - 16, sticky = N + S + E + W)
             # somehow add picture to button
-        
+
         self.newgame_button = Button(frame, text = 'new game', command = self.newgame)
         self.newgame_button.grid(column = 0, row = 16, sticky = N + S + E + W)
 
@@ -58,15 +58,29 @@ class Buttons:
 
     def newgame(self):
         # first remove all remaining robots from field:
-        for i in range(32):
+        for i in range(6):
+            # blue team
             if self.state[i] == ON:
                 self.toggle(i)
             self.state[i] = OFF
-            self.x[i] = 10
-            self.y[i] = i*2
+            self.x[i] = 4
+            self.y[i] = 3*i + 1
+
+        for i in range(16, 22):
+            # yellow team
+            if self.state[i] == ON:
+                self.toggle(i)
+            self.state[i] = OFF
+            self.x[i] = 15
+            self.y[i] = 3*(i - 16) + 1
 
         # then add all robots back onto field in starting positions:
-        for i in range(32):
+        for i in range(6):
+            # blue team
+            self.toggle(i)
+
+        for i in range(16, 22):
+            # yellow team
             self.toggle(i)
 
         self.started = True
