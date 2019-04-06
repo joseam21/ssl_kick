@@ -18,13 +18,13 @@ class Buttons:
         widget = Tk()
         self.widget = widget
         frame = Frame(widget)
-        Grid.rowconfigure(widget, 0, weight = 1)
-        Grid.columnconfigure(widget, 0, weight = 1)
-        frame.grid(row = 0, column = 0, sticky = N + S + E + W)
+        Grid.rowconfigure(widget, 16, weight = 1)
+        Grid.columnconfigure(widget, 3, weight = 1)
+        frame.grid(row = 16, column = 3) #, sticky = N + S + E + W)
         grid = Frame(frame)
-        grid.grid(sticky = N + S + E + W, column = 0, row = 7, columnspan = 2)
-        Grid.rowconfigure(frame, 7, weight = 1)
-        Grid.columnconfigure(frame, 0, weight = 1)
+        grid.grid(sticky = N + S + E + W, column = 3, row = 16, columnspan = 3)
+        Grid.rowconfigure(frame, 16, weight = 1)
+        Grid.columnconfigure(frame, 3, weight = 1)
 
         self.robot_buttons = {i:None for i in range(32)} # holds buttons for toggling each robot
         self.x = {i:None for i in range(32)} # holds x coordinate turtle is currently supposed to be at
@@ -38,17 +38,28 @@ class Buttons:
         # make individual robot buttons, without spawning the robots:
         for i in range(16):
             self.robot_buttons[i] = Button(frame, text = str(i), command = make_toggler(i))
-            self.robot_buttons[i].grid(column = 0, row = i, sticky = N + S + E + W)
+            self.robot_buttons[i].grid(column = 1, row = i, sticky = N + S + E + W)
             # somehow add picture to button
         for i in range(16, 32):
             self.robot_buttons[i] = Button(frame, text = str(i), command = make_toggler(i))
-            self.robot_buttons[i].grid(column = 1, row = i - 16, sticky = N + S + E + W)
+            self.robot_buttons[i].grid(column = 2, row = i - 16, sticky = N + S + E + W)
             # somehow add picture to button
 
         self.newgame_button = Button(frame, text = 'new game', command = self.newgame)
-        self.newgame_button.grid(column = 0, row = 16, sticky = N + S + E + W)
+        self.newgame_button.grid(column = 0, row = 0, sticky = N + S + E + W)
 
-        for c in range(2):
+        # stop
+        # halt
+        # normal start
+        # kick-off
+        # direct free-kick
+        # indirect free-kick
+        # force start
+        # penalty kick
+        # auto ball placement
+        # shoot-out
+
+        for c in range(3):
             Grid.columnconfigure(frame, c, weight = 1)
         for r in range(17):
             Grid.rowconfigure(frame, r, weight = 1)
