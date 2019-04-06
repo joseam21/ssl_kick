@@ -26,11 +26,12 @@ class Buttons:
         Grid.rowconfigure(frame, 16, weight = 1)
         Grid.columnconfigure(frame, 3, weight = 1)
 
-        self.robot_buttons = {i:None for i in range(32)} # holds buttons for toggling each robot
-        self.x = {i:None for i in range(32)} # holds x coordinate turtle is currently supposed to be at
-        self.y = {i:None for i in range(32)} # holds y coordinate turtle is currently supposed to be at
-        self.state = {i:None for i in range(32)} # holds whether robots are ON or OFF the field
-        self.name = {i:None for i in range(32)} # holds name of turtle for board removal purposes
+        self.robot_buttons = [None for i in range(32)] # holds buttons for toggling each robot
+        self.x = [None for i in range(32)] # holds x coordinate turtle is currently supposed to be at
+        self.y = [None for i in range(32)] # holds y coordinate turtle is currently supposed to be at
+        self.state = [None for i in range(32)] # holds whether robots are ON or OFF the field
+        self.name = [None for i in range(32)] # holds name of turtle for board removal purposes
+        self.vel_pubs = # list of velocity publishers here
 
         def make_toggler(idx):
             return lambda : self.toggle(idx)
@@ -48,16 +49,35 @@ class Buttons:
         self.newgame_button = Button(frame, text = 'new game', command = self.newgame)
         self.newgame_button.grid(column = 0, row = 0, sticky = N + S + E + W)
 
-        # stop
-        # halt
-        # normal start
-        # kick-off
-        # direct free-kick
-        # indirect free-kick
-        # force start
-        # penalty kick
-        # auto ball placement
-        # shoot-out
+        self.stop_button = Button(frame, text = 'stop', command = self.stop)
+        self.stop_button.grid(column = 0, row = 1, sticky = N + S + E + W)
+
+        self.halt_button = Button(frame, text = 'halt', command = self.halt)
+        self.halt_button.grid(column = 0, row = 2, sticky = N + S + E + W)
+
+        self.normal_start_button = Button(frame, text = 'normal start', command = self.normal_start)
+        self.normal_start_button.grid(column = 0, row = 3, sticky = N + S + E + W)
+
+        self.kickoff_button = Button(frame, text = 'kick-off', command = self.kickoff)
+        self.kickoff_button.grid(column = 0, row = 4, sticky = N + S + E + W)
+
+        self.direct_freekick_button = Button(frame, text = 'direct free-kick', command = self.direct_freekick)
+        self.direct_freekick_button.grid(column = 0, row = 5, sticky = N + S + E + W)
+
+        self.indirect_freekick_button = Button(frame, text = 'indirect free-kick', command = self.indirect_freekick)
+        self.indirect_freekick_button.grid(column = 0, row = 6, sticky = N + S + E + W)
+
+        self.force_start_button = Button(frame, text = 'force start', command = self.force_start)
+        self.force_start_button.grid(column = 0, row = 7, sticky = N + S + E + W)
+
+        self.penalty_kick_button = Button(frame, text = 'penalty_kick', command = self.penalty_kick)
+        self.penalty_kick_button.grid(column = 0, row = 8, sticky = N + S + E + W)
+
+        self.autoball_button = Button(frame, text = 'auto ball placement', command = self.autoball)
+        self.autoball_button.grid(column = 0, row = 9, sticky = N + S + E + W)
+
+        self.shootout_button = Button(frame, text = 'shoot-out', command = self.shootout)
+        self.shootout_button.grid(column = 0, row = 10, sticky = N + S + E + W)
 
         for c in range(3):
             Grid.columnconfigure(frame, c, weight = 1)
@@ -111,6 +131,36 @@ class Buttons:
         else:
             # if state is still None, means we are initializing buttons
             pass
+
+    def stop(self):
+        pass
+
+    def halt(self):
+        pass
+
+    def normal_start(self):
+        pass
+
+    def kickoff(self):
+        pass
+
+    def direct_freekick(self):
+        pass
+
+    def indirect_freekick(self):
+        pass
+
+    def force_start(self):
+        pass
+
+    def penalty_kick(self):
+        pass
+
+    def autoball(self):
+        pass
+
+    def shootout(self):
+        pass
 
 if __name__ == '__main__':
     node = rospy.init_node('buttons', anonymous = True)
