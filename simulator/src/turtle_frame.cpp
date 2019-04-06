@@ -139,7 +139,7 @@ TurtleFrame::~TurtleFrame()
   delete update_timer_;
 }
 
-bool TurtleFrame::spawnCallback(simulator::Spawn::Request& req, simulator::Spawn::Response& res)
+bool TurtleFrame::spawnCallback(turtlesim::Spawn::Request& req, turtlesim::Spawn::Response& res)
 {
   std::string name = spawnTurtle(req.name, req.x, req.y, req.theta, req.idx);
   if (name.empty())
