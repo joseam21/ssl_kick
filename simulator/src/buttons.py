@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 
 import rospy
+import random
 from Tkinter import *
-from simulator.srv import *
-from geometry_msgs.msg import Twist
+from turtlesim.srv import *
+from geometry_msgs.msg import Twist, Vector3
 
 class Buttons:
     ON = 0
@@ -11,6 +12,8 @@ class Buttons:
 
     def __init__(self):
         self.started = False
+        rospy.wait_for_service('kill')
+        rospy.wait_for_service('spawn')
         self.kill_service = rospy.ServiceProxy('kill', Kill)
         self.spawn_service = rospy.ServiceProxy('spawn', Spawn)
 
@@ -31,8 +34,9 @@ class Buttons:
         self.x = [None for i in range(32)] # holds x coordinate turtle is currently supposed to be at
         self.y = [None for i in range(32)] # holds y coordinate turtle is currently supposed to be at
         self.state = [None for i in range(32)] # holds whether robots are ON or OFF the field
-        self.name = [None for i in range(32)] # holds name of turtle for board removal purposes
-        self.vel_pubs = [rospy.Publisher('/turtle'+ str(i) +'/cmd_vel', Twist, queue_size=10) for i in range(32)]# list of velocity publishers here
+        self.name = ['robot' + str(i) for i in range(32)] # holds name of turtle for board removal purposes
+        self.vel_pub = [rospy.Publisher(self.name[i] +'/cmd_vel', Twist, queue_size = 10) for i in range(32)]
+        self.twist = [Twist(linear = Vector3(0, 0, 0), angular = Vector3(0, 0, 0)) for i in range(32)]
 
         def make_toggler(idx):
             return lambda : self.toggle(idx)
@@ -80,6 +84,9 @@ class Buttons:
         self.shootout_button = Button(frame, text = 'shoot-out', command = self.shootout)
         self.shootout_button.grid(column = 0, row = 10, sticky = N + S + E + W)
 
+        self.random_play_button = Button(frame, text = 'random play', command = self.random_play)
+        self.random_play_button.grid(column = 0, row = 11, sticky = N + S + E + W)
+
         for c in range(3):
             Grid.columnconfigure(frame, c, weight = 1)
         for r in range(17):
@@ -120,11 +127,14 @@ class Buttons:
     def toggle(self, robot_idx):
         if self.state[robot_idx] == OFF:
             # somehow "press"/hold down button (color it green or something)
-            self.name[robot_idx] = self.spawn_service(x = self.x[robot_idx],
+            _ = self.spawn_service(x = self.x[robot_idx],
                                    y = self.y[robot_idx],
                                    theta = 0,
-                                   idx = robot_idx).name
+                                   idx = robot_idx,
+                                   name = self.name[robot_idx])
             self.state[robot_idx] = ON
+            rospy.wait_for_service(self.name[robot_idx] + '/set_pen')
+            _ = rospy.ServiceProxy(self.name[robot_idx] + '/set_pen', SetPen)(off = 1)
         elif self.state[robot_idx] == ON:
             # somehow "unpress" button
             _ = self.kill_service(self.name[robot_idx])
@@ -139,7 +149,8 @@ class Buttons:
     def halt(self):
         # all robots must stop moving within 2 seconds
         # this implementation will need to be changed in real life or robots will tip over
-        pass
+        for i in range(32):
+            self.twist[i] = Twist(linear = Vector3(0, 0, 0), angular = Vector3(0, 0, 0))
 
     def normal_start(self):
         pass
@@ -164,6 +175,11 @@ class Buttons:
 
     def shootout(self):
         pass
+
+    def random_play(self):
+        for i in range(32):
+            self.twist[i] = Twist(linear = Vector3(random.randint(1, 10), random.randint(1, 10), random.randint(1, 10)),
+                                           angular = Vector3(random.randint(1, 10), random.randint(1, 10), random.randint(1, 10)))
 
 if __name__ == '__main__':
     node = rospy.init_node('buttons', anonymous = True)

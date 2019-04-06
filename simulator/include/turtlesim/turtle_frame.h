@@ -39,7 +39,7 @@
 # include <ros/ros.h>
 
 # include <std_srvs/Empty.h>
-# include <simulator/Spawn.h>
+# include <turtlesim/Spawn.h>
 # include <turtlesim/Kill.h>
 # include <map>
 
@@ -72,7 +72,7 @@ private:
 
   bool clearCallback(std_srvs::Empty::Request&, std_srvs::Empty::Response&);
   bool resetCallback(std_srvs::Empty::Request&, std_srvs::Empty::Response&);
-  bool spawnCallback(simulator::Spawn::Request&, simulator::Spawn::Response&);
+  bool spawnCallback(turtlesim::Spawn::Request&, turtlesim::Spawn::Response&);
   bool killCallback(turtlesim::Kill::Request&, turtlesim::Kill::Response&);
 
   ros::NodeHandle nh_;

@@ -1,4 +1,4 @@
 <launch>
-  <node name="turtlesim_node" pkg="simulator" type="turtlesim_node" />
-  <node name="buttons" pkg="simulator" type="buttons.py" />
+  <node name="turtlesim_node" pkg="turtlesim" type="turtlesim_node" />
+  <node name="buttons" pkg="turtlesim" type="buttons.py" />
 </launch>
