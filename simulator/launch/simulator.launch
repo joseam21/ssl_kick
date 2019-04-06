@@ -1,4 +1,0 @@
-<launch>
-  <node name="turtlesim_node" pkg="simulator" type="turtlesim_node" />
-  <node name="buttons" pkg="simulator" type="buttons.py" />
-</launch>
