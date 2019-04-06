@@ -3,6 +3,7 @@
 import rospy
 from Tkinter import *
 from simulator.srv import *
+from geometry_msgs.msg import Twist
 
 class Buttons:
     ON = 0
@@ -31,7 +32,7 @@ class Buttons:
         self.y = [None for i in range(32)] # holds y coordinate turtle is currently supposed to be at
         self.state = [None for i in range(32)] # holds whether robots are ON or OFF the field
         self.name = [None for i in range(32)] # holds name of turtle for board removal purposes
-        self.vel_pubs = # list of velocity publishers here
+        self.vel_pubs = [rospy.Publisher('/turtle'+ str(i) +'/cmd_vel', Twist, queue_size=10) for i in range(32)]# list of velocity publishers here
 
         def make_toggler(idx):
             return lambda : self.toggle(idx)
