@@ -3,7 +3,8 @@
 import rospy
 import random
 from Tkinter import *
-from turtlesim.srv import *
+from turtlesim.msg import Pose
+from turtlesim.srv import Kill, Spawn, SetPen
 from geometry_msgs.msg import Twist, Vector3
 
 class Buttons:
@@ -92,6 +93,12 @@ class Buttons:
         for r in range(17):
             Grid.rowconfigure(frame, r, weight = 1)
 
+        # for velocity publishing:
+        for i in range(32):
+            def make_publisher(i):
+                return lambda x : self.vel_pub[i].publish(self.twist[i])
+            _ = rospy.Subscriber(self.name[i]+'/pose', Pose, make_publisher(i))
+
         # place all robots in starting positions:
         self.newgame() # will set self.started to True
 
@@ -179,7 +186,8 @@ class Buttons:
     def random_play(self):
         for i in range(32):
             self.twist[i] = Twist(linear = Vector3(random.randint(1, 10), random.randint(1, 10), random.randint(1, 10)),
-                                           angular = Vector3(random.randint(1, 10), random.randint(1, 10), random.randint(1, 10)))
+                                  angular = Vector3(random.randint(1, 10), random.randint(1, 10), random.randint(1, 10)))
+
 
 if __name__ == '__main__':
     node = rospy.init_node('buttons', anonymous = True)
