@@ -136,6 +136,8 @@ class Buttons:
         pass
 
     def halt(self):
+        # all robots must stop moving within 2 seconds
+        # this implementation will need to be changed in real life or robots will tip over
         pass
 
     def normal_start(self):
