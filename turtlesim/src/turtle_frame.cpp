@@ -98,7 +98,7 @@ TurtleFrame::TurtleFrame(QWidget* parent, Qt::WindowFlags f)
   turtles.append("roboty14.png");
   turtles.append("roboty15.png");
 
-  QString images_path = (ros::package::getPath("simulator") + "/images/").c_str();
+  QString images_path = (ros::package::getPath("turtlesim") + "/images/").c_str();
   for (int i = 0; i < turtles.size(); ++i)
   {
     QImage img;
