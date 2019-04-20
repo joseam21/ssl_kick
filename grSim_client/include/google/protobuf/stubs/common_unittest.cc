@@ -1,6 +1,6 @@
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// http://code.google.com/p/protobuf/
+// https://developers.google.com/protocol-buffers/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -31,14 +31,15 @@
 // Author: kenton@google.com (Kenton Varda)
 
 #include <vector>
+#include <google/protobuf/stubs/callback.h>
+#include <google/protobuf/stubs/casts.h>
 #include <google/protobuf/stubs/common.h>
+#include <google/protobuf/stubs/logging.h>
 #include <google/protobuf/stubs/strutil.h>
 #include <google/protobuf/stubs/substitute.h>
 
 #include <google/protobuf/testing/googletest.h>
 #include <gtest/gtest.h>
-
-#include "config.h"
 
 namespace google {
 namespace protobuf {
@@ -76,7 +77,7 @@ TEST(CommonTest, IntMinMaxConstants) {
   EXPECT_EQ(0, kuint64max + 1);
 }
 
-vector<string> captured_messages_;
+std::vector<string> captured_messages_;
 
 void CaptureLog(LogLevel level, const char* filename, int line,
                 const string& message) {
@@ -94,21 +95,21 @@ TEST(LoggingTest, DefaultLogging) {
 
   string text = GetCapturedTestStderr();
   EXPECT_EQ(
-    "[libprotobuf INFO "__FILE__":" + SimpleItoa(line + 1) + "] A message.\n"
-    "[libprotobuf WARNING "__FILE__":" + SimpleItoa(line + 2) + "] A warning.\n"
-    "[libprotobuf ERROR "__FILE__":" + SimpleItoa(line + 3) + "] An error.\n",
+    "[libprotobuf INFO " __FILE__ ":" + SimpleItoa(line + 1) + "] A message.\n"
+    "[libprotobuf WARNING " __FILE__ ":" + SimpleItoa(line + 2) + "] A warning.\n"
+    "[libprotobuf ERROR " __FILE__ ":" + SimpleItoa(line + 3) + "] An error.\n",
     text);
 }
 
 TEST(LoggingTest, NullLogging) {
-  LogHandler* old_handler = SetLogHandler(NULL);
+  LogHandler* old_handler = SetLogHandler(nullptr);
 
   CaptureTestStderr();
   GOOGLE_LOG(INFO   ) << "A message.";
   GOOGLE_LOG(WARNING) << "A warning.";
   GOOGLE_LOG(ERROR  ) << "An error.";
 
-  EXPECT_TRUE(SetLogHandler(old_handler) == NULL);
+  EXPECT_TRUE(SetLogHandler(old_handler) == nullptr);
 
   string text = GetCapturedTestStderr();
   EXPECT_EQ("", text);
@@ -127,10 +128,10 @@ TEST(LoggingTest, CaptureLogging) {
 
   ASSERT_EQ(2, captured_messages_.size());
   EXPECT_EQ(
-    "2 "__FILE__":" + SimpleItoa(start_line + 1) + ": An error.",
+    "2 " __FILE__ ":" + SimpleItoa(start_line + 1) + ": An error.",
     captured_messages_[0]);
   EXPECT_EQ(
-    "1 "__FILE__":" + SimpleItoa(start_line + 2) + ": A warning.",
+    "1 " __FILE__ ":" + SimpleItoa(start_line + 2) + ": A warning.",
     captured_messages_[1]);
 }
 
@@ -153,10 +154,10 @@ TEST(LoggingTest, SilenceLogging) {
 
   ASSERT_EQ(2, captured_messages_.size());
   EXPECT_EQ(
-    "0 "__FILE__":" + SimpleItoa(line1) + ": Visible1",
+    "0 " __FILE__ ":" + SimpleItoa(line1) + ": Visible1",
     captured_messages_[0]);
   EXPECT_EQ(
-    "0 "__FILE__":" + SimpleItoa(line2) + ": Visible2",
+    "0 " __FILE__ ":" + SimpleItoa(line2) + ": Visible2",
     captured_messages_[1]);
 }
 
@@ -180,9 +181,9 @@ class ClosureTest : public testing::Test {
   virtual void SetUp() {
     current_instance_ = this;
     a_ = 0;
-    b_ = NULL;
+    b_ = nullptr;
     c_.clear();
-    permanent_closure_ = NULL;
+    permanent_closure_ = nullptr;
   }
 
   void DeleteClosureInCallback() {
@@ -197,7 +198,7 @@ class ClosureTest : public testing::Test {
   static ClosureTest* current_instance_;
 };
 
-ClosureTest* ClosureTest::current_instance_ = NULL;
+ClosureTest* ClosureTest::current_instance_ = nullptr;
 
 TEST_F(ClosureTest, TestClosureFunction0) {
   Closure* closure = NewCallback(&SetA123Function);
@@ -322,7 +323,7 @@ TEST_F(ClosureTest, TestPermanentClosureFunction2) {
   EXPECT_EQ(789, a_);
   EXPECT_EQ(cstr, b_);
   a_ = 0;
-  b_ = NULL;
+  b_ = nullptr;
   closure->Run();
   EXPECT_EQ(789, a_);
   EXPECT_EQ(cstr, b_);
@@ -339,7 +340,7 @@ TEST_F(ClosureTest, TestPermanentClosureMethod2) {
   EXPECT_EQ(789, a_);
   EXPECT_EQ(cstr, b_);
   a_ = 0;
-  b_ = NULL;
+  b_ = nullptr;
   closure->Run();
   EXPECT_EQ(789, a_);
   EXPECT_EQ(cstr, b_);

@@ -1,6 +1,6 @@
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// http://code.google.com/p/protobuf/
+// https://developers.google.com/protocol-buffers/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -50,12 +50,16 @@ class File {
 
   // Read an entire file to a string.  Return true if successful, false
   // otherwise.
-  static bool ReadFileToString(const string& name, string* output);
+  static bool ReadFileToString(const string& name, string* output, bool text_mode = false);
 
   // Same as above, but crash on failure.
   static void ReadFileToStringOrDie(const string& name, string* output);
 
   // Create a file and write a string to it.
+  static bool WriteStringToFile(const string& contents,
+                                const string& name);
+
+  // Same as above, but crash on failure.
   static void WriteStringToFileOrDie(const string& contents,
                                      const string& name);
 
@@ -72,6 +76,24 @@ class File {
   // method but they are not used anywhere in protocol buffers.
   static void DeleteRecursively(const string& name,
                                 void* dummy1, void* dummy2);
+
+  // Change working directory to given directory.
+  static bool ChangeWorkingDirectory(const string& new_working_directory);
+
+  static bool GetContents(
+      const string& name, string* output, bool /*is_default*/) {
+    return ReadFileToString(name, output);
+  }
+
+  static bool GetContentsAsText(
+      const string& name, string* output, bool /*is_default*/) {
+    return ReadFileToString(name, output, true);
+  }
+
+  static bool SetContents(
+      const string& name, const string& contents, bool /*is_default*/) {
+    return WriteStringToFile(contents, name);
+  }
 
  private:
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(File);

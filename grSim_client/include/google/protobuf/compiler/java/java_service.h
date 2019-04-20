@@ -1,6 +1,6 @@
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// http://code.google.com/p/protobuf/
+// https://developers.google.com/protocol-buffers/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -40,11 +40,19 @@
 
 namespace google {
 namespace protobuf {
-  namespace io {
-    class Printer;             // printer.h
-  }
+namespace compiler {
+namespace java {
+class Context;            // context.h
+class ClassNameResolver;  // name_resolver.h
+}  // namespace java
+}  // namespace compiler
+namespace io {
+class Printer;  // printer.h
 }
+}  // namespace protobuf
+}  // namespace google
 
+namespace google {
 namespace protobuf {
 namespace compiler {
 namespace java {
@@ -52,9 +60,27 @@ namespace java {
 class ServiceGenerator {
  public:
   explicit ServiceGenerator(const ServiceDescriptor* descriptor);
-  ~ServiceGenerator();
+  virtual ~ServiceGenerator();
 
-  void Generate(io::Printer* printer);
+  virtual void Generate(io::Printer* printer) = 0;
+
+  enum RequestOrResponse { REQUEST, RESPONSE };
+  enum IsAbstract { IS_ABSTRACT, IS_CONCRETE };
+
+ protected:
+  const ServiceDescriptor* descriptor_;
+
+ private:
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(ServiceGenerator);
+};
+
+class ImmutableServiceGenerator : public ServiceGenerator {
+ public:
+  ImmutableServiceGenerator(const ServiceDescriptor* descriptor,
+                            Context* context);
+  virtual ~ImmutableServiceGenerator();
+
+  virtual void Generate(io::Printer* printer);
 
  private:
 
@@ -80,7 +106,6 @@ class ServiceGenerator {
   void GenerateCallBlockingMethod(io::Printer* printer);
 
   // Generate the implementations of Service.get{Request,Response}Prototype().
-  enum RequestOrResponse { REQUEST, RESPONSE };
   void GenerateGetPrototype(RequestOrResponse which, io::Printer* printer);
 
   // Generate a stub implementation of the service.
@@ -88,7 +113,6 @@ class ServiceGenerator {
 
   // Generate a method signature, possibly abstract, without body or trailing
   // semicolon.
-  enum IsAbstract { IS_ABSTRACT, IS_CONCRETE };
   void GenerateMethodSignature(io::Printer* printer,
                                const MethodDescriptor* method,
                                IsAbstract is_abstract);
@@ -100,14 +124,17 @@ class ServiceGenerator {
   void GenerateBlockingMethodSignature(io::Printer* printer,
                                        const MethodDescriptor* method);
 
-  const ServiceDescriptor* descriptor_;
+  // Return the output type of the method.
+  std::string GetOutput(const MethodDescriptor* method);
 
-  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(ServiceGenerator);
+  Context* context_;
+  ClassNameResolver* name_resolver_;
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(ImmutableServiceGenerator);
 };
 
 }  // namespace java
 }  // namespace compiler
 }  // namespace protobuf
+}  // namespace google
 
 #endif  // NET_PROTO2_COMPILER_JAVA_SERVICE_H__
-}  // namespace google

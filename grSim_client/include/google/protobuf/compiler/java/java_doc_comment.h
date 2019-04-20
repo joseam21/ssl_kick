@@ -1,6 +1,6 @@
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// http://code.google.com/p/protobuf/
+// https://developers.google.com/protocol-buffers/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -37,13 +37,17 @@
 
 #include <google/protobuf/descriptor.h>
 
+#include <google/protobuf/port_def.inc>
+
 namespace google {
 namespace protobuf {
-  namespace io {
-    class Printer;             // printer.h
-  }
+namespace io {
+class Printer;  // printer.h
 }
+}  // namespace protobuf
+}  // namespace google
 
+namespace google {
 namespace protobuf {
 namespace compiler {
 namespace java {
@@ -59,11 +63,13 @@ void WriteMethodDocComment(io::Printer* printer,
                            const MethodDescriptor* method);
 
 // Exposed for testing only.
-LIBPROTOC_EXPORT string EscapeJavadoc(const string& input);
+PROTOC_EXPORT std::string EscapeJavadoc(const std::string& input);
 
 }  // namespace java
 }  // namespace compiler
 }  // namespace protobuf
-
 }  // namespace google
+
+#include <google/protobuf/port_undef.inc>
+
 #endif  // GOOGLE_PROTOBUF_COMPILER_JAVA_DOC_COMMENT_H__

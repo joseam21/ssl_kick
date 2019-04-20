@@ -1,6 +1,6 @@
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// http://code.google.com/p/protobuf/
+// https://developers.google.com/protocol-buffers/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -30,7 +30,7 @@
 
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// http://code.google.com/p/protobuf/
+// https://developers.google.com/protocol-buffers/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -73,19 +73,19 @@ class ZipWriter {
   ZipWriter(io::ZeroCopyOutputStream* raw_output);
   ~ZipWriter();
 
-  bool Write(const string& filename, const string& contents);
+  bool Write(const std::string& filename, const std::string& contents);
   bool WriteDirectory();
 
  private:
   struct FileInfo {
-    string name;
+    std::string name;
     uint32 offset;
     uint32 size;
     uint32 crc32;
   };
 
   io::ZeroCopyOutputStream* raw_output_;
-  vector<FileInfo> files_;
+  std::vector<FileInfo> files_;
 };
 
 }  // namespace compiler

@@ -1,6 +1,6 @@
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// http://code.google.com/p/protobuf/
+// https://developers.google.com/protocol-buffers/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -43,14 +43,27 @@ namespace google {
 namespace protobuf {
 namespace compiler {
 namespace java {
+class Context;            // context.h
+class ClassNameResolver;  // name_resolver.h
+}  // namespace java
+}  // namespace compiler
+}  // namespace protobuf
+}  // namespace google
 
-class EnumFieldGenerator : public FieldGenerator {
+namespace google {
+namespace protobuf {
+namespace compiler {
+namespace java {
+
+class ImmutableEnumFieldGenerator : public ImmutableFieldGenerator {
  public:
-  explicit EnumFieldGenerator(const FieldDescriptor* descriptor,
-      int messageBitIndex, int builderBitIndex);
-  ~EnumFieldGenerator();
+  explicit ImmutableEnumFieldGenerator(const FieldDescriptor* descriptor,
+                                       int messageBitIndex, int builderBitIndex,
+                                       Context* context);
+  ~ImmutableEnumFieldGenerator();
 
-  // implements FieldGenerator ---------------------------------------
+  // implements ImmutableFieldGenerator
+  // ---------------------------------------
   int GetNumBitsForMessage() const;
   int GetNumBitsForBuilder() const;
   void GenerateInterfaceMembers(io::Printer* printer) const;
@@ -68,24 +81,49 @@ class EnumFieldGenerator : public FieldGenerator {
   void GenerateEqualsCode(io::Printer* printer) const;
   void GenerateHashCode(io::Printer* printer) const;
 
-  string GetBoxedType() const;
+  std::string GetBoxedType() const;
 
- private:
+ protected:
   const FieldDescriptor* descriptor_;
-  map<string, string> variables_;
+  std::map<std::string, std::string> variables_;
   const int messageBitIndex_;
   const int builderBitIndex_;
+  Context* context_;
+  ClassNameResolver* name_resolver_;
 
-  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(EnumFieldGenerator);
+ private:
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(ImmutableEnumFieldGenerator);
 };
 
-class RepeatedEnumFieldGenerator : public FieldGenerator {
+class ImmutableEnumOneofFieldGenerator : public ImmutableEnumFieldGenerator {
  public:
-  explicit RepeatedEnumFieldGenerator(const FieldDescriptor* descriptor,
-      int messageBitIndex, int builderBitIndex);
-  ~RepeatedEnumFieldGenerator();
+  ImmutableEnumOneofFieldGenerator(const FieldDescriptor* descriptor,
+                                   int messageBitIndex, int builderBitIndex,
+                                   Context* context);
+  ~ImmutableEnumOneofFieldGenerator();
 
-  // implements FieldGenerator ---------------------------------------
+  void GenerateMembers(io::Printer* printer) const;
+  void GenerateBuilderMembers(io::Printer* printer) const;
+  void GenerateMergingCode(io::Printer* printer) const;
+  void GenerateBuildingCode(io::Printer* printer) const;
+  void GenerateParsingCode(io::Printer* printer) const;
+  void GenerateSerializationCode(io::Printer* printer) const;
+  void GenerateSerializedSizeCode(io::Printer* printer) const;
+  void GenerateEqualsCode(io::Printer* printer) const;
+  void GenerateHashCode(io::Printer* printer) const;
+
+ private:
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(ImmutableEnumOneofFieldGenerator);
+};
+
+class RepeatedImmutableEnumFieldGenerator : public ImmutableFieldGenerator {
+ public:
+  explicit RepeatedImmutableEnumFieldGenerator(
+      const FieldDescriptor* descriptor, int messageBitIndex,
+      int builderBitIndex, Context* context);
+  ~RepeatedImmutableEnumFieldGenerator();
+
+  // implements ImmutableFieldGenerator ---------------------------------------
   int GetNumBitsForMessage() const;
   int GetNumBitsForBuilder() const;
   void GenerateInterfaceMembers(io::Printer* printer) const;
@@ -104,20 +142,22 @@ class RepeatedEnumFieldGenerator : public FieldGenerator {
   void GenerateEqualsCode(io::Printer* printer) const;
   void GenerateHashCode(io::Printer* printer) const;
 
-  string GetBoxedType() const;
+  std::string GetBoxedType() const;
 
  private:
   const FieldDescriptor* descriptor_;
-  map<string, string> variables_;
+  std::map<std::string, std::string> variables_;
   const int messageBitIndex_;
   const int builderBitIndex_;
+  Context* context_;
+  ClassNameResolver* name_resolver_;
 
-  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(RepeatedEnumFieldGenerator);
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(RepeatedImmutableEnumFieldGenerator);
 };
 
 }  // namespace java
 }  // namespace compiler
 }  // namespace protobuf
-
 }  // namespace google
+
 #endif  // GOOGLE_PROTOBUF_COMPILER_JAVA_ENUM_FIELD_H__
