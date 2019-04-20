@@ -52,7 +52,7 @@ class RRT:
         self.goal = Node(random.randint(0, width),
                          random.randint(0, height))
         self.start.setH(self.start.distance(self.goal))
-
+        
         self.tree_points = [self.start]
         self.obstacles = []
         self.delta = 10.0
@@ -69,6 +69,33 @@ class RRT:
         self.generateRandomObstacles(30)
         for obstacle in self.obstacles:
             GUI.drawPinkCircle(obstacle.xcor, obstacle.ycor)
+
+    def obstacleFree(self, q1, q2):
+        x1, y1 = q1.xcor, q1.ycor
+        x2, y2 = q2.xcor, q2.ycor
+        
+        for obstacle in self.obstacles:
+            try:
+                x0, y0 = obstacle.xcor, obstacle.ycor
+                a = (x2-x1, y2-y1)
+                b = (x0-x1, y0-y1)
+
+                norm_a = (a[0]**2 + a[1]**2)**(1/2)
+                comp = (a[0]*b[0] + a[1]*b[1])/norm_a
+                proj = (comp*(a[0]/norm_a), comp*(a[1]/norm_a))
+
+                dx, dy = x1+proj[0], y1+proj[1]
+                qD = Node(dx, dy)
+                if q1.distance(qD) > q1.distance(q2):
+                    continue
+
+                if obstacle.distance(qD) <= 30:
+                    return False
+            except:
+                return False
+
+        return True
+
 
     def getRandomPoint(self):
         q = Node(random.randint(0, self.width),
@@ -129,12 +156,40 @@ class RRT:
         added to reach the goal, returns False otherwise.
         """
         # Generate a new point that is in bounds and not in an obstacle
-        q_new = self.getBiasedRandomPoint()
-        q_new.setH(q_new.distance(self.goal))
+        if random.randint(0, 10) <= 5:
+            q_new = self.getRandomPoint()
+        else:
+            q_new = self.getBiasedRandomPoint()
 
-        if self.endOfPath(q_new, 8):
-            self.start.setEnd(False)
+        #if self.endOfPath(q_new, 8):
+        #    self.start.setEnd(False)
+        #    return True
+        
+        # Find closest node to q_new
+        q_nearest = self.tree_points[-1]
+        best_distance = q_new.distance(q_nearest)
+        for node in self.tree_points[:-1]:
+            if q_new.distance(node) <= best_distance:
+                q_nearest = node
+                best_distance = q_new.distance(node)
+
+        # Slide q_new closer
+        heading = math.degrees(math.atan2(q_new.ycor - q_nearest.ycor,
+                                          q_new.xcor - q_nearest.xcor))
+        
+        q_new = Node(q_nearest.xcor+(self.delta*math.cos(heading)),
+                     q_nearest.ycor+(self.delta*math.sin(heading)))
+        q_new.setH(q_new.distance(self.goal))
+        
+        if not self.validNode(q_new):
             return True
+
+        #if len(close_nodes) > 20:
+        #    q_new.setEnd(True)
+        #    for node in close_nodes:
+        #        q_new.setEnd(True)
+        #    self.start.setEnd(False)
+        #    return True
 
         # Find all nodes within self.neighborhood of q_new
         close_nodes = []
@@ -142,45 +197,41 @@ class RRT:
             if q_new.distance(node) <= self.neighborhood:
                 close_nodes.append(node)
 
-
-        if len(close_nodes) > 20:
-            q_new.setEnd(True)
-            for node in close_nodes:
-                q_new.setEnd(True)
-            self.start.setEnd(False)
-            return True
-
         # Find cheapest parent for q_new from close_nodes
         best_parent = close_nodes[0]
-        for i in range(1, len(close_nodes)):
+        for node in close_nodes[1:]:
             cost1 = q_new.distance(best_parent) + best_parent.getCost()
-            cost2 = q_new.distance(close_nodes[i]) + close_nodes[i].getCost()
+            cost2 = q_new.distance(node) + node.getCost()
             if cost2 < cost1:
-                best_parent = close_nodes[i]
+                best_parent = node
 
-        q_new.setParent(best_parent)
-        self.tree_points.append(q_new)
+        if self.obstacleFree(best_parent, q_new):
+            q_new.setParent(best_parent)
+            self.tree_points.append(q_new)
 
-        # Look at close_nodes and see if any of them have a better path through q_new
-        for i in range(len(close_nodes)):
-            cost1 = close_nodes[i].getCost() + close_nodes[i].getH()
-            cost2 = q_new.getCost() + q_new.distance(close_nodes[i]) + q_new.getH()
-            if cost2 < cost1:
-                close_nodes[i].setParent(q_new)
+            # Look at close_nodes and see if any of them have a better path through q_new
+            for node in close_nodes:
+                cost1 = node.getCost()
+                cost2 = q_new.getCost() + q_new.distance(node)
+                if cost2 < cost1:
+                    if self.obstacleFree(q_new, node):
+                        node.setParent(q_new)
 
-        # Determine if more points need to be added
-        if q_new.distance(self.goal) <= 10:
-            return False
+            # Determine if more points need to be added
+            if q_new.distance(self.goal) <= 10:
+                return False
+        
         return True
+
 
     def add_goal_point(self):
         close_nodes = []
-        for node in self.tree_points:
-            if self.goal.distance(node) <= self.neighborhood:
-                close_nodes.append(node)
-
-        if len(close_nodes) == 0:
-            close_nodes = self.tree_points
+        radius = self.neighborhood
+        while len(close_nodes) == 0:
+            for node in self.tree_points:
+                if self.goal.distance(node) <= radius:
+                    close_nodes.append(node)
+            radius *= 2
 
         best_parent = close_nodes[0]
         for node in close_nodes[1:]:
@@ -222,7 +273,7 @@ def run_RRT():
     r = RRT(width, height)
     cont = True
     i = 0
-    while cont and i < 2000:
+    while cont and i < 3000:
         cont = r.add_point()
         i += 1
         print(i)

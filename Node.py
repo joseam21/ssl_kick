@@ -9,6 +9,7 @@ class Node(object):
         self.cost = 0
         self.endNode = False
         self.h = 0
+        self.depth = 0
 
     def getCoord(self):
         return (self.xcor, self.ycor)
@@ -31,6 +32,7 @@ class Node(object):
     def setParent(self, parent_node):
         self.parent = parent_node
         parent_node.addChild(self)
+        self.depth = parent_node.depth + 1
         self.cost = self.parent.getCost() + self.distance(self.parent)
 
     def setCost(self, cost):
