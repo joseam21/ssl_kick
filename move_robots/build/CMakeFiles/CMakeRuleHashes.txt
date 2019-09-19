@@ -1,0 +1,10 @@
+# Hashes of file build rules.
+0a2867600c997b1e95efc1fc89f5e5da grSim_Commands.pb.cc
+18d523b53e5b244eda9b9f3cef51bf7c grSim_Packet.pb.cc
+66a131e8af4cf7a67e104e6e62a8b071 grSim_Replacement.pb.cc
+5e359fe5c551b3f0f805abc95ba6b3a9 messages_robocup_ssl_detection.pb.cc
+e1c6eccc49f64a610f528e4aab55e531 messages_robocup_ssl_geometry.pb.cc
+6b3d47139d7635f757dedcabb8deb29e messages_robocup_ssl_geometry_legacy.pb.cc
+84f17a8fafe5aec3b601630a2e2ca194 messages_robocup_ssl_refbox_log.pb.cc
+3dce33d750282539475e0cb2703c3738 messages_robocup_ssl_wrapper.pb.cc
+eb0081cd5be8b7cf98dadd66722194ed messages_robocup_ssl_wrapper_legacy.pb.cc
