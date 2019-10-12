@@ -26,6 +26,8 @@ class BasicOffense {
         int canPass();
         // check for path with no enemy robots
         bool clearPath(pose, pose);
+        // execute play
+        void play();
 };
 
 BasicOffense::BasicOffense(int possession){

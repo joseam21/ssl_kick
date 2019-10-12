@@ -46,3 +46,17 @@ int BasicOffense::canPass(){
     }
     return 7;
 }
+
+void BasicOffense::play(){
+    robots();
+    enemyRobots();
+    if (canScore()) {
+        // tell robot to shoot!
+    } else{
+        int receiver = canPass();
+        if (receiver != 7)
+            pose receiver_loc = us[receiver];
+            //tell robot to pass!
+    }
+    // rest of the robots should guard nearest enemy
+}
