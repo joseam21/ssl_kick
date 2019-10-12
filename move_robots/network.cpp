@@ -14,10 +14,10 @@ bool sendVelocity(int robot_id, double veltangent, double velnormal, double vela
     packet.mutable_commands()->set_isteamyellow(true);
     packet.mutable_commands()->set_timestamp(0.0);
     grSim_Robot_Command* command = packet.mutable_commands()->add_robot_commands();
-    command->set_id(0);
-    command->set_veltangent(1.0);
-    command->set_velnormal(0.5);
-    command->set_velangular(0.5);
+    command->set_id(robot_id);
+    command->set_veltangent(veltangent);
+    command->set_velnormal(velnormal);
+    command->set_velangular(velangular);
     command->set_wheelsspeed(false);
     command->set_spinner(false);
     command->set_kickspeedx(1.0);
