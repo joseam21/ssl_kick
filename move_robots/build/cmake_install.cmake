@@ -1,4 +1,4 @@
-# Install script for directory: /home/mtan/robocup_packages/move_robots
+# Install script for directory: /home/adrian/code/robocup_soccer_2020/move_robots
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -40,5 +40,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/mtan/robocup_packages/move_robots/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/adrian/code/robocup_soccer_2020/move_robots/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

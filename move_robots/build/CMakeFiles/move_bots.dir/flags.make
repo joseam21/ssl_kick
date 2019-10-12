@@ -6,5 +6,5 @@ CXX_FLAGS =  -std=c++11
 
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/usr/local/include -I/home/mtan/robocup_packages/move_robots/build 
+CXX_INCLUDES = -I/home/adrian/code/robocup_soccer_2020/move_robots/build 
 

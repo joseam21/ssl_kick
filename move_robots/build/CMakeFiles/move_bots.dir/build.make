@@ -43,10 +43,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/mtan/robocup_packages/move_robots
+CMAKE_SOURCE_DIR = /home/adrian/code/robocup_soccer_2020/move_robots
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/mtan/robocup_packages/move_robots/build
+CMAKE_BINARY_DIR = /home/adrian/code/robocup_soccer_2020/move_robots/build
 
 # Include any dependencies generated for this target.
 include CMakeFiles/move_bots.dir/depend.make
@@ -58,89 +58,89 @@ include CMakeFiles/move_bots.dir/progress.make
 include CMakeFiles/move_bots.dir/flags.make
 
 grSim_Commands.pb.cc: ../src/proto/grSim_Commands.proto
-grSim_Commands.pb.cc: /usr/local/bin/protoc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/mtan/robocup_packages/move_robots/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Running C++ protocol buffer compiler on src/proto/grSim_Commands.proto"
-	/usr/local/bin/protoc --cpp_out /home/mtan/robocup_packages/move_robots/build -I /home/mtan/robocup_packages/move_robots/src/proto /home/mtan/robocup_packages/move_robots/src/proto/grSim_Commands.proto
+grSim_Commands.pb.cc: /usr/bin/protoc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/adrian/code/robocup_soccer_2020/move_robots/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Running C++ protocol buffer compiler on src/proto/grSim_Commands.proto"
+	/usr/bin/protoc --cpp_out /home/adrian/code/robocup_soccer_2020/move_robots/build -I /home/adrian/code/robocup_soccer_2020/move_robots/src/proto /home/adrian/code/robocup_soccer_2020/move_robots/src/proto/grSim_Commands.proto
 
 grSim_Commands.pb.h: grSim_Commands.pb.cc
 	@$(CMAKE_COMMAND) -E touch_nocreate grSim_Commands.pb.h
 
 grSim_Packet.pb.cc: ../src/proto/grSim_Packet.proto
-grSim_Packet.pb.cc: /usr/local/bin/protoc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/mtan/robocup_packages/move_robots/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Running C++ protocol buffer compiler on src/proto/grSim_Packet.proto"
-	/usr/local/bin/protoc --cpp_out /home/mtan/robocup_packages/move_robots/build -I /home/mtan/robocup_packages/move_robots/src/proto /home/mtan/robocup_packages/move_robots/src/proto/grSim_Packet.proto
+grSim_Packet.pb.cc: /usr/bin/protoc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/adrian/code/robocup_soccer_2020/move_robots/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Running C++ protocol buffer compiler on src/proto/grSim_Packet.proto"
+	/usr/bin/protoc --cpp_out /home/adrian/code/robocup_soccer_2020/move_robots/build -I /home/adrian/code/robocup_soccer_2020/move_robots/src/proto /home/adrian/code/robocup_soccer_2020/move_robots/src/proto/grSim_Packet.proto
 
 grSim_Packet.pb.h: grSim_Packet.pb.cc
 	@$(CMAKE_COMMAND) -E touch_nocreate grSim_Packet.pb.h
 
 grSim_Replacement.pb.cc: ../src/proto/grSim_Replacement.proto
-grSim_Replacement.pb.cc: /usr/local/bin/protoc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/mtan/robocup_packages/move_robots/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Running C++ protocol buffer compiler on src/proto/grSim_Replacement.proto"
-	/usr/local/bin/protoc --cpp_out /home/mtan/robocup_packages/move_robots/build -I /home/mtan/robocup_packages/move_robots/src/proto /home/mtan/robocup_packages/move_robots/src/proto/grSim_Replacement.proto
+grSim_Replacement.pb.cc: /usr/bin/protoc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/adrian/code/robocup_soccer_2020/move_robots/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Running C++ protocol buffer compiler on src/proto/grSim_Replacement.proto"
+	/usr/bin/protoc --cpp_out /home/adrian/code/robocup_soccer_2020/move_robots/build -I /home/adrian/code/robocup_soccer_2020/move_robots/src/proto /home/adrian/code/robocup_soccer_2020/move_robots/src/proto/grSim_Replacement.proto
 
 grSim_Replacement.pb.h: grSim_Replacement.pb.cc
 	@$(CMAKE_COMMAND) -E touch_nocreate grSim_Replacement.pb.h
 
 messages_robocup_ssl_detection.pb.cc: ../src/proto/messages_robocup_ssl_detection.proto
-messages_robocup_ssl_detection.pb.cc: /usr/local/bin/protoc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/mtan/robocup_packages/move_robots/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Running C++ protocol buffer compiler on src/proto/messages_robocup_ssl_detection.proto"
-	/usr/local/bin/protoc --cpp_out /home/mtan/robocup_packages/move_robots/build -I /home/mtan/robocup_packages/move_robots/src/proto /home/mtan/robocup_packages/move_robots/src/proto/messages_robocup_ssl_detection.proto
+messages_robocup_ssl_detection.pb.cc: /usr/bin/protoc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/adrian/code/robocup_soccer_2020/move_robots/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Running C++ protocol buffer compiler on src/proto/messages_robocup_ssl_detection.proto"
+	/usr/bin/protoc --cpp_out /home/adrian/code/robocup_soccer_2020/move_robots/build -I /home/adrian/code/robocup_soccer_2020/move_robots/src/proto /home/adrian/code/robocup_soccer_2020/move_robots/src/proto/messages_robocup_ssl_detection.proto
 
 messages_robocup_ssl_detection.pb.h: messages_robocup_ssl_detection.pb.cc
 	@$(CMAKE_COMMAND) -E touch_nocreate messages_robocup_ssl_detection.pb.h
 
 messages_robocup_ssl_geometry.pb.cc: ../src/proto/messages_robocup_ssl_geometry.proto
-messages_robocup_ssl_geometry.pb.cc: /usr/local/bin/protoc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/mtan/robocup_packages/move_robots/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Running C++ protocol buffer compiler on src/proto/messages_robocup_ssl_geometry.proto"
-	/usr/local/bin/protoc --cpp_out /home/mtan/robocup_packages/move_robots/build -I /home/mtan/robocup_packages/move_robots/src/proto /home/mtan/robocup_packages/move_robots/src/proto/messages_robocup_ssl_geometry.proto
+messages_robocup_ssl_geometry.pb.cc: /usr/bin/protoc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/adrian/code/robocup_soccer_2020/move_robots/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Running C++ protocol buffer compiler on src/proto/messages_robocup_ssl_geometry.proto"
+	/usr/bin/protoc --cpp_out /home/adrian/code/robocup_soccer_2020/move_robots/build -I /home/adrian/code/robocup_soccer_2020/move_robots/src/proto /home/adrian/code/robocup_soccer_2020/move_robots/src/proto/messages_robocup_ssl_geometry.proto
 
 messages_robocup_ssl_geometry.pb.h: messages_robocup_ssl_geometry.pb.cc
 	@$(CMAKE_COMMAND) -E touch_nocreate messages_robocup_ssl_geometry.pb.h
 
 messages_robocup_ssl_geometry_legacy.pb.cc: ../src/proto/messages_robocup_ssl_geometry_legacy.proto
-messages_robocup_ssl_geometry_legacy.pb.cc: /usr/local/bin/protoc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/mtan/robocup_packages/move_robots/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Running C++ protocol buffer compiler on src/proto/messages_robocup_ssl_geometry_legacy.proto"
-	/usr/local/bin/protoc --cpp_out /home/mtan/robocup_packages/move_robots/build -I /home/mtan/robocup_packages/move_robots/src/proto /home/mtan/robocup_packages/move_robots/src/proto/messages_robocup_ssl_geometry_legacy.proto
+messages_robocup_ssl_geometry_legacy.pb.cc: /usr/bin/protoc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/adrian/code/robocup_soccer_2020/move_robots/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Running C++ protocol buffer compiler on src/proto/messages_robocup_ssl_geometry_legacy.proto"
+	/usr/bin/protoc --cpp_out /home/adrian/code/robocup_soccer_2020/move_robots/build -I /home/adrian/code/robocup_soccer_2020/move_robots/src/proto /home/adrian/code/robocup_soccer_2020/move_robots/src/proto/messages_robocup_ssl_geometry_legacy.proto
 
 messages_robocup_ssl_geometry_legacy.pb.h: messages_robocup_ssl_geometry_legacy.pb.cc
 	@$(CMAKE_COMMAND) -E touch_nocreate messages_robocup_ssl_geometry_legacy.pb.h
 
 messages_robocup_ssl_refbox_log.pb.cc: ../src/proto/messages_robocup_ssl_refbox_log.proto
-messages_robocup_ssl_refbox_log.pb.cc: /usr/local/bin/protoc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/mtan/robocup_packages/move_robots/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Running C++ protocol buffer compiler on src/proto/messages_robocup_ssl_refbox_log.proto"
-	/usr/local/bin/protoc --cpp_out /home/mtan/robocup_packages/move_robots/build -I /home/mtan/robocup_packages/move_robots/src/proto /home/mtan/robocup_packages/move_robots/src/proto/messages_robocup_ssl_refbox_log.proto
+messages_robocup_ssl_refbox_log.pb.cc: /usr/bin/protoc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/adrian/code/robocup_soccer_2020/move_robots/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Running C++ protocol buffer compiler on src/proto/messages_robocup_ssl_refbox_log.proto"
+	/usr/bin/protoc --cpp_out /home/adrian/code/robocup_soccer_2020/move_robots/build -I /home/adrian/code/robocup_soccer_2020/move_robots/src/proto /home/adrian/code/robocup_soccer_2020/move_robots/src/proto/messages_robocup_ssl_refbox_log.proto
 
 messages_robocup_ssl_refbox_log.pb.h: messages_robocup_ssl_refbox_log.pb.cc
 	@$(CMAKE_COMMAND) -E touch_nocreate messages_robocup_ssl_refbox_log.pb.h
 
 messages_robocup_ssl_wrapper.pb.cc: ../src/proto/messages_robocup_ssl_wrapper.proto
-messages_robocup_ssl_wrapper.pb.cc: /usr/local/bin/protoc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/mtan/robocup_packages/move_robots/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Running C++ protocol buffer compiler on src/proto/messages_robocup_ssl_wrapper.proto"
-	/usr/local/bin/protoc --cpp_out /home/mtan/robocup_packages/move_robots/build -I /home/mtan/robocup_packages/move_robots/src/proto /home/mtan/robocup_packages/move_robots/src/proto/messages_robocup_ssl_wrapper.proto
+messages_robocup_ssl_wrapper.pb.cc: /usr/bin/protoc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/adrian/code/robocup_soccer_2020/move_robots/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Running C++ protocol buffer compiler on src/proto/messages_robocup_ssl_wrapper.proto"
+	/usr/bin/protoc --cpp_out /home/adrian/code/robocup_soccer_2020/move_robots/build -I /home/adrian/code/robocup_soccer_2020/move_robots/src/proto /home/adrian/code/robocup_soccer_2020/move_robots/src/proto/messages_robocup_ssl_wrapper.proto
 
 messages_robocup_ssl_wrapper.pb.h: messages_robocup_ssl_wrapper.pb.cc
 	@$(CMAKE_COMMAND) -E touch_nocreate messages_robocup_ssl_wrapper.pb.h
 
 messages_robocup_ssl_wrapper_legacy.pb.cc: ../src/proto/messages_robocup_ssl_wrapper_legacy.proto
-messages_robocup_ssl_wrapper_legacy.pb.cc: /usr/local/bin/protoc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/mtan/robocup_packages/move_robots/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Running C++ protocol buffer compiler on src/proto/messages_robocup_ssl_wrapper_legacy.proto"
-	/usr/local/bin/protoc --cpp_out /home/mtan/robocup_packages/move_robots/build -I /home/mtan/robocup_packages/move_robots/src/proto /home/mtan/robocup_packages/move_robots/src/proto/messages_robocup_ssl_wrapper_legacy.proto
+messages_robocup_ssl_wrapper_legacy.pb.cc: /usr/bin/protoc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/adrian/code/robocup_soccer_2020/move_robots/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Running C++ protocol buffer compiler on src/proto/messages_robocup_ssl_wrapper_legacy.proto"
+	/usr/bin/protoc --cpp_out /home/adrian/code/robocup_soccer_2020/move_robots/build -I /home/adrian/code/robocup_soccer_2020/move_robots/src/proto /home/adrian/code/robocup_soccer_2020/move_robots/src/proto/messages_robocup_ssl_wrapper_legacy.proto
 
 messages_robocup_ssl_wrapper_legacy.pb.h: messages_robocup_ssl_wrapper_legacy.pb.cc
 	@$(CMAKE_COMMAND) -E touch_nocreate messages_robocup_ssl_wrapper_legacy.pb.h
 
 CMakeFiles/move_bots.dir/move.cpp.o: CMakeFiles/move_bots.dir/flags.make
 CMakeFiles/move_bots.dir/move.cpp.o: ../move.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mtan/robocup_packages/move_robots/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/move_bots.dir/move.cpp.o"
-	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/move_bots.dir/move.cpp.o -c /home/mtan/robocup_packages/move_robots/move.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/adrian/code/robocup_soccer_2020/move_robots/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/move_bots.dir/move.cpp.o"
+	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/move_bots.dir/move.cpp.o -c /home/adrian/code/robocup_soccer_2020/move_robots/move.cpp
 
 CMakeFiles/move_bots.dir/move.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/move_bots.dir/move.cpp.i"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/mtan/robocup_packages/move_robots/move.cpp > CMakeFiles/move_bots.dir/move.cpp.i
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/adrian/code/robocup_soccer_2020/move_robots/move.cpp > CMakeFiles/move_bots.dir/move.cpp.i
 
 CMakeFiles/move_bots.dir/move.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/move_bots.dir/move.cpp.s"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/mtan/robocup_packages/move_robots/move.cpp -o CMakeFiles/move_bots.dir/move.cpp.s
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/adrian/code/robocup_soccer_2020/move_robots/move.cpp -o CMakeFiles/move_bots.dir/move.cpp.s
 
 CMakeFiles/move_bots.dir/move.cpp.o.requires:
 
@@ -155,16 +155,16 @@ CMakeFiles/move_bots.dir/move.cpp.o.provides.build: CMakeFiles/move_bots.dir/mov
 
 CMakeFiles/move_bots.dir/network.cpp.o: CMakeFiles/move_bots.dir/flags.make
 CMakeFiles/move_bots.dir/network.cpp.o: ../network.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mtan/robocup_packages/move_robots/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/move_bots.dir/network.cpp.o"
-	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/move_bots.dir/network.cpp.o -c /home/mtan/robocup_packages/move_robots/network.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/adrian/code/robocup_soccer_2020/move_robots/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/move_bots.dir/network.cpp.o"
+	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/move_bots.dir/network.cpp.o -c /home/adrian/code/robocup_soccer_2020/move_robots/network.cpp
 
 CMakeFiles/move_bots.dir/network.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/move_bots.dir/network.cpp.i"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/mtan/robocup_packages/move_robots/network.cpp > CMakeFiles/move_bots.dir/network.cpp.i
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/adrian/code/robocup_soccer_2020/move_robots/network.cpp > CMakeFiles/move_bots.dir/network.cpp.i
 
 CMakeFiles/move_bots.dir/network.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/move_bots.dir/network.cpp.s"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/mtan/robocup_packages/move_robots/network.cpp -o CMakeFiles/move_bots.dir/network.cpp.s
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/adrian/code/robocup_soccer_2020/move_robots/network.cpp -o CMakeFiles/move_bots.dir/network.cpp.s
 
 CMakeFiles/move_bots.dir/network.cpp.o.requires:
 
@@ -179,16 +179,16 @@ CMakeFiles/move_bots.dir/network.cpp.o.provides.build: CMakeFiles/move_bots.dir/
 
 CMakeFiles/move_bots.dir/grSim_Commands.pb.cc.o: CMakeFiles/move_bots.dir/flags.make
 CMakeFiles/move_bots.dir/grSim_Commands.pb.cc.o: grSim_Commands.pb.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mtan/robocup_packages/move_robots/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object CMakeFiles/move_bots.dir/grSim_Commands.pb.cc.o"
-	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/move_bots.dir/grSim_Commands.pb.cc.o -c /home/mtan/robocup_packages/move_robots/build/grSim_Commands.pb.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/adrian/code/robocup_soccer_2020/move_robots/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object CMakeFiles/move_bots.dir/grSim_Commands.pb.cc.o"
+	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/move_bots.dir/grSim_Commands.pb.cc.o -c /home/adrian/code/robocup_soccer_2020/move_robots/build/grSim_Commands.pb.cc
 
 CMakeFiles/move_bots.dir/grSim_Commands.pb.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/move_bots.dir/grSim_Commands.pb.cc.i"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/mtan/robocup_packages/move_robots/build/grSim_Commands.pb.cc > CMakeFiles/move_bots.dir/grSim_Commands.pb.cc.i
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/adrian/code/robocup_soccer_2020/move_robots/build/grSim_Commands.pb.cc > CMakeFiles/move_bots.dir/grSim_Commands.pb.cc.i
 
 CMakeFiles/move_bots.dir/grSim_Commands.pb.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/move_bots.dir/grSim_Commands.pb.cc.s"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/mtan/robocup_packages/move_robots/build/grSim_Commands.pb.cc -o CMakeFiles/move_bots.dir/grSim_Commands.pb.cc.s
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/adrian/code/robocup_soccer_2020/move_robots/build/grSim_Commands.pb.cc -o CMakeFiles/move_bots.dir/grSim_Commands.pb.cc.s
 
 CMakeFiles/move_bots.dir/grSim_Commands.pb.cc.o.requires:
 
@@ -203,16 +203,16 @@ CMakeFiles/move_bots.dir/grSim_Commands.pb.cc.o.provides.build: CMakeFiles/move_
 
 CMakeFiles/move_bots.dir/grSim_Packet.pb.cc.o: CMakeFiles/move_bots.dir/flags.make
 CMakeFiles/move_bots.dir/grSim_Packet.pb.cc.o: grSim_Packet.pb.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mtan/robocup_packages/move_robots/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building CXX object CMakeFiles/move_bots.dir/grSim_Packet.pb.cc.o"
-	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/move_bots.dir/grSim_Packet.pb.cc.o -c /home/mtan/robocup_packages/move_robots/build/grSim_Packet.pb.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/adrian/code/robocup_soccer_2020/move_robots/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building CXX object CMakeFiles/move_bots.dir/grSim_Packet.pb.cc.o"
+	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/move_bots.dir/grSim_Packet.pb.cc.o -c /home/adrian/code/robocup_soccer_2020/move_robots/build/grSim_Packet.pb.cc
 
 CMakeFiles/move_bots.dir/grSim_Packet.pb.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/move_bots.dir/grSim_Packet.pb.cc.i"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/mtan/robocup_packages/move_robots/build/grSim_Packet.pb.cc > CMakeFiles/move_bots.dir/grSim_Packet.pb.cc.i
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/adrian/code/robocup_soccer_2020/move_robots/build/grSim_Packet.pb.cc > CMakeFiles/move_bots.dir/grSim_Packet.pb.cc.i
 
 CMakeFiles/move_bots.dir/grSim_Packet.pb.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/move_bots.dir/grSim_Packet.pb.cc.s"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/mtan/robocup_packages/move_robots/build/grSim_Packet.pb.cc -o CMakeFiles/move_bots.dir/grSim_Packet.pb.cc.s
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/adrian/code/robocup_soccer_2020/move_robots/build/grSim_Packet.pb.cc -o CMakeFiles/move_bots.dir/grSim_Packet.pb.cc.s
 
 CMakeFiles/move_bots.dir/grSim_Packet.pb.cc.o.requires:
 
@@ -227,16 +227,16 @@ CMakeFiles/move_bots.dir/grSim_Packet.pb.cc.o.provides.build: CMakeFiles/move_bo
 
 CMakeFiles/move_bots.dir/grSim_Replacement.pb.cc.o: CMakeFiles/move_bots.dir/flags.make
 CMakeFiles/move_bots.dir/grSim_Replacement.pb.cc.o: grSim_Replacement.pb.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mtan/robocup_packages/move_robots/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building CXX object CMakeFiles/move_bots.dir/grSim_Replacement.pb.cc.o"
-	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/move_bots.dir/grSim_Replacement.pb.cc.o -c /home/mtan/robocup_packages/move_robots/build/grSim_Replacement.pb.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/adrian/code/robocup_soccer_2020/move_robots/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building CXX object CMakeFiles/move_bots.dir/grSim_Replacement.pb.cc.o"
+	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/move_bots.dir/grSim_Replacement.pb.cc.o -c /home/adrian/code/robocup_soccer_2020/move_robots/build/grSim_Replacement.pb.cc
 
 CMakeFiles/move_bots.dir/grSim_Replacement.pb.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/move_bots.dir/grSim_Replacement.pb.cc.i"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/mtan/robocup_packages/move_robots/build/grSim_Replacement.pb.cc > CMakeFiles/move_bots.dir/grSim_Replacement.pb.cc.i
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/adrian/code/robocup_soccer_2020/move_robots/build/grSim_Replacement.pb.cc > CMakeFiles/move_bots.dir/grSim_Replacement.pb.cc.i
 
 CMakeFiles/move_bots.dir/grSim_Replacement.pb.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/move_bots.dir/grSim_Replacement.pb.cc.s"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/mtan/robocup_packages/move_robots/build/grSim_Replacement.pb.cc -o CMakeFiles/move_bots.dir/grSim_Replacement.pb.cc.s
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/adrian/code/robocup_soccer_2020/move_robots/build/grSim_Replacement.pb.cc -o CMakeFiles/move_bots.dir/grSim_Replacement.pb.cc.s
 
 CMakeFiles/move_bots.dir/grSim_Replacement.pb.cc.o.requires:
 
@@ -251,16 +251,16 @@ CMakeFiles/move_bots.dir/grSim_Replacement.pb.cc.o.provides.build: CMakeFiles/mo
 
 CMakeFiles/move_bots.dir/messages_robocup_ssl_detection.pb.cc.o: CMakeFiles/move_bots.dir/flags.make
 CMakeFiles/move_bots.dir/messages_robocup_ssl_detection.pb.cc.o: messages_robocup_ssl_detection.pb.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mtan/robocup_packages/move_robots/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Building CXX object CMakeFiles/move_bots.dir/messages_robocup_ssl_detection.pb.cc.o"
-	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/move_bots.dir/messages_robocup_ssl_detection.pb.cc.o -c /home/mtan/robocup_packages/move_robots/build/messages_robocup_ssl_detection.pb.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/adrian/code/robocup_soccer_2020/move_robots/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Building CXX object CMakeFiles/move_bots.dir/messages_robocup_ssl_detection.pb.cc.o"
+	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/move_bots.dir/messages_robocup_ssl_detection.pb.cc.o -c /home/adrian/code/robocup_soccer_2020/move_robots/build/messages_robocup_ssl_detection.pb.cc
 
 CMakeFiles/move_bots.dir/messages_robocup_ssl_detection.pb.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/move_bots.dir/messages_robocup_ssl_detection.pb.cc.i"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/mtan/robocup_packages/move_robots/build/messages_robocup_ssl_detection.pb.cc > CMakeFiles/move_bots.dir/messages_robocup_ssl_detection.pb.cc.i
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/adrian/code/robocup_soccer_2020/move_robots/build/messages_robocup_ssl_detection.pb.cc > CMakeFiles/move_bots.dir/messages_robocup_ssl_detection.pb.cc.i
 
 CMakeFiles/move_bots.dir/messages_robocup_ssl_detection.pb.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/move_bots.dir/messages_robocup_ssl_detection.pb.cc.s"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/mtan/robocup_packages/move_robots/build/messages_robocup_ssl_detection.pb.cc -o CMakeFiles/move_bots.dir/messages_robocup_ssl_detection.pb.cc.s
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/adrian/code/robocup_soccer_2020/move_robots/build/messages_robocup_ssl_detection.pb.cc -o CMakeFiles/move_bots.dir/messages_robocup_ssl_detection.pb.cc.s
 
 CMakeFiles/move_bots.dir/messages_robocup_ssl_detection.pb.cc.o.requires:
 
@@ -275,16 +275,16 @@ CMakeFiles/move_bots.dir/messages_robocup_ssl_detection.pb.cc.o.provides.build: 
 
 CMakeFiles/move_bots.dir/messages_robocup_ssl_geometry.pb.cc.o: CMakeFiles/move_bots.dir/flags.make
 CMakeFiles/move_bots.dir/messages_robocup_ssl_geometry.pb.cc.o: messages_robocup_ssl_geometry.pb.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mtan/robocup_packages/move_robots/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Building CXX object CMakeFiles/move_bots.dir/messages_robocup_ssl_geometry.pb.cc.o"
-	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/move_bots.dir/messages_robocup_ssl_geometry.pb.cc.o -c /home/mtan/robocup_packages/move_robots/build/messages_robocup_ssl_geometry.pb.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/adrian/code/robocup_soccer_2020/move_robots/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Building CXX object CMakeFiles/move_bots.dir/messages_robocup_ssl_geometry.pb.cc.o"
+	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/move_bots.dir/messages_robocup_ssl_geometry.pb.cc.o -c /home/adrian/code/robocup_soccer_2020/move_robots/build/messages_robocup_ssl_geometry.pb.cc
 
 CMakeFiles/move_bots.dir/messages_robocup_ssl_geometry.pb.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/move_bots.dir/messages_robocup_ssl_geometry.pb.cc.i"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/mtan/robocup_packages/move_robots/build/messages_robocup_ssl_geometry.pb.cc > CMakeFiles/move_bots.dir/messages_robocup_ssl_geometry.pb.cc.i
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/adrian/code/robocup_soccer_2020/move_robots/build/messages_robocup_ssl_geometry.pb.cc > CMakeFiles/move_bots.dir/messages_robocup_ssl_geometry.pb.cc.i
 
 CMakeFiles/move_bots.dir/messages_robocup_ssl_geometry.pb.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/move_bots.dir/messages_robocup_ssl_geometry.pb.cc.s"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/mtan/robocup_packages/move_robots/build/messages_robocup_ssl_geometry.pb.cc -o CMakeFiles/move_bots.dir/messages_robocup_ssl_geometry.pb.cc.s
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/adrian/code/robocup_soccer_2020/move_robots/build/messages_robocup_ssl_geometry.pb.cc -o CMakeFiles/move_bots.dir/messages_robocup_ssl_geometry.pb.cc.s
 
 CMakeFiles/move_bots.dir/messages_robocup_ssl_geometry.pb.cc.o.requires:
 
@@ -299,16 +299,16 @@ CMakeFiles/move_bots.dir/messages_robocup_ssl_geometry.pb.cc.o.provides.build: C
 
 CMakeFiles/move_bots.dir/messages_robocup_ssl_geometry_legacy.pb.cc.o: CMakeFiles/move_bots.dir/flags.make
 CMakeFiles/move_bots.dir/messages_robocup_ssl_geometry_legacy.pb.cc.o: messages_robocup_ssl_geometry_legacy.pb.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mtan/robocup_packages/move_robots/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_17) "Building CXX object CMakeFiles/move_bots.dir/messages_robocup_ssl_geometry_legacy.pb.cc.o"
-	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/move_bots.dir/messages_robocup_ssl_geometry_legacy.pb.cc.o -c /home/mtan/robocup_packages/move_robots/build/messages_robocup_ssl_geometry_legacy.pb.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/adrian/code/robocup_soccer_2020/move_robots/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_17) "Building CXX object CMakeFiles/move_bots.dir/messages_robocup_ssl_geometry_legacy.pb.cc.o"
+	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/move_bots.dir/messages_robocup_ssl_geometry_legacy.pb.cc.o -c /home/adrian/code/robocup_soccer_2020/move_robots/build/messages_robocup_ssl_geometry_legacy.pb.cc
 
 CMakeFiles/move_bots.dir/messages_robocup_ssl_geometry_legacy.pb.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/move_bots.dir/messages_robocup_ssl_geometry_legacy.pb.cc.i"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/mtan/robocup_packages/move_robots/build/messages_robocup_ssl_geometry_legacy.pb.cc > CMakeFiles/move_bots.dir/messages_robocup_ssl_geometry_legacy.pb.cc.i
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/adrian/code/robocup_soccer_2020/move_robots/build/messages_robocup_ssl_geometry_legacy.pb.cc > CMakeFiles/move_bots.dir/messages_robocup_ssl_geometry_legacy.pb.cc.i
 
 CMakeFiles/move_bots.dir/messages_robocup_ssl_geometry_legacy.pb.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/move_bots.dir/messages_robocup_ssl_geometry_legacy.pb.cc.s"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/mtan/robocup_packages/move_robots/build/messages_robocup_ssl_geometry_legacy.pb.cc -o CMakeFiles/move_bots.dir/messages_robocup_ssl_geometry_legacy.pb.cc.s
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/adrian/code/robocup_soccer_2020/move_robots/build/messages_robocup_ssl_geometry_legacy.pb.cc -o CMakeFiles/move_bots.dir/messages_robocup_ssl_geometry_legacy.pb.cc.s
 
 CMakeFiles/move_bots.dir/messages_robocup_ssl_geometry_legacy.pb.cc.o.requires:
 
@@ -323,16 +323,16 @@ CMakeFiles/move_bots.dir/messages_robocup_ssl_geometry_legacy.pb.cc.o.provides.b
 
 CMakeFiles/move_bots.dir/messages_robocup_ssl_refbox_log.pb.cc.o: CMakeFiles/move_bots.dir/flags.make
 CMakeFiles/move_bots.dir/messages_robocup_ssl_refbox_log.pb.cc.o: messages_robocup_ssl_refbox_log.pb.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mtan/robocup_packages/move_robots/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_18) "Building CXX object CMakeFiles/move_bots.dir/messages_robocup_ssl_refbox_log.pb.cc.o"
-	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/move_bots.dir/messages_robocup_ssl_refbox_log.pb.cc.o -c /home/mtan/robocup_packages/move_robots/build/messages_robocup_ssl_refbox_log.pb.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/adrian/code/robocup_soccer_2020/move_robots/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_18) "Building CXX object CMakeFiles/move_bots.dir/messages_robocup_ssl_refbox_log.pb.cc.o"
+	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/move_bots.dir/messages_robocup_ssl_refbox_log.pb.cc.o -c /home/adrian/code/robocup_soccer_2020/move_robots/build/messages_robocup_ssl_refbox_log.pb.cc
 
 CMakeFiles/move_bots.dir/messages_robocup_ssl_refbox_log.pb.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/move_bots.dir/messages_robocup_ssl_refbox_log.pb.cc.i"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/mtan/robocup_packages/move_robots/build/messages_robocup_ssl_refbox_log.pb.cc > CMakeFiles/move_bots.dir/messages_robocup_ssl_refbox_log.pb.cc.i
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/adrian/code/robocup_soccer_2020/move_robots/build/messages_robocup_ssl_refbox_log.pb.cc > CMakeFiles/move_bots.dir/messages_robocup_ssl_refbox_log.pb.cc.i
 
 CMakeFiles/move_bots.dir/messages_robocup_ssl_refbox_log.pb.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/move_bots.dir/messages_robocup_ssl_refbox_log.pb.cc.s"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/mtan/robocup_packages/move_robots/build/messages_robocup_ssl_refbox_log.pb.cc -o CMakeFiles/move_bots.dir/messages_robocup_ssl_refbox_log.pb.cc.s
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/adrian/code/robocup_soccer_2020/move_robots/build/messages_robocup_ssl_refbox_log.pb.cc -o CMakeFiles/move_bots.dir/messages_robocup_ssl_refbox_log.pb.cc.s
 
 CMakeFiles/move_bots.dir/messages_robocup_ssl_refbox_log.pb.cc.o.requires:
 
@@ -347,16 +347,16 @@ CMakeFiles/move_bots.dir/messages_robocup_ssl_refbox_log.pb.cc.o.provides.build:
 
 CMakeFiles/move_bots.dir/messages_robocup_ssl_wrapper.pb.cc.o: CMakeFiles/move_bots.dir/flags.make
 CMakeFiles/move_bots.dir/messages_robocup_ssl_wrapper.pb.cc.o: messages_robocup_ssl_wrapper.pb.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mtan/robocup_packages/move_robots/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_19) "Building CXX object CMakeFiles/move_bots.dir/messages_robocup_ssl_wrapper.pb.cc.o"
-	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/move_bots.dir/messages_robocup_ssl_wrapper.pb.cc.o -c /home/mtan/robocup_packages/move_robots/build/messages_robocup_ssl_wrapper.pb.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/adrian/code/robocup_soccer_2020/move_robots/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_19) "Building CXX object CMakeFiles/move_bots.dir/messages_robocup_ssl_wrapper.pb.cc.o"
+	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/move_bots.dir/messages_robocup_ssl_wrapper.pb.cc.o -c /home/adrian/code/robocup_soccer_2020/move_robots/build/messages_robocup_ssl_wrapper.pb.cc
 
 CMakeFiles/move_bots.dir/messages_robocup_ssl_wrapper.pb.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/move_bots.dir/messages_robocup_ssl_wrapper.pb.cc.i"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/mtan/robocup_packages/move_robots/build/messages_robocup_ssl_wrapper.pb.cc > CMakeFiles/move_bots.dir/messages_robocup_ssl_wrapper.pb.cc.i
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/adrian/code/robocup_soccer_2020/move_robots/build/messages_robocup_ssl_wrapper.pb.cc > CMakeFiles/move_bots.dir/messages_robocup_ssl_wrapper.pb.cc.i
 
 CMakeFiles/move_bots.dir/messages_robocup_ssl_wrapper.pb.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/move_bots.dir/messages_robocup_ssl_wrapper.pb.cc.s"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/mtan/robocup_packages/move_robots/build/messages_robocup_ssl_wrapper.pb.cc -o CMakeFiles/move_bots.dir/messages_robocup_ssl_wrapper.pb.cc.s
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/adrian/code/robocup_soccer_2020/move_robots/build/messages_robocup_ssl_wrapper.pb.cc -o CMakeFiles/move_bots.dir/messages_robocup_ssl_wrapper.pb.cc.s
 
 CMakeFiles/move_bots.dir/messages_robocup_ssl_wrapper.pb.cc.o.requires:
 
@@ -371,16 +371,16 @@ CMakeFiles/move_bots.dir/messages_robocup_ssl_wrapper.pb.cc.o.provides.build: CM
 
 CMakeFiles/move_bots.dir/messages_robocup_ssl_wrapper_legacy.pb.cc.o: CMakeFiles/move_bots.dir/flags.make
 CMakeFiles/move_bots.dir/messages_robocup_ssl_wrapper_legacy.pb.cc.o: messages_robocup_ssl_wrapper_legacy.pb.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mtan/robocup_packages/move_robots/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_20) "Building CXX object CMakeFiles/move_bots.dir/messages_robocup_ssl_wrapper_legacy.pb.cc.o"
-	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/move_bots.dir/messages_robocup_ssl_wrapper_legacy.pb.cc.o -c /home/mtan/robocup_packages/move_robots/build/messages_robocup_ssl_wrapper_legacy.pb.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/adrian/code/robocup_soccer_2020/move_robots/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_20) "Building CXX object CMakeFiles/move_bots.dir/messages_robocup_ssl_wrapper_legacy.pb.cc.o"
+	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/move_bots.dir/messages_robocup_ssl_wrapper_legacy.pb.cc.o -c /home/adrian/code/robocup_soccer_2020/move_robots/build/messages_robocup_ssl_wrapper_legacy.pb.cc
 
 CMakeFiles/move_bots.dir/messages_robocup_ssl_wrapper_legacy.pb.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/move_bots.dir/messages_robocup_ssl_wrapper_legacy.pb.cc.i"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/mtan/robocup_packages/move_robots/build/messages_robocup_ssl_wrapper_legacy.pb.cc > CMakeFiles/move_bots.dir/messages_robocup_ssl_wrapper_legacy.pb.cc.i
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/adrian/code/robocup_soccer_2020/move_robots/build/messages_robocup_ssl_wrapper_legacy.pb.cc > CMakeFiles/move_bots.dir/messages_robocup_ssl_wrapper_legacy.pb.cc.i
 
 CMakeFiles/move_bots.dir/messages_robocup_ssl_wrapper_legacy.pb.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/move_bots.dir/messages_robocup_ssl_wrapper_legacy.pb.cc.s"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/mtan/robocup_packages/move_robots/build/messages_robocup_ssl_wrapper_legacy.pb.cc -o CMakeFiles/move_bots.dir/messages_robocup_ssl_wrapper_legacy.pb.cc.s
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/adrian/code/robocup_soccer_2020/move_robots/build/messages_robocup_ssl_wrapper_legacy.pb.cc -o CMakeFiles/move_bots.dir/messages_robocup_ssl_wrapper_legacy.pb.cc.s
 
 CMakeFiles/move_bots.dir/messages_robocup_ssl_wrapper_legacy.pb.cc.o.requires:
 
@@ -422,9 +422,9 @@ move_bots: CMakeFiles/move_bots.dir/messages_robocup_ssl_refbox_log.pb.cc.o
 move_bots: CMakeFiles/move_bots.dir/messages_robocup_ssl_wrapper.pb.cc.o
 move_bots: CMakeFiles/move_bots.dir/messages_robocup_ssl_wrapper_legacy.pb.cc.o
 move_bots: CMakeFiles/move_bots.dir/build.make
-move_bots: /usr/local/lib/libprotobuf.so
+move_bots: /usr/lib/x86_64-linux-gnu/libprotobuf.so
 move_bots: CMakeFiles/move_bots.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/mtan/robocup_packages/move_robots/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_21) "Linking CXX executable move_bots"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/adrian/code/robocup_soccer_2020/move_robots/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_21) "Linking CXX executable move_bots"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/move_bots.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -468,6 +468,6 @@ CMakeFiles/move_bots.dir/depend: messages_robocup_ssl_wrapper.pb.cc
 CMakeFiles/move_bots.dir/depend: messages_robocup_ssl_wrapper.pb.h
 CMakeFiles/move_bots.dir/depend: messages_robocup_ssl_wrapper_legacy.pb.cc
 CMakeFiles/move_bots.dir/depend: messages_robocup_ssl_wrapper_legacy.pb.h
-	cd /home/mtan/robocup_packages/move_robots/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/mtan/robocup_packages/move_robots /home/mtan/robocup_packages/move_robots /home/mtan/robocup_packages/move_robots/build /home/mtan/robocup_packages/move_robots/build /home/mtan/robocup_packages/move_robots/build/CMakeFiles/move_bots.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/adrian/code/robocup_soccer_2020/move_robots/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/adrian/code/robocup_soccer_2020/move_robots /home/adrian/code/robocup_soccer_2020/move_robots /home/adrian/code/robocup_soccer_2020/move_robots/build /home/adrian/code/robocup_soccer_2020/move_robots/build /home/adrian/code/robocup_soccer_2020/move_robots/build/CMakeFiles/move_bots.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/move_bots.dir/depend
 
