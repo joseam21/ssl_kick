@@ -3,7 +3,7 @@
 
 void BasicOffense::robots(){
     pose *p = ourRobots();
-    for (int n=0; n<6; n++) {
+    for (int n=0; n<6; n++) { //TODO: generalize for more than 6 robots
         us[n] = p[n];
     } 
 };
@@ -46,4 +46,3 @@ int BasicOffense::canPass(){
     }
     return 7;
 }
-
