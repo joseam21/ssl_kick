@@ -1,7 +1,8 @@
-cmake_minimum_required (VERSION 2.6)
+cmake_minimum_required (VERSION 3.1)
 project (RoboCup_Strategy)
 
 # The version number.
+set (CMAKE_CXX_STANDARD 11)
 set (RoboCup_Strategy_VERSION_MAJOR 1)
 set (RoboCup_Strategy_VERSION_MINOR 0)
 
