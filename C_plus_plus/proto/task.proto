@@ -1,0 +1,9 @@
+syntax = "proto2";
+
+package strategy;
+
+message Task{
+    required string action = 1;
+    required float xloc = 2;
+    required float yloc = 3;
+}
