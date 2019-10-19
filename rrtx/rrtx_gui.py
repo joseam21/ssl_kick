@@ -8,6 +8,8 @@ import matplotlib.pyplot as plt
 from Node import Node
 from queue import Queue, PriorityQueue
 
+# Here's the paper where we got this from: http://srl.informatik.uni-freiburg.de/teachingdir/ss15/otteWAFR14.pdf
+
 class GUI:
     @staticmethod
     def drawRedCircle(x, y):
@@ -70,8 +72,6 @@ class RRTX:
                           random.randint(0, self.map_height))
         self.robot = self.start
 
-        #self.goal = Node(random.randint(0, self.map_width),
-        #                 random.randint(0, self.map_height))
         self.goal = Node(width // 2, height // 2)
         self.goal.g = 0
         self.goal.lmc = 0
@@ -83,11 +83,6 @@ class RRTX:
         self.orphans = set()
         self.O = set()
         self.Q = PriorityQueue()
-
-        for i in range(10):
-            point = self.getRandomPoint()
-            if point.distance(self.start) > 30 and point.distance(self.goal) > 30:
-                self.O.add(point)
 
     def drawObstacles(self):
         for obs in self.O:
@@ -201,11 +196,8 @@ class RRTX:
             for u in (v.incoming_0 | v.incoming_r) - {v.parent}:
                 if u.lmc > self.distance(u, v) + v.lmc:
                     self.makeParentOf(u, v)
-                    print("u.lmc, u.g : ", u.lmc, u.g)
                     if u.g - u.lmc > self.eps:
-                        print("Queued ", u.getCoords())
                         self.verifyQueue(u)
-        print('='*50)
 
     def getBotCondition(self):
         top = self.Q.get()
@@ -220,13 +212,10 @@ class RRTX:
     def reduceInconsistency(self):
         while (not self.Q.empty()) and self.getBotCondition():
             _, _, v = self.Q.get()
-            print("Lookin at ", v.getCoords(), v.g - v.lmc)
             if v.g - v.lmc > self.eps:
                 self.updateLMC(v)
-                print("new lmc: ", v.lmc)
                 self.rewireNeighbors(v)
             v.g = v.lmc
-        #print('='*50)
 
     def possiblePath(self, v, u, obstacles):
         x1, y1 = v.getCoords()
@@ -410,15 +399,28 @@ def run_RRT():
     #r = RRTX(width, height)
     cont = True
     i = 0
-    while i < 2500:
+    while i < 3000:
         i += 1
         r.step()
         print(i)
-    #r.step(add_point=r.robot)
 
     r.drawObstacles()
     r.drawTree()
-    #r.drawPathToGoal()
+
+def add_obstacles():
+    canvas.delete("all")
+    new_obs = set()
+    for i in range(10):
+        point = r.getRandomPoint()
+        if point.distance(r.start) > 30 and point.distance(r.goal) > 30:
+            new_obs.add(point)
+
+    r.updateObstacles(set(), new_obs)
+    print('updated')
+    r.drawObstacles()
+    print('obs drawn')
+    r.drawTree()
+    print('tree drawn')
 
 def change_obstacles():
     canvas.delete("all")
@@ -435,12 +437,13 @@ def change_obstacles():
     r.drawObstacles()
     print('obs drawn')
     r.drawTree()
-    #r.drawPathToGoal()
     print('tree drawn')
 
 button = tkinter.Button(top, text="Restart", command=run_RRT)
 button.pack()
-button2 = tkinter.Button(top, text="Move Obs", command=change_obstacles)
+button2 = tkinter.Button(top, text="Add Obs", command=add_obstacles)
 button2.pack()
+button3 = tkinter.Button(top, text="Move Obs", command=change_obstacles)
+button3.pack()
 top.mainloop()
 
