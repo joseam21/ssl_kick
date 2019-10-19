@@ -20,7 +20,7 @@ message ("PROTO_CPP = ${PROTO_CPP}")
 message ("PROTO_H = ${PROTO_H}")
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-add_executable(move_bots move.cpp network.cpp ${PROTO_CPP} ${PROTO_H})
+add_executable(move_bots move.cpp network.cpp robotFSM.cpp netraw.cpp robocup_ssl_client.cpp main.cpp ${PROTO_CPP} ${PROTO_H})
 
 target_include_directories(move_bots
     PUBLIC
