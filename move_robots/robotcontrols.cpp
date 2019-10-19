@@ -1,26 +1,61 @@
-/*
-#include <stdio.h>
-#include "timer.h"
-
-#include "robocup_ssl_client.h"
-
-#include "messages_robocup_ssl_detection.pb.h"
-#include "messages_robocup_ssl_geometry.pb.h"
-#include "messages_robocup_ssl_wrapper.pb.h"
-#include "grSim_Packet.pb.h"
-#include "grSim_Commands.pb.h"
-#include "grSim_Replacement.pb.h"
-#include "robotFSM.h"
-#include <thread>
-#include <utility>
-#include <unistd.h>
-#include <iostream>*/
 #include "robotcontrols.h"
 
-/*
-//this is the thread to update the vision information of the board, received from the vision multicast port of the simulator
-void updateRobotsThread(RoboCupSSLClient & client, RobotFSM * yellowRobots, RobotFSM * blueRobots, std::pair<float,float> &ballloc)
+
+
+RobotFSM RobotControls::yellowRobots[] = {RobotFSM(),RobotFSM(),RobotFSM(),RobotFSM(),RobotFSM(),RobotFSM()};
+RobotFSM RobotControls::blueRobots[]= {RobotFSM(),RobotFSM(),RobotFSM(),RobotFSM(),RobotFSM(),RobotFSM()};
+deque<std::pair<float,float>> RobotControls::ballloc = deque<std::pair<float,float>>();
+deque<float> RobotControls::balltime = deque<float>();
+
+
+RobotControls::RobotControls()
 {
+    // setup the robots   
+    
+    for(int i = 0; i < 6; i++){
+        yellowRobots[i].set_id(i);
+        yellowRobots[i].set_isYellow(true);
+        blueRobots[i].set_id(i);
+        blueRobots[i].set_isYellow(false);
+    }
+}
+
+void RobotControls::go()
+{
+    std::thread t1(updateRobotsThread);
+    std::thread t2(sendRobotCommandThread);
+    std::thread t3(setRobotStateThread);
+    t1.join();
+    t2.join();
+    t3.join();
+}
+
+RobotFSM& RobotControls::getRobot(bool isYellow, int id)
+{
+    if(isYellow)
+    {
+        return yellowRobots[id];
+    }
+    else{
+        return blueRobots[id];
+    }
+}
+
+std::pair<float,float> RobotControls::getCurrentBallLoc()
+{
+    return ballloc.front();
+}
+
+std::pair<float,float> RobotControls::getCurrentBallSpeed()
+{
+    return std::make_pair((ballloc[0].first-ballloc[1].first)/(balltime[0]-balltime[1]),
+            (ballloc[0].second-ballloc[1].second)/(balltime[0]-balltime[1]));
+}
+
+void RobotControls::updateRobotsThread()
+{
+    RoboCupSSLClient client;
+    client.open(true);
     SSL_WrapperPacket packet;
     while(true)
     {
@@ -32,8 +67,7 @@ void updateRobotsThread(RoboCupSSLClient & client, RobotFSM * yellowRobots, Robo
                 if(detection.balls_size() > 0)
                 {
                     SSL_DetectionBall ball = detection.balls(0);
-                    ballloc.first = ball.x();
-                    ballloc.second = ball.y();
+                    ballloc.push_front(std::make_pair(ball.x(),ball.y()));
                 }
                 int num_blue_robots = detection.robots_blue_size();
                 int num_yellow_robots = detection.robots_yellow_size();
@@ -49,12 +83,9 @@ void updateRobotsThread(RoboCupSSLClient & client, RobotFSM * yellowRobots, Robo
                 {
                     const SSL_DetectionRobot& robot = detection.robots_yellow(i);
                     int id = robot.robot_id();
-                    //printf(" %d,",id);
-                    //fflush(stdout);
                     yellowRobots[id].update_x(robot.x());
                     yellowRobots[id].update_y(robot.y());
                     yellowRobots[id].update_angle(robot.orientation());
-                    //printf("%f\n",robot.orientation());
                 }
             }
             // it's possible for the packet to have geometry information about the field, but for the most part we assume the field is correct and constant, so we have no use for the information
@@ -62,8 +93,7 @@ void updateRobotsThread(RoboCupSSLClient & client, RobotFSM * yellowRobots, Robo
     }
 }
 
-//this is the thread for each robot to send their action to the simulator depending on their robotState
-void sendRobotCommandThread(RobotFSM * yellowRobots, RobotFSM * blueRobots)
+void RobotControls::sendRobotCommandThread()
 {
     while(true)
     {
@@ -76,8 +106,7 @@ void sendRobotCommandThread(RobotFSM * yellowRobots, RobotFSM * blueRobots)
     }
 }
 
-//this is the thread to modify the robot states, depending on 
-void setRobotStateThread(RobotFSM * yellowRobots, RobotFSM * blueRobots, pair<float,float> & ballloc)
+void RobotControls::setRobotStateThread()
 {
     usleep(1000000); // in microseconds
     for(int i = 0; i < 6; i++){
@@ -118,35 +147,3 @@ void setRobotStateThread(RobotFSM * yellowRobots, RobotFSM * blueRobots, pair<fl
     }
     usleep(100000000);
 }
-*/
-int main(int argc, char *argv[])
-{
-    (void)argc;
-    (void)argv;
-
-    RobotControls robotControls;
-    robotControls.go();
-    /*
-    //printf("Hello\n");
-    //fflush(stdout);
-    RobotFSM yellowRobots[6];
-    RobotFSM blueRobots[6];
-    for(int i = 1; i <= 6; i++){
-        yellowRobots[i-1].set_id(i-1);
-        yellowRobots[i-1].set_isYellow(true);
-        blueRobots[i-1].set_id(i-1);
-        blueRobots[i-1].set_isYellow(false);
-    }
-    std::pair<float,float> ballloc;
-    RoboCupSSLClient client;
-    client.open(true);
-    //updateRobotsThread(client,yellowRobots,blueRobots,ballloc);
-    std::thread t1(updateRobotsThread,std::ref(client),yellowRobots,blueRobots,std::ref(ballloc));
-    std::thread t2(sendRobotCommandThread,yellowRobots,blueRobots);
-    std:;thread t3(setRobotStateThread,yellowRobots,blueRobots,std::ref(ballloc));
-    t1.join();
-    t2.join();
-    t3.join();
-    */
-}
-
