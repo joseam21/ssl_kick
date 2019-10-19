@@ -6,7 +6,10 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 from Node import Node
-from queue import Queue, PriorityQueue
+#from queue import Queue, PriorityQueue
+from MinHeap import MinHeap
+
+# Here's the paper where we got this from: http://srl.informatik.uni-freiburg.de/teachingdir/ss15/otteWAFR14.pdf
 
 class GUI:
     @staticmethod
@@ -70,8 +73,6 @@ class RRTX:
                           random.randint(0, self.map_height))
         self.robot = self.start
 
-        #self.goal = Node(random.randint(0, self.map_width),
-        #                 random.randint(0, self.map_height))
         self.goal = Node(width // 2, height // 2)
         self.goal.g = 0
         self.goal.lmc = 0
@@ -82,18 +83,20 @@ class RRTX:
         self.V = {self.goal}
         self.orphans = set()
         self.O = set()
-        self.Q = PriorityQueue()
-
-        for i in range(10):
-            point = self.getRandomPoint()
-            if point.distance(self.start) > 30 and point.distance(self.goal) > 30:
-                self.O.add(point)
+        self.Q = MinHeap()
 
     def drawObstacles(self):
+        """
+        Draws all the obstacles on the GUI
+        """
         for obs in self.O:
             GUI.drawPinkCircle(*obs.getIntCoords())
 
     def getRandomPoint(self):
+        """
+        Generates a random point that does not collide with
+        an obstacle
+        """
         q = Node(random.randint(0, self.map_width),
                  random.randint(0, self.map_height))
 
@@ -104,6 +107,9 @@ class RRTX:
         return q
 
     def validNode(self, q):
+        """
+        Checks if a point is in the map and not inside an obstacle
+        """
         if 0 <= q.xcor < self.map_width and 0 <= q.ycor < self.map_height:
             for obstacle in self.O:
                 if q.distance(obstacle) <= 30:
@@ -113,6 +119,10 @@ class RRTX:
             return False
 
     def step(self, obs_change=None, add_point=None):
+        """
+        Adds a point to the RRT, and updates the obstacles if there
+        was a change
+        """
         if obs_change:
             self.updateObstacles(obs_change[0], obs_change[1])
 
@@ -133,6 +143,9 @@ class RRTX:
             self.reduceInconsistency()
 
     def nearest(self, v):
+        """
+        Finds the nearest node to the input node v
+        """
         nearest = None
         best_dist = float('inf')
 
@@ -144,6 +157,10 @@ class RRTX:
         return nearest
 
     def saturate(self, v, v_nearest):
+        """
+        Shifts the location of v so that it is self.delta away
+        from v_nearest, but still in the same direction
+        """
         heading = math.degrees(math.atan2(v.ycor - v_nearest.ycor,
                                           v.xcor - v_nearest.xcor))
 
@@ -151,6 +168,9 @@ class RRTX:
         v.ycor = v_nearest.ycor + self.delta*math.sin(heading)
 
     def near(self, v, r):
+        """
+        Returns a set of all the nodes within radius r of node v
+        """
         near_nodes = set()
         for node in self.V:
             if v.distance(node) <= r:
@@ -158,6 +178,10 @@ class RRTX:
         return near_nodes
 
     def extend(self, v, r):
+        """
+        First determines if v can be added to the RRT. If it can be
+        added, it inserts v in to the RRT
+        """
         V_near = self.near(v, r)
         self.findParent(v, V_near)
         if v.parent == None:
@@ -177,12 +201,19 @@ class RRTX:
                 v.incoming_r.add(u)
 
     def cullNeighbors(self, v, r):
+        """
+        Removes all neighbors of v that are now more than
+        a radius r away
+        """
         for u in v.outgoing_r.copy():
             if r < v.distance(u) and v.parent != u:
                 v.outgoing_r.remove(u)
                 u.incoming_r.remove(v)
 
     def makeParentOf(self, v, u):
+        """
+        Makes the node u the parent of node v
+        """
         if v.parent != None:
             v.parent.children.remove(v)
 
@@ -191,25 +222,32 @@ class RRTX:
         v.lmc = self.distance(v, u) + u.lmc
 
     def distance(self, v, u):
+        """
+        Returns the Euclidean distance between v and u, but
+        returns infinity if there is an obstacle in the way
+        """
         if self.possiblePath(v, u, self.O):
             return v.distance(u)
         return float('inf')
 
     def rewireNeighbors(self, v):
+        """
+        Rewires the RRT to use the new lmc value of node v
+        """
         if v.g - v.lmc > self.eps:
             self.cullNeighbors(v, self.r)
             for u in (v.incoming_0 | v.incoming_r) - {v.parent}:
                 if u.lmc > self.distance(u, v) + v.lmc:
                     self.makeParentOf(u, v)
-                    print("u.lmc, u.g : ", u.lmc, u.g)
                     if u.g - u.lmc > self.eps:
-                        print("Queued ", u.getCoords())
                         self.verifyQueue(u)
-        print('='*50)
 
     def getBotCondition(self):
-        top = self.Q.get()
-        self.Q.put(top)
+        """
+        Returns the inconsistency conditions that depend on the robot's
+        location
+        """
+        top = self.Q.getMin()
         robot_key = (min(self.robot.g, self.robot.lmc), self.robot.g, self.robot)
         bot_condition = (self.robot.g != self.robot.lmc or
                          self.robot.g == float('inf') or
@@ -218,17 +256,23 @@ class RRTX:
         return bot_condition
 
     def reduceInconsistency(self):
-        while (not self.Q.empty()) and self.getBotCondition():
-            _, _, v = self.Q.get()
-            print("Lookin at ", v.getCoords(), v.g - v.lmc)
+        """
+        While the graph is not self.epsilon-consistent: it fetches a node,
+        it updates the node's lmc, rewires the neighbors, and makes that node
+        0-consistent
+        """
+        while len(self.Q) > 0 and self.getBotCondition():
+            _, _, v = self.Q.extractMin()
             if v.g - v.lmc > self.eps:
                 self.updateLMC(v)
-                print("new lmc: ", v.lmc)
                 self.rewireNeighbors(v)
             v.g = v.lmc
-        #print('='*50)
 
     def possiblePath(self, v, u, obstacles):
+        """
+        Determines if the straight-line path from node v to node u
+        has an obstacle in the way
+        """
         x1, y1 = v.getCoords()
         x2, y2 = u.getCoords()
 
@@ -258,6 +302,10 @@ class RRTX:
         return True
 
     def findParent(self, v, U):
+        """
+        Find's the best parent, as measured by lmc, for node v
+        from the set of nodes U
+        """
         for u in U:
             if self.possiblePath(v, u, self.O):
                 if v.distance(u) <= self.r and v.lmc > v.distance(u) + u.lmc:
@@ -265,6 +313,10 @@ class RRTX:
                     v.lmc = self.distance(v, u) + u.lmc
 
     def updateObstacles(self, removed, added):
+        """
+        Updates the RRT with the knowledge that some obstacles have been
+        removed, and some have been added
+        """
         if len(removed) > 0:
             for obs in removed:
                 self.removeObstacle(obs)
@@ -278,6 +330,10 @@ class RRTX:
             self.reduceInconsistency()
 
     def propagateDescendants(self):
+        """
+        Starts with all initially orphaned/cut-off nodes and propagates
+        that through their descendants so they're all marked as cut-off
+        """
         stack = {orphan for orphan in self.orphans}
         while len(stack) != 0:
             new_stack = set()
@@ -300,21 +356,20 @@ class RRTX:
                 v.parent = None
 
     def verifyOrphan(self, v):
-        if (min(v.g, v.lmc), v.g, v) in self.Q.queue:
-            found = False
-            removed = []
-            while not found:
-                u = self.Q.get()
-                if u[2] == v:
-                    found = True
-                else:
-                    removed.append(u)
-            for u in removed:
-                self.Q.put(u)
-
+        """
+        v is an orphan, so we take it out of the queue and put
+        it in the orphans set
+        """
+        key = (min(v.g, v.lmc), v.g, v)
+        if key in self.Q.heap:
+            i = self.Q.heap.index(key)
+            self.Q.deleteKey(i)
         self.orphans.add(v)
 
     def removeObstacle(self, obs):
+        """
+        Removes obstacle obs, and updates the RRT
+        """
         E_obs = set()
         for v in self.V:
             for u in self.near(v, self.r):
@@ -334,6 +389,9 @@ class RRTX:
                 self.verifyQueue(v)
 
     def addNewObstacle(self, obs):
+        """
+        Adds obstacle obs, and updates the RRT
+        """
         self.O.add(obs)
         E_obs = set()
         for v in self.V:
@@ -348,22 +406,29 @@ class RRTX:
                 self.verifyOrphan(v)
 
     def verifyQueue(self, v):
-        if (min(v.g, v.lmc), v.g, v) in self.Q.queue:
+        """
+        If v is in the queue, update it's key. If it isn't,
+        insert it into the queue
+        """
+        if (min(v.g, v.lmc), v.g, v) in self.Q.heap:
             found = False
             removed = []
             while not found:
-                u = self.Q.get()
+                u = self.Q.extractMin()
                 if u[2] == v:
                     removed.append((min(v.g, v.lmc), v.g, v))
                     found = True
                 else:
                     removed.append(u)
             for u in removed:
-                self.Q.put(u)
+                self.Q.insertKey(u)
         else:
-            self.Q.put((min(v.g, v.lmc), v.g, v))
+            self.Q.insertKey((min(v.g, v.lmc), v.g, v))
 
     def updateLMC(self, v):
+        """
+        Updates the lmc of v based off of it's neighbors
+        """
         self.cullNeighbors(v, self.r)
         p = None
         for u in (v.outgoing_0 | v.outgoing_r) - self.orphans:
@@ -375,9 +440,15 @@ class RRTX:
             self.makeParentOf(v, p)
 
     def add_goal_point(self):
+        """
+        Draws the goal point
+        """
         GUI.drawYellowCircle(*self.goal.getIntCoords())
 
     def drawTree(self):
+        """
+        Draws the RRT
+        """
         for node in self.V:
             GUI.drawBlackCircle(*node.getIntCoords())
             if node.parent != None:
@@ -387,6 +458,10 @@ class RRTX:
         self.add_goal_point()
 
     def drawPathToGoal(self):
+        """
+        If self.robot is in the tree, it draws the path from robot
+        to the goal
+        """
         node = self.robot
         GUI.drawBlueCircle(*node.getIntCoords())
         while node.parent != None:
@@ -410,15 +485,28 @@ def run_RRT():
     #r = RRTX(width, height)
     cont = True
     i = 0
-    while i < 2500:
+    while i < 3000:
         i += 1
         r.step()
         print(i)
-    #r.step(add_point=r.robot)
 
     r.drawObstacles()
     r.drawTree()
-    #r.drawPathToGoal()
+
+def add_obstacles():
+    canvas.delete("all")
+    new_obs = set()
+    for i in range(10):
+        point = r.getRandomPoint()
+        if point.distance(r.start) > 30 and point.distance(r.goal) > 30:
+            new_obs.add(point)
+
+    r.updateObstacles(set(), new_obs)
+    print('updated')
+    r.drawObstacles()
+    print('obs drawn')
+    r.drawTree()
+    print('tree drawn')
 
 def change_obstacles():
     canvas.delete("all")
@@ -435,12 +523,13 @@ def change_obstacles():
     r.drawObstacles()
     print('obs drawn')
     r.drawTree()
-    #r.drawPathToGoal()
     print('tree drawn')
 
 button = tkinter.Button(top, text="Restart", command=run_RRT)
 button.pack()
-button2 = tkinter.Button(top, text="Move Obs", command=change_obstacles)
+button2 = tkinter.Button(top, text="Add Obs", command=add_obstacles)
 button2.pack()
+button3 = tkinter.Button(top, text="Move Obs", command=change_obstacles)
+button3.pack()
 top.mainloop()
 
