@@ -27,6 +27,7 @@ enum RobotTurnState{
 class RobotFSM{
 public:
     RobotFSM();
+    RobotFSM(const RobotFSM& robotFSM);
     RobotFSM(int id1, bool isYellow1);
     void move_In_Direction(float dir);
     void move_To_Location(std::pair<float,float> loc);

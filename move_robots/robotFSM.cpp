@@ -21,6 +21,14 @@ RobotFSM::RobotFSM()
     spinner = false;
 }
 
+RobotFSM::RobotFSM(const RobotFSM& robotFSM)
+{
+    id = -1;
+    robot_state = RobotMoveState::PAUSE;
+    kick_tries = 0;
+    spinner = false;
+}
+
 RobotFSM::RobotFSM(int id1, bool isYellow1) : id(id1),isYellow(isYellow1)
 {
     robot_state = RobotMoveState::PAUSE;
