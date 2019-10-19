@@ -1,7 +1,7 @@
-#include "./strategy.h"
-#include "./main.cpp"
+#include "./play.h"
+#include "../main.cpp"
 
-void BasicOffense::setRobots(){
+void Play::setRobots(){
     pose *p = ourRobots();
     pose *q = theirRobots();
     for (int n=0; n<6; n++) { //TODO: generalize for more than 6 robots
@@ -12,7 +12,7 @@ void BasicOffense::setRobots(){
     }
 };
 
-bool BasicOffense::clearPath(pose loc1, pose loc2){
+bool Play::clearPath(pose loc1, pose loc2){
     // check for enemy robots along line
     float dist = pow(pow(get<0>(loc1) - get<0>(loc2), 2) + pow(get<1>(loc1) - get<1>(loc2), 2), 0.5);
     float delta_y = get<1>(loc2) - get<1>(loc1);
@@ -25,7 +25,7 @@ bool BasicOffense::clearPath(pose loc1, pose loc2){
     return true;
 }
 
-bool BasicOffense::canScore(){
+bool Play::canScore(){
     pose goalLoc = goal();
     // get location of robot with ball
     pose withBall = robots[posession];
@@ -35,7 +35,7 @@ bool BasicOffense::canScore(){
     return false;
 }
 
-int BasicOffense::canPass(){
+int Play::canPass(){
     for (int n=0; n<6; n++){
         if (n != posession){
             if (clearPath(robots[n], robots[posession]))
@@ -45,7 +45,7 @@ int BasicOffense::canPass(){
     return 7;
 }
 
-int BasicOffense::guard(int robo){
+int Play::guard(int robo){
     float min_dist = 1000000;
     int nearest;
     for (int n=6; n<12; n++){
@@ -56,24 +56,4 @@ int BasicOffense::guard(int robo){
         }
     }
     return nearest;
-}
-
-void BasicOffense::play(){
-    setRobots();
-    if (canScore()) {
-        // tell robot to shoot!
-    } else{
-        int receiver = canPass();
-        if (receiver != 7) {
-            pose receiver_loc = robots[receiver];
-            //tell robot to pass!
-        } else {
-            // dribble towards goal
-        }
-    }
-    // rest of the robots should guard nearest enemy
-    for (int n=6; n<6; n++){
-        int nearest = guard(n);
-        // tell robot to guard enemy robot
-    }
 }
