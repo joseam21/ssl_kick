@@ -23,6 +23,8 @@ class BasicOffense {
         int canPass();
         // check for path with no enemy robots
         bool clearPath(pose, pose);
+        // find closest enemy for robot to guard
+        int guard(int);
         // execute play
         void play();
 };

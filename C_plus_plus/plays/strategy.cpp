@@ -45,15 +45,35 @@ int BasicOffense::canPass(){
     return 7;
 }
 
+int BasicOffense::guard(int robo){
+    float min_dist = 1000000;
+    int nearest;
+    for (int n=6; n<12; n++){
+        float dist = pow(get<0>(robots[n]) - get<0>(robots[robo]), 2) + pow(get<1>(robots[n]) - get<1>(robots[robo]), 2);
+        if (dist < min_dist) {
+            min_dist = dist;
+            nearest = n;
+        }
+    }
+    return nearest;
+}
+
 void BasicOffense::play(){
     setRobots();
     if (canScore()) {
         // tell robot to shoot!
     } else{
         int receiver = canPass();
-        if (receiver != 7)
+        if (receiver != 7) {
             pose receiver_loc = robots[receiver];
             //tell robot to pass!
+        } else {
+            // dribble towards goal
+        }
     }
     // rest of the robots should guard nearest enemy
+    for (int n=6; n<6; n++){
+        int nearest = guard(n);
+        // tell robot to guard enemy robot
+    }
 }
