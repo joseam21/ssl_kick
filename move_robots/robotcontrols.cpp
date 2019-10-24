@@ -75,13 +75,13 @@ void RobotControls::updateRobotsThread()
                 {
                     const SSL_DetectionRobot& robot = detection.robots_blue(i);
                     int id = robot.robot_id();
-                    blueRobots[id].update_geometry(robot.x(),robot.y(),robot.orientation());
+                    blueRobots[id].update_geometry(robot.x(),robot.y(),robot.orientation(),GetTimeSec());
                 }
                 for(int i = 0; i < num_yellow_robots; i++)
                 {
                     const SSL_DetectionRobot& robot = detection.robots_yellow(i);
                     int id = robot.robot_id();
-                    yellowRobots[id].update_geometry(robot.x(),robot.y(),robot.orientation());
+                    yellowRobots[id].update_geometry(robot.x(),robot.y(),robot.orientation(),GetTimeSec());
                 }
             }
             // it's possible for the packet to have geometry information about the field, but for the most part we assume the field is correct and constant, so we have no use for the information
@@ -96,8 +96,8 @@ void RobotControls::sendRobotCommandThread()
         usleep(16000);// approx 60 times a second, which is approx how often we get info from vision
         for(int i = 0; i < 6; i++)
         {
-            yellowRobots[i].send_Command();
-            blueRobots[i].send_Command();
+            yellowRobots[i].send_Command(GetTimeSec());
+            blueRobots[i].send_Command(GetTimeSec());
         }
     }
 }

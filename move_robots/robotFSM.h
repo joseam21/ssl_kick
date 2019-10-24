@@ -50,9 +50,9 @@ public:
     void stop_dribble();
     void kick(float kick_speed_x1, float kick_speed_z1, int kick_tries1);
     // send to simulator
-    void send_Command();
+    void send_Command(float cur_time);
     // receive from simulator
-    void update_geometry(float x1, float y1, float angle1);
+    void update_geometry(float x1, float y1, float angle1, float time1);
     // setters
     void set_id(int id1);
     void set_isYellow(bool isYellow1);
@@ -60,7 +60,12 @@ public:
     float get_x();
     float get_y();
     float get_angle();
-    std::pair<float,float> get_speed();
+    std::pair<float,float> get_vel();
+    float get_ang_vel();
+    float get_speed();
+    // methods for estimation of speed and position if telemetry stops
+    std::pair<float,float> get_vel_est();
+    std::pair<float,float> get_pos_est();
     float get_angular_speed();
 private:
     // private data
@@ -68,6 +73,7 @@ private:
     bool isYellow;
     std::deque<float> x, y, angle, time; // sorted by time, so x[0] is the most recent x variable
     // for angle, 0 is towards the right(yellow goal) side and is the same for both blue and yellow, increases counterclockwise like in radial coordinates, so positive angular velocity turns you left and negative turns you right
+    float velangular,velnormal,veltangent;
     //ball manipulation variables
     float kick_speed_x, kick_speed_z, kick_tries; // kick_speed_z is chip
     bool spinner;
@@ -80,14 +86,14 @@ private:
     std::pair<float,float> constant_location_loc;   // first is x, second is y for all location pairs
     std::pair<float,float> * variable_location_loc;
     // thread stuff
-    mutable std::mutex mtx_x, mtx_y, mtx_angle, mtx_robot_move_state, mtx_robot_turn_state; // used for mutex lock due to threading, lock for x,y,angle, and robot_state
-    
+    mutable std::mutex mtx_x, mtx_y, mtx_angle, mtx_time, mtx_robot_move_state, mtx_robot_turn_state; // used for mutex lock due to threading, lock for x,y,angle, and robot_state
     // storing errors for PID alogrithm
     std::deque<float> move_error, angle_error;
     // private functions
     void update_x(float x1);
     void update_y(float y1);
     void update_angle(float angle1);
+    void update_time(float time1);
     // resets varaibles so it doesn't interfere with state changes
     void reset_state_variables();
 };
