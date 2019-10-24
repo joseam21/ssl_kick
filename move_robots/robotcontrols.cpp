@@ -75,17 +75,13 @@ void RobotControls::updateRobotsThread()
                 {
                     const SSL_DetectionRobot& robot = detection.robots_blue(i);
                     int id = robot.robot_id();
-                    blueRobots[id].update_x(robot.x());
-                    blueRobots[id].update_y(robot.y());
-                    blueRobots[id].update_angle(robot.orientation());
+                    blueRobots[id].update_geometry(robot.x(),robot.y(),robot.orientation());
                 }
                 for(int i = 0; i < num_yellow_robots; i++)
                 {
                     const SSL_DetectionRobot& robot = detection.robots_yellow(i);
                     int id = robot.robot_id();
-                    yellowRobots[id].update_x(robot.x());
-                    yellowRobots[id].update_y(robot.y());
-                    yellowRobots[id].update_angle(robot.orientation());
+                    yellowRobots[id].update_geometry(robot.x(),robot.y(),robot.orientation());
                 }
             }
             // it's possible for the packet to have geometry information about the field, but for the most part we assume the field is correct and constant, so we have no use for the information
@@ -111,11 +107,11 @@ void RobotControls::setRobotStateThread()
     usleep(1000000); // in microseconds
     for(int i = 0; i < 6; i++){
         //yellowRobots[i].move_In_Direction(0);
-        yellowRobots[i].move_To_Location(std::make_pair(0,0));
+        yellowRobots[i].move_to_location(std::make_pair(0,0));
     }
     usleep(5000000); // in microseconds
     for(int i = 0; i < 6; i++){
-        yellowRobots[i].move_To_Location(std::make_pair(0,i-2.5));
+        yellowRobots[i].move_to_location(std::make_pair(0,i-2.5));
     }
     while(true){
         std::cout << "Enter team: ";
@@ -138,9 +134,9 @@ void RobotControls::setRobotStateThread()
         std::cout << "Enter y: ";
         std::cin >> y;
         if(isYellow){
-            yellowRobots[id].move_To_Location(std::make_pair(x,y));
+            yellowRobots[id].move_to_location(std::make_pair(x,y));
         }else{
-            blueRobots[id].move_To_Location(std::make_pair(x,y));
+            blueRobots[id].move_to_location(std::make_pair(x,y));
         }
         std::getline(std::cin,ans);
             
