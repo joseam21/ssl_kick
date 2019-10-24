@@ -16,7 +16,7 @@ float get_angle_diff(float angle1, float angle2);
 RobotFSM::RobotFSM()
 {
     id = -1;
-    robot_state = RobotMoveState::PAUSE;
+    robot_move_state = MOVE_PAUSE;
     kick_tries = 0;
     spinner = false;
 }
@@ -24,59 +24,59 @@ RobotFSM::RobotFSM()
 RobotFSM::RobotFSM(const RobotFSM& robotFSM)
 {
     id = -1;
-    robot_state = RobotMoveState::PAUSE;
+    robot_move_state = MOVE_PAUSE;
     kick_tries = 0;
     spinner = false;
 }
 
 RobotFSM::RobotFSM(int id1, bool isYellow1) : id(id1),isYellow(isYellow1)
 {
-    robot_state = RobotMoveState::PAUSE;
+    robot_move_state = MOVE_PAUSE;
     kick_tries = 0;
     spinner = false;
 }
 
 void RobotFSM::move_In_Direction(float dir)
 {
-    mtx_robot_state.lock();
-    robot_state = RobotMoveState::CONSTANT_DIRECTION;
+    mtx_robot_move_state.lock();
+    robot_move_state = MOVE_CONSTANT_DIRECTION;
     error.clear();
     constant_Direction_dir = dir;
-    mtx_robot_state.unlock();
+    mtx_robot_move_state.unlock();
 }
 
 void RobotFSM::move_To_Location(std::pair<float,float> loc)
 {
-    mtx_robot_state.lock();
+    mtx_robot_move_state.lock();
     error.clear();
-    robot_state = RobotMoveState::CONSTANT_LOCATION;
+    robot_move_state = MOVE_CONSTANT_LOCATION;
     constant_Location_loc = std::pair<float,float>(loc);
-    mtx_robot_state.unlock();
+    mtx_robot_move_state.unlock();
 }
 
 void RobotFSM::pause()
 {
-    mtx_robot_state.lock();
-    robot_state = RobotMoveState::PAUSE;
-    mtx_robot_state.unlock();
+    mtx_robot_move_state.lock();
+    robot_move_state = MOVE_PAUSE;
+    mtx_robot_move_state.unlock();
 }
 
 void RobotFSM::intercept(std::pair<float,float> * loc)
 {
-    mtx_robot_state.lock();
+    mtx_robot_move_state.lock();
     error.clear();
-    robot_state = RobotMoveState::VARIABLE_LOCATION_INTERCEPT;
+    robot_move_state = MOVE_VARIABLE_LOCATION_INTERCEPT;
     variable_Location_Intercept_loc = loc;
-    mtx_robot_state.unlock();
+    mtx_robot_move_state.unlock();
 }
 
 void RobotFSM::track(std::pair<float,float> * loc)
 {
-    mtx_robot_state.lock();
+    mtx_robot_move_state.lock();
     error.clear();
-    robot_state = RobotMoveState::VARIABLE_LOCATION_TRACK;
+    robot_move_state = MOVE_VARIABLE_LOCATION_TRACK;
     variable_Location_Track_loc = loc;
-    mtx_robot_state.unlock();
+    mtx_robot_move_state.unlock();
 }
 
 void RobotFSM::dribble()
@@ -87,11 +87,6 @@ void RobotFSM::dribble()
 void RobotFSM::stop_dribble()
 {
     spinner = false;
-}
-
-void RobotFSM::pass()
-{
-
 }
 
 void RobotFSM::kick(float kick_speed_x1 = 5, float kick_speed_z1 = 0, int kick_tries1 = 5)
@@ -122,10 +117,10 @@ void RobotFSM::send_Command()
     }
     
     float veltangent, velnormal, velangular;
-    mtx_robot_state.lock();
-    switch(robot_state)
+    mtx_robot_move_state.lock();
+    switch(robot_move_state)
     {
-        case RobotMoveState::CONSTANT_DIRECTION:
+        case MOVE_CONSTANT_DIRECTION:
         {
             float angle_error = get_angle() - constant_Direction_dir + 4 * PI;
             while(angle_error > 1 * PI){
@@ -133,28 +128,9 @@ void RobotFSM::send_Command()
             }
             veltangent = cos(angle_error*-1)*V_MAX;
             velnormal = sin(angle_error*-1)*V_MAX;
-            /*mtx_angle.lock();
-            errorIntegral += angle_error;
-            float angle_derivative = (angle[0]-angle[1])*60.0;
-            const float K_p = -2.0;
-            const float K_i = 0.0;
-            const float K_d = 0.0;
-            velangular = K_p*angle_error+K_i*errorIntegral+K_d*angle_derivative;
-            if(id == 0){
-                printf("angle: %f  ,angErr: %f , ErrInt: %f, ErrDer: %f, VelAng: %f\n",angle[0], angle_error,errorIntegral,angle_derivative,velangular);
-            }
-            if(velangular > 2*V_MAX)
-            {
-                velangular = 2*V_MAX;
-            }
-            else if (velangular < -2*V_MAX)
-            {
-                velangular = -2*V_MAX;
-            }
-            mtx_angle.unlock();*/
             break;
         }
-        case RobotMoveState::CONSTANT_LOCATION:
+        case MOVE_CONSTANT_LOCATION:
         {
             float xdif = constant_Location_loc.first - get_x();
             float ydif = constant_Location_loc.second - get_y();
@@ -197,7 +173,7 @@ void RobotFSM::send_Command()
             //velnormal = 0;
             break;
         }
-        case RobotMoveState::PAUSE:
+        case MOVE_PAUSE:
         {
             veltangent = 0;
             velnormal = 0;
@@ -208,13 +184,13 @@ void RobotFSM::send_Command()
             }
             break;
         }
-        case RobotMoveState::VARIABLE_LOCATION_INTERCEPT:
+        case MOVE_VARIABLE_LOCATION_INTERCEPT:
         {
             veltangent = 0;
             velnormal = 0;
             break;
         }
-        case RobotMoveState::VARIABLE_LOCATION_TRACK:
+        case MOVE_VARIABLE_LOCATION_TRACK:
         {
             veltangent = 0;
             velnormal = 0;
@@ -222,11 +198,11 @@ void RobotFSM::send_Command()
         }
     
     }
-    mtx_robot_state.unlock();
+    mtx_robot_move_state.unlock();
     mtx_robot_turn_state.lock();
     switch(robot_turn_state)
     {
-        case RobotTurnState::CONSTANT_ANGLE:
+        case TURN_CONSTANT_ANGLE:
         {
             float new_error = get_angle_diff(get_angle(),constant_Angle_angle);
             float error_derivative = 0;
@@ -258,7 +234,6 @@ void RobotFSM::send_Command()
                 optimal_velocity = -V_ANG_MAX;
             }
             velangular = optimal_velocity;
-            
             error1.push_front(new_error);
             while(error1.size() > SIZE)
             {
@@ -266,12 +241,22 @@ void RobotFSM::send_Command()
             }
             break;
         }
-        case RobotTurnState::TRACK_OBJECT:
+        case TURN_CONSTANT_LOCATION:
         {
             velangular = 0;
             break;
         }
-        case RobotTurnState::DIRECTION_OF_MOVEMENT:
+        case TURN_VARIABLE_ANGLE:
+        {
+            velangular = 0;
+            break;
+        }
+        case TURN_VARIABLE_LOCATION:
+        {
+            velangular = 0;
+            break;
+        }
+        case TURN_DIRECTION_OF_MOVEMENT:
         {
             velangular = 0;
             break;
@@ -407,4 +392,25 @@ float get_angle_diff(float angle1, float angle2)
         diff -= 2*PI;
     }
     return diff;
+}
+
+float get_PID_result(std::deque<float> &error, float K_p, float K_i, float K_d)
+{
+    if(error.empty())
+    {
+        printf("ERROR: Accessing PID algorithm with empty error vector");
+        return 0;
+    }
+    float new_error = error.front();
+    float error_integral = 0;
+    float error_derivative = 0;
+    if(error.size() > 1)
+    {
+        error_derivative = (error.front() - error[1]);
+        for(int i = 0; i < error.size(); i++)
+        {
+            error_derivative += error[i];
+        }
+    }
+    return K_p*new_error+K_i*error_integral+K_d*error_derivative;
 }
