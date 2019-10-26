@@ -13,6 +13,7 @@
 
 float get_angle_diff(float angle1, float angle2);
 float get_PID_result(float new_error, std::deque<float> &time, std::deque<float> &error, float K_p, float K_i, float K_d, float min_result, float max_result);
+float * wheel_velocities(float velnormal, float veltangent, float velangular);
 
 RobotFSM::RobotFSM()
 {
@@ -135,7 +136,7 @@ void RobotFSM::stop_dribble()
     spinner = false;
 }
 
-void RobotFSM::kick(float kick_speed_x1 = 5, float kick_speed_z1 = 0, int kick_tries1 = 5)
+void RobotFSM::kick(float kick_speed_x1, float kick_speed_z1, int kick_tries1)
 {
     kick_speed_x = kick_speed_x1;
     kick_speed_z = kick_speed_z1;
@@ -146,11 +147,17 @@ void RobotFSM::send_Command(float cur_time)
 {
     grSim_Packet packet;
     packet.mutable_commands()->set_isteamyellow(isYellow);
-    packet.mutable_commands()->set_timestamp(0.0);
+    packet.mutable_commands()->set_timestamp(cur_time);
     grSim_Robot_Command* command = packet.mutable_commands()->add_robot_commands();
     command->set_id(id);
-    command->set_wheelsspeed(false);
-    command->set_spinner(false);
+    if(USE_WHEEL_VEL)
+    {
+        command->set_wheelsspeed(true);
+    }else
+    {
+        command->set_wheelsspeed(false);
+    }
+    command->set_spinner(spinner);
     if(kick_tries > 0)
     {
         command->set_kickspeedx(kick_speed_x);
@@ -182,8 +189,8 @@ void RobotFSM::send_Command(float cur_time)
             float angle_diff = get_angle_diff(get_angle(), angle1);
             float new_error = sqrt(pow(xdif,2)+pow(ydif,2));
             const float K_p = 1.0;
-            const float K_i = 0.00006;
-            const float K_d = 0.00002;
+            const float K_i = 0.06;
+            const float K_d = 0.02;
             float optimal_velocity = get_PID_result(new_error, time, move_error,K_p,K_i,K_d,-V_MAX,V_MAX);
             veltangent = cos(-1*angle_diff)*optimal_velocity;
             velnormal = sin(-1*angle_diff)*optimal_velocity;
@@ -244,12 +251,28 @@ void RobotFSM::send_Command(float cur_time)
         }
     }
     mtx_robot_turn_state.unlock();
-    command->set_veltangent(veltangent);
-    command->set_velnormal(velnormal);
-    command->set_velangular(velangular);
-    
+    if(USE_WHEEL_VEL){
+        float * wheels = wheel_velocities(velnormal,veltangent,velangular);
+        command->set_wheel1(*wheels);
+        command->set_wheel2(*(wheels+1));
+        command->set_wheel3(*(wheels+2));
+        command->set_wheel4(*(wheels+3));
+    }else
+    {
+        printf("WOWTHISSUCKS\n");
+        fflush(stdout);
+        command->set_veltangent(veltangent);
+        command->set_velnormal(velnormal);
+        command->set_velangular(velangular);
+    }
     if(id == 0 && isYellow)
     {
+        printf("Y");
+        packet.PrintDebugString();
+    }
+    if(id == 0 && !isYellow)
+    {
+        printf("B");
         packet.PrintDebugString();
     }
     // Serialize
@@ -423,6 +446,17 @@ float get_angle_diff(float angle1, float angle2)
         diff -= 2*PI;
     }
     return diff;
+}
+
+
+float * wheel_velocities(float velnormal, float veltangent, float velangular){
+    float wheels[4];
+    // do math
+    wheels[0] = 0;
+    wheels[1] = 0;
+    wheels[2] = 0;
+    wheels[3] = 0;   
+    return wheels;
 }
 
 float get_PID_result(float new_error, std::deque<float> &time, std::deque<float> &error, float K_p, float K_i, float K_d, float min_result = -99, float max_result = 99)
