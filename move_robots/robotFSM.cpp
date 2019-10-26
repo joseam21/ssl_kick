@@ -13,6 +13,7 @@
 
 float get_angle_diff(float angle1, float angle2);
 float get_PID_result(float new_error, std::deque<float> &time, std::deque<float> &error, float K_p, float K_i, float K_d, float min_result, float max_result);
+float * wheel_velocities(float velnormal, float veltangent, float velangular);
 
 RobotFSM::RobotFSM()
 {
@@ -135,7 +136,7 @@ void RobotFSM::stop_dribble()
     spinner = false;
 }
 
-void RobotFSM::kick(float kick_speed_x1 = 5, float kick_speed_z1 = 0, int kick_tries1 = 5)
+void RobotFSM::kick(float kick_speed_x1, float kick_speed_z1, int kick_tries1)
 {
     kick_speed_x = kick_speed_x1;
     kick_speed_z = kick_speed_z1;
@@ -182,8 +183,8 @@ void RobotFSM::send_Command(float cur_time)
             float angle_diff = get_angle_diff(get_angle(), angle1);
             float new_error = sqrt(pow(xdif,2)+pow(ydif,2));
             const float K_p = 1.0;
-            const float K_i = 0.00006;
-            const float K_d = 0.00002;
+            const float K_i = 0.06;
+            const float K_d = 0.02;
             float optimal_velocity = get_PID_result(new_error, time, move_error,K_p,K_i,K_d,-V_MAX,V_MAX);
             veltangent = cos(-1*angle_diff)*optimal_velocity;
             velnormal = sin(-1*angle_diff)*optimal_velocity;
@@ -424,6 +425,8 @@ float get_angle_diff(float angle1, float angle2)
     }
     return diff;
 }
+
+
 
 float get_PID_result(float new_error, std::deque<float> &time, std::deque<float> &error, float K_p, float K_i, float K_d, float min_result = -99, float max_result = 99)
 {

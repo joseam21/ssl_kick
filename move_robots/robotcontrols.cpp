@@ -75,12 +75,16 @@ void RobotControls::updateRobotsThread()
                 {
                     const SSL_DetectionRobot& robot = detection.robots_blue(i);
                     int id = robot.robot_id();
+                    assert(id < 6);
+                    assert(id >= 0);
                     blueRobots[id].update_geometry(robot.x(),robot.y(),robot.orientation(),GetTimeSec());
                 }
                 for(int i = 0; i < num_yellow_robots; i++)
                 {
                     const SSL_DetectionRobot& robot = detection.robots_yellow(i);
                     int id = robot.robot_id();
+                    assert(id < 6);
+                    assert(id >= 0);
                     yellowRobots[id].update_geometry(robot.x(),robot.y(),robot.orientation(),GetTimeSec());
                 }
             }
@@ -113,7 +117,7 @@ void RobotControls::setRobotStateThread()
     for(int i = 0; i < 6; i++){
         yellowRobots[i].move_to_location(std::make_pair(0,i-2.5));
     }
-    while(true){
+    /*while(true){
         std::cout << "Enter team: ";
         std::string ans;
         bool isYellow;
@@ -140,6 +144,6 @@ void RobotControls::setRobotStateThread()
         }
         std::getline(std::cin,ans);
             
-    }
+    }*/
     usleep(100000000);
 }
