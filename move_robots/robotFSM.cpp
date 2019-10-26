@@ -147,11 +147,17 @@ void RobotFSM::send_Command(float cur_time)
 {
     grSim_Packet packet;
     packet.mutable_commands()->set_isteamyellow(isYellow);
-    packet.mutable_commands()->set_timestamp(0.0);
+    packet.mutable_commands()->set_timestamp(cur_time);
     grSim_Robot_Command* command = packet.mutable_commands()->add_robot_commands();
     command->set_id(id);
-    command->set_wheelsspeed(false);
-    command->set_spinner(false);
+    if(USE_WHEEL_VEL)
+    {
+        command->set_wheelsspeed(true);
+    }else
+    {
+        command->set_wheelsspeed(false);
+    }
+    command->set_spinner(spinner);
     if(kick_tries > 0)
     {
         command->set_kickspeedx(kick_speed_x);
@@ -245,12 +251,28 @@ void RobotFSM::send_Command(float cur_time)
         }
     }
     mtx_robot_turn_state.unlock();
-    command->set_veltangent(veltangent);
-    command->set_velnormal(velnormal);
-    command->set_velangular(velangular);
-    
+    if(USE_WHEEL_VEL){
+        float * wheels = wheel_velocities(velnormal,veltangent,velangular);
+        command->set_wheel1(*wheels);
+        command->set_wheel2(*(wheels+1));
+        command->set_wheel3(*(wheels+2));
+        command->set_wheel4(*(wheels+3));
+    }else
+    {
+        printf("WOWTHISSUCKS\n");
+        fflush(stdout);
+        command->set_veltangent(veltangent);
+        command->set_velnormal(velnormal);
+        command->set_velangular(velangular);
+    }
     if(id == 0 && isYellow)
     {
+        printf("Y");
+        packet.PrintDebugString();
+    }
+    if(id == 0 && !isYellow)
+    {
+        printf("B");
         packet.PrintDebugString();
     }
     // Serialize
@@ -427,6 +449,15 @@ float get_angle_diff(float angle1, float angle2)
 }
 
 
+float * wheel_velocities(float velnormal, float veltangent, float velangular){
+    float wheels[4];
+    // do math
+    wheels[0] = 0;
+    wheels[1] = 0;
+    wheels[2] = 0;
+    wheels[3] = 0;   
+    return wheels;
+}
 
 float get_PID_result(float new_error, std::deque<float> &time, std::deque<float> &error, float K_p, float K_i, float K_d, float min_result = -99, float max_result = 99)
 {

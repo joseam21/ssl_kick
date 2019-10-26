@@ -108,11 +108,15 @@ void RobotControls::sendRobotCommandThread()
 
 void RobotControls::setRobotStateThread()
 {
+    printf("WOWWWWWW\n");
+    fflush(stdout);
     usleep(1000000); // in microseconds
     for(int i = 0; i < 6; i++){
         //yellowRobots[i].move_In_Direction(0);
         yellowRobots[i].move_to_location(std::make_pair(0,0));
     }
+    printf("WOWWWWWW\n");
+    fflush(stdout);
     usleep(5000000); // in microseconds
     for(int i = 0; i < 6; i++){
         yellowRobots[i].move_to_location(std::make_pair(0,i-2.5));
