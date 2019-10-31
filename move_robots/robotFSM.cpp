@@ -13,7 +13,7 @@
 
 float get_angle_diff(float angle1, float angle2);
 float get_PID_result(float new_error, std::deque<float> &time, std::deque<float> &error, float K_p, float K_i, float K_d, float min_result, float max_result);
-float * wheel_velocities(float velnormal, float veltangent, float velangular);
+void wheel_velocities(float velnormal, float veltangent, float velangular, float *wheels);
 
 RobotFSM::RobotFSM()
 {
@@ -449,14 +449,34 @@ float get_angle_diff(float angle1, float angle2)
 }
 
 
-float * wheel_velocities(float velnormal, float veltangent, float velangular){
-    float wheels[4];
-    // do math
-    wheels[0] = 0;
-    wheels[1] = 0;
-    wheels[2] = 0;
-    wheels[3] = 0;   
-    return wheels;
+void wheel_velocities(float velnormal, float veltangent, float velangular, float * wheels){
+	// velnormal  is positive to the right of the robot 
+	// veltangent is positvite straight forward
+	// velangular is the angular velocity in rads/s (positive counter clockwise)
+
+	// NB! The following three variables are the ones used the simulator
+	/*
+	double phi_1 = 33*M_PI/180;
+	double phi_2 = 45*M_PI/180;
+	double R = 0.0289;
+	*/
+	velnormal = -velnormal;
+	
+	//* This can also be correct
+	double phi_1 = 30*M_PI/180;
+	double phi_2 = 45*M_PI/180;
+	double R = 0.027;
+	//*/	
+	// Find out if the following code can be vectorized later
+	//* C
+	// Caused weird behaviour, probably different implementation in simulator
+    wheels[3] = (-sin(phi_1)*velnormal + cos(phi_1)*veltangent + R*velangular)/R;
+    wheels[0] = (-sin(phi_1)*velnormal - cos(phi_1)*veltangent + R*velangular)/R;
+    wheels[1] = (sin(phi_2)*velnormal - cos(phi_2)*veltangent + R*velangular)/R;
+    wheels[2] = (sin(phi_2)*velnormal + cos(phi_2)*veltangent + R*velangular)/R;
+	//*/
+	// We ARE SENDING ANGULAR VELOCITIES TO THE WHEELS
+    return;
 }
 
 float get_PID_result(float new_error, std::deque<float> &time, std::deque<float> &error, float K_p, float K_i, float K_d, float min_result = -99, float max_result = 99)
