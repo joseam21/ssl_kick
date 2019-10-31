@@ -252,11 +252,16 @@ void RobotFSM::send_Command(float cur_time)
     }
     mtx_robot_turn_state.unlock();
     if(USE_WHEEL_VEL){
-        float * wheels = wheel_velocities(velnormal,veltangent,velangular);
+        float * wheels = new float[4]; 
+	wheel_velocities(velnormal,veltangent,velangular, wheels);
         command->set_wheel1(*wheels);
         command->set_wheel2(*(wheels+1));
         command->set_wheel3(*(wheels+2));
         command->set_wheel4(*(wheels+3));
+        command->set_veltangent(0.0);
+        command->set_velnormal(0.0);
+        command->set_velangular(0.0);
+	delete wheels;
     }else
     {
         printf("WOWTHISSUCKS\n");
