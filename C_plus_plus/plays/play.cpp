@@ -1,16 +1,4 @@
 #include "./play.h"
-#include "../main.cpp"
-
-void Play::setRobots(){
-    pose *p = ourRobots();
-    pose *q = theirRobots();
-    for (int n=0; n<6; n++) { //TODO: generalize for more than 6 robots
-        robots[n] = p[n];
-    } 
-    for (int n=0; n<6; n++) { //TODO: generalize for more than 6 robots
-        robots[n + 6] = q[n];
-    }
-};
 
 bool Play::clearPath(pose loc1, pose loc2){
     // check for enemy robots along line
@@ -18,7 +6,8 @@ bool Play::clearPath(pose loc1, pose loc2){
     float delta_y = get<1>(loc2) - get<1>(loc1);
     float delta_x = get<0>(loc2) - get<0>(loc1);
     for (int n=0; n<6; n++){
-        float distFromLine = (delta_y*get<0>(robots[n + 6]) - delta_x*get<1>(robots[n + 6]) + get<0>(loc1)*get<1>(loc2) + get<1>(loc1)*get<0>(loc2)) / dist;
+        RobotFSM interceptor = controller.getRobot(false, n); 
+        float distFromLine = (delta_y*interceptor.get_x() - delta_x*interceptor.get_y() + get<0>(loc1)*get<1>(loc2) + get<1>(loc1)*get<0>(loc2)) / dist;
         if (distFromLine < interference_distance)
             return false;
     }
@@ -26,19 +15,23 @@ bool Play::clearPath(pose loc1, pose loc2){
 }
 
 bool Play::canScore(){
-    pose goalLoc = goal();
-    // get location of robot with ball
-    pose withBall = robots[posession];
-    float dist = pow(get<0>(goalLoc) - get<0>(withBall), 2) + pow(get<1>(goalLoc) - get<1>(withBall), 2);
-    if (dist < posession_distance && clearPath(goalLoc, withBall))
+    // get robot with ball
+    RobotFSM withBall = controller.getRobot(true, posession);
+    float x = withBall.get_x();
+    float y = withBall.get_y();
+    float dist = pow(get<0>(goal_loc) - x, 2) + pow(get<1>(goal_loc) - y, 2);
+    pose shooter = std::make_tuple(x, y);
+    if (dist < posession_distance && clearPath(goal_loc, shooter))
         return true;
     return false;
 }
 
 int Play::canPass(){
+    RobotFSM withBall = controller.getRobot(true, posession);
     for (int n=0; n<6; n++){
         if (n != posession){
-            if (clearPath(robots[n], robots[posession]))
+            RobotFSM receiver = controller.getRobot(true, n);
+            if (clearPath(std::make_tuple(receiver.get_x(), receiver.get_y()), std::make_tuple(withBall.get_x(), withBall.get_y())))
                 return n;
         }
     }
@@ -48,8 +41,14 @@ int Play::canPass(){
 int Play::guard(int robo){
     float min_dist = 1000000;
     int nearest;
-    for (int n=6; n<12; n++){
-        float dist = pow(get<0>(robots[n]) - get<0>(robots[robo]), 2) + pow(get<1>(robots[n]) - get<1>(robots[robo]), 2);
+    RobotFSM robot = controller.getRobot(true, robo);
+    float x = robot.get_x();
+    float y = robot.get_y();
+    for (int n=0; n<6; n++){
+        RobotFSM enemy = controller.getRobot(false, n);
+        float enemy_x = enemy.get_x();
+        float enemy_y = enemy.get_y();
+        float dist = pow(enemy_x - x, 2) + pow(enemy_y - y, 2);
         if (dist < min_dist) {
             min_dist = dist;
             nearest = n;

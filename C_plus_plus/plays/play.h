@@ -1,19 +1,20 @@
 #include <iostream>
+#include "../../move_robots/robotcontrols.cpp"
 using namespace std;
 
-typedef std::tuple<int, int> pose;
+typedef std::tuple<float, float> pose;
 
 class Play {
     public:
         const double posession_distance = 0.2;
         const double interference_distance = 1;
+        const pose goal_loc = std::make_tuple(0, 0);
         int posession; 
-        pose ball;
-        pose robots[];
+        RobotControls controller;
 
     public: 
         // constructor to set which robot has the ball
-        Play (int);
+        Play (RobotControls, int);
         //set robot locations, first 6 should be ours, next 6 enemy
         void setRobots();
         // check if robot with posession can score
@@ -26,6 +27,7 @@ class Play {
         int guard(int);
 };
 
-Play::Play(int hasBall){
+Play::Play(RobotControls controls, int hasBall){
     posession = hasBall;
+    controller = controls;
 }
