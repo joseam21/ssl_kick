@@ -27,6 +27,9 @@ class RobotControls
 public:
     RobotControls();
     static void go();
+    static RobotFSM& getRobot(bool isYellow, int id); // IDs range from 0-5
+    static std::pair<float,float> getCurrentBallLoc();
+    static std::pair<float,float> getCurrentBallSpeed();
 private:
     static const int size = 60;// size of the deque for the ball locations, approx 1 second at 60 fps
     
@@ -36,9 +39,6 @@ private:
     static deque<float> balltime;
     static std::chrono::time_point<std::chrono::system_clock> start;
     
-    static RobotFSM& getRobot(bool isYellow, int id); // IDs range from 0-5
-    static std::pair<float,float> getCurrentBallLoc();
-    static std::pair<float,float> getCurrentBallSpeed();
     static float getTime(); // returns time in seconds
     
     static void updateRobotsThread();    // Thread to update the Robots from the vision information
