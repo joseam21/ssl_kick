@@ -6,7 +6,7 @@ RobotFSM RobotControls::yellowRobots[] = {RobotFSM(),RobotFSM(),RobotFSM(),Robot
 RobotFSM RobotControls::blueRobots[]= {RobotFSM(),RobotFSM(),RobotFSM(),RobotFSM(),RobotFSM(),RobotFSM()};
 deque<std::pair<float,float>> RobotControls::ballloc = deque<std::pair<float,float>>();
 deque<float> RobotControls::balltime = deque<float>();
-
+std::chrono::time_point<std::chrono::system_clock> RobotControls::start = std::chrono::system_clock::now();
 
 RobotControls::RobotControls()
 {
@@ -63,6 +63,9 @@ void RobotControls::updateRobotsThread()
         {
             if(packet.has_detection())
             {
+                float t = getTime();
+                //printf("Packet Received at Time: %f\n", t);
+                //fflush(stdout);
                 SSL_DetectionFrame detection = packet.detection();
                 if(detection.balls_size() > 0)
                 {
@@ -77,7 +80,7 @@ void RobotControls::updateRobotsThread()
                     int id = robot.robot_id();
                     assert(id < 6);
                     assert(id >= 0);
-                    blueRobots[id].update_geometry(robot.x(),robot.y(),robot.orientation(),GetTimeSec());
+                    blueRobots[id].update_geometry(robot.x()/1000,robot.y()/1000,robot.orientation(),robot.confidence(),t);
                 }
                 for(int i = 0; i < num_yellow_robots; i++)
                 {
@@ -85,7 +88,7 @@ void RobotControls::updateRobotsThread()
                     int id = robot.robot_id();
                     assert(id < 6);
                     assert(id >= 0);
-                    yellowRobots[id].update_geometry(robot.x(),robot.y(),robot.orientation(),GetTimeSec());
+                    yellowRobots[id].update_geometry(robot.x()/1000,robot.y()/1000,robot.orientation(),robot.confidence(),t);
                 }
             }
             // it's possible for the packet to have geometry information about the field, but for the most part we assume the field is correct and constant, so we have no use for the information
@@ -100,54 +103,34 @@ void RobotControls::sendRobotCommandThread()
         usleep(16000);// approx 60 times a second, which is approx how often we get info from vision
         for(int i = 0; i < 6; i++)
         {
-            yellowRobots[i].send_Command(GetTimeSec());
-            blueRobots[i].send_Command(GetTimeSec());
+            float t1 = (float)(getTime());
+            yellowRobots[i].send_Command(t1);
+            float t2 = (float)(getTime());
+            blueRobots[i].send_Command(t2);
         }
     }
 }
 
 void RobotControls::setRobotStateThread()
 {
-    printf("WOWWWWWW\n");
-    fflush(stdout);
+    //printf("WOWWWWWW\n");
+    //fflush(stdout);
     usleep(1000000); // in microseconds
     for(int i = 0; i < 6; i++){
-        //yellowRobots[i].move_In_Direction(0);
+        //yellowRobots[i].move_in_direction(0);
         yellowRobots[i].move_to_location(std::make_pair(0,0));
     }
-    printf("WOWWWWWW\n");
-    fflush(stdout);
+    //printf("WOWWWWWW\n");
+    //fflush(stdout);
     usleep(5000000); // in microseconds
     for(int i = 0; i < 6; i++){
         yellowRobots[i].move_to_location(std::make_pair(0,i-2.5));
     }
-    /*while(true){
-        std::cout << "Enter team: ";
-        std::string ans;
-        bool isYellow;
-        int id;
-        float x,y;
-        std::getline(std::cin,ans);
-        if(ans[0] == 'b' || ans[0] == 'B'){
-            isYellow = false;
-        }else if(ans[0] == 'y' || ans[0] == 'Y'){
-            isYellow = true;
-        }else if(ans[0] == 'e'){
-            break;
-        }
-        std::cout << "Enter ID: ";
-        std::cin >> id;
-        std::cout << "Enter x: ";
-        std::cin >> x; 
-        std::cout << "Enter y: ";
-        std::cin >> y;
-        if(isYellow){
-            yellowRobots[id].move_to_location(std::make_pair(x,y));
-        }else{
-            blueRobots[id].move_to_location(std::make_pair(x,y));
-        }
-        std::getline(std::cin,ans);
-            
-    }*/
     usleep(100000000);
+}
+
+float RobotControls::getTime(){
+    auto cur = std::chrono::system_clock::now();
+    std::chrono::duration<float> diff = cur - RobotControls::start;
+    return diff.count();
 }

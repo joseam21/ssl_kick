@@ -2,7 +2,8 @@
 #define ROBOTCONTROLS
 
 #include <stdio.h>
-#include "timer.h"
+#include <chrono>
+#include <ctime>
 
 #include "robocup_ssl_client.h"
 
@@ -36,6 +37,10 @@ private:
     static RobotFSM blueRobots[];
     static deque<std::pair<float,float>> ballloc;
     static deque<float> balltime;
+    static std::chrono::time_point<std::chrono::system_clock> start;
+    
+    static float getTime(); // returns time in seconds
+    
     static void updateRobotsThread();    // Thread to update the Robots from the vision information
     static void sendRobotCommandThread();// Thread to calculate + send commands to the Simulator
     
