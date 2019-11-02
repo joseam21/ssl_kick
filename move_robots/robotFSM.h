@@ -4,13 +4,16 @@
 #include<utility>
 #include<deque>
 #include<mutex>
+#include "moveableobject.h"
 
 #define PI 3.1415926535897
 #define USE_WHEEL_VEL 0     // toggle whether or not to use wheel velocity 
-#define V_MAX 1.5
-#define V_ANG_MAX 2.4
+#define V_MAX 3
+#define V_ANG_MAX 2
 
 #define SIZE 60
+
+// NOTE: Robots accelerate at approx 150 rad/s^2 and 5.2 m/s
 
 enum RobotMoveState{
     MOVE_CONSTANT_DIRECTION=1,   // uses constant_direction_dir
@@ -28,7 +31,7 @@ enum RobotTurnState{
     TURN_DIRECTION_OF_MOVEMENT=5
 };
 
-class RobotFSM{
+class RobotFSM : public MoveableObject{
 public:
     RobotFSM();
     RobotFSM(const RobotFSM& robotFSM);
@@ -92,48 +95,13 @@ public:
      * @param float specifying the current time of the program
      */
     void send_Command(float cur_time);
-    //TODO: move geometric properties to superclass MovableObject
-    /**
-     * Updates the robot 
-     * @param float specifying the last updated x position, 0 as the center, in m
-     * @param float specifying the last updated y position, 0 as the center, in m
-     * @param float specifying the last updated orientation/angle 
-     * @param float specifying the last updated time of the program in s
-     */
-    void update_geometry(float x1, float y1, float angle1, float time1);
     // setters
     void set_id(int id1);
     void set_isYellow(bool isYellow1);
-    // getters
-    // returns the last updated x position of the robot in m
-    float get_x();
-    // returns the last updated y position of the robot in m
-    float get_y();
-    // returns the last updated angle of the robot in radians from -PI to PI
-    float get_angle();
-    // returns the last updated velocity of the robot as a pair of floats in m/s of x and y directions
-    std::pair<float,float> get_vel();
-    // returns the last updated velocity of the robot as float in rad/s
-    float get_ang_vel();
-    // returns the speed of the robot in m/s
-    float get_speed();
-    // methods for estimation of speed and position if telemetry stops
-    /** NOT IMPLEMENTED
-     * returns a pair of floats specifying the estimation of the current velocity
-     * based on acceleration assumptions
-     */
-    std::pair<float,float> get_vel_est();
-    /** NOT IMPLEMENTED
-     * returns a pair of floats specifying the estimation of the current position
-     * based on acceleration assumptions
-     */
-    std::pair<float,float> get_pos_est();
 private:
     // private data
     int id;
     bool isYellow;
-    std::deque<float> x, y, angle, time; // sorted by time, so x[0] is the most recent x variable
-    // for angle, 0 is towards the right(yellow goal) side and is the same for both blue and yellow, increases counterclockwise like in radial coordinates, so positive angular velocity turns you left and negative turns you right
     float velangular,velnormal,veltangent;
     //ball manipulation variables
     float kick_speed_x, kick_speed_z, kick_tries; // kick_speed_z is chip
@@ -147,16 +115,15 @@ private:
     std::pair<float,float> constant_location_loc;   // first is x, second is y for all location pairs
     std::pair<float,float> * variable_location_loc;
     // thread stuff
-    mutable std::mutex mtx_x, mtx_y, mtx_angle, mtx_time, mtx_robot_move_state, mtx_robot_turn_state; // used for mutex lock due to threading, lock for x,y,angle, and robot_state
+    mutable std::mutex mtx_robot_move_state, mtx_robot_turn_state; // used for mutex lock due to threading, lock for x,y,angle, and robot_state
     // storing errors for PID alogrithm
     std::deque<float> move_error, angle_error;
     // private functions
-    void update_x(float x1);
-    void update_y(float y1);
-    void update_angle(float angle1);
-    void update_time(float time1);
     // resets varaibles so it doesn't interfere with state changes
     void reset_state_variables();
+    
+    std::pair<float,float> compute_plane_vel(float time1);
+    float compute_ang_vel(float time1);
 };
 
 #endif
