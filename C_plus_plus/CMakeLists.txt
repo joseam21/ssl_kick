@@ -11,5 +11,5 @@ set (RoboCup_Strategy_VERSION_MINOR 0)
 include_directories("${PROJECT_BINARY_DIR}")
  
 # add the executable
-add_executable(strategy strategy.cpp)
+add_executable(strategy basic_offense.cpp)
 

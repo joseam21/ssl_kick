@@ -10,7 +10,7 @@ void BasicOffense::play(){
     } else{
         int receiver = canPass();
         if (receiver != 7) {
-            pose receiver_loc = robots[receiver];
+            RobotFSM receiver_loc = controller.getRobot(true, receiver);
             //tell robot to pass!
         } else {
             // dribble towards goal
