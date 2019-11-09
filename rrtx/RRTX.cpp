@@ -11,8 +11,8 @@ RRTX::RRTX(float w, float h){
 
     std::random_device seeder;
     std::mt19937 engine(seeder());
-    std::uniform_int_distribution<float> genW(0, w);
-    std::uniform_int_distribution<float> genH(0, h);
+    std::uniform_real_distribution<float> genW(0, w);
+    std::uniform_real_distribution<float> genH(0, h);
     map_width = w;
     map_height = h;
     start = new Node(genW(engine), genH(engine)); // temporarily a random point
@@ -34,8 +34,8 @@ RRTX::RRTX(float w, float h){
 Node* RRTX::getRandomPoint() {
     std::random_device seeder;
     std::mt19937 engine(seeder());
-    std::uniform_int_distribution<float> genW(0, map_width);
-    std::uniform_int_distribution<float> genH(0, map_height);
+    std::uniform_real_distribution<float> genW(0, map_width);
+    std::uniform_real_distribution<float> genH(0, map_height);
     Node* counter = new Node(genW(engine), genH(engine));;
     while(!validNode(counter)){
         delete counter;
