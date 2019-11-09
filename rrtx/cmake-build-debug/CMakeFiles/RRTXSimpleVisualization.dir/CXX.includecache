@@ -1,0 +1,40 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/iperez/CLionProjects/RRTXSimpleVisualization/Node.h
+vector
+-
+tuple
+-
+limits
+-
+cmath
+-
+string
+-
+iostream
+-
+
+/Users/iperez/CLionProjects/RRTXSimpleVisualization/RRTX.cpp
+RRTX.h
+/Users/iperez/CLionProjects/RRTXSimpleVisualization/RRTX.h
+
+/Users/iperez/CLionProjects/RRTXSimpleVisualization/RRTX.h
+Node.h
+/Users/iperez/CLionProjects/RRTXSimpleVisualization/Node.h
+queue
+-
+vector
+-
+random
+-
+tuple
+-
+algorithm
+-
+
