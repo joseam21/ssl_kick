@@ -14,6 +14,7 @@
 #include "grSim_Commands.pb.h"
 #include "grSim_Replacement.pb.h"
 #include "robotFSM.h"
+#include "network.h"
 #include <thread>
 #include <utility>
 #include <unistd.h>

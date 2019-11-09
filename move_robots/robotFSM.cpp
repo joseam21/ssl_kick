@@ -3,6 +3,7 @@
 #include "grSim_Commands.pb.h"
 #include "grSim_Replacement.pb.h"
 #include "messages_robocup_ssl_wrapper.pb.h"
+#include "network.h"
 #include <iostream>
 #include <arpa/inet.h>
 #include <netinet/in.h>
@@ -145,63 +146,76 @@ void RobotFSM::kick(float kick_speed_x1, float kick_speed_z1, int kick_tries1)
 
 void RobotFSM::send_Command(float cur_time)
 {
-    grSim_Packet packet;
+    /*grSim_Packet packet;
     packet.mutable_commands()->set_isteamyellow(isYellow);
     packet.mutable_commands()->set_timestamp(cur_time);
     grSim_Robot_Command* command = packet.mutable_commands()->add_robot_commands();
-    command->set_id(id);
-    if(USE_WHEEL_VEL)
+    command->set_id(id);*/
+    bool wheelsspeed1;
+    float kick_speed_x1, kick_speed_z1, wheel1,wheel2,wheel3,wheel4;
+    /*if(USE_WHEEL_VEL)
     {
         command->set_wheelsspeed(true);
     }else
     {
         command->set_wheelsspeed(false);
-    }
+    }*/
     
-    command->set_spinner(spinner);
-    
+    //command->set_spinner(spinner);
+    wheelsspeed1 = USE_WHEEL_VEL == 1;
     if(kick_tries > 0)
     {
-        command->set_kickspeedx(kick_speed_x);
-        command->set_kickspeedz(kick_speed_z);
+        //command->set_kickspeedx(kick_speed_x);
+        //command->set_kickspeedz(kick_speed_z);
+        kick_speed_x1 = kick_speed_x;
+        kick_speed_z1 = kick_speed_z;
         kick_tries--;
     }
     else {
-        command->set_kickspeedx(0);
-        command->set_kickspeedz(0);
+        //command->set_kickspeedx(0);
+        //command->set_kickspeedz(0);
+        kick_speed_x1 = 0;
+        kick_speed_z1 = 0;
     }
-    //printf("1\n");
-    //fflush(stdout);
     std::pair<float,float> vels = compute_plane_vel(cur_time);
-    //printf("2\n");
-    //fflush(stdout);
     veltangent = vels.first;
     velnormal = vels.second;
     velangular = compute_ang_vel(cur_time);
-    //printf("3\n");
-    //fflush(stdout);
     if(USE_WHEEL_VEL){
         float * wheels = new float[4]; 
-	wheel_velocities(velnormal,veltangent,velangular, wheels);
+	    wheel_velocities(velnormal,veltangent,velangular, wheels);
+        /*
         command->set_wheel1(*wheels);
         command->set_wheel2(*(wheels+1));
         command->set_wheel3(*(wheels+2));
         command->set_wheel4(*(wheels+3));
         command->set_veltangent(0.0);
         command->set_velnormal(0.0);
-        command->set_velangular(0.0);
+        command->set_velangular(0.0);*/
+        wheel1 = *wheels;
+        wheel2 = *(wheels+1);
+        wheel3 = *(wheels+2);
+        wheel4 = *(wheels+3);
 	delete wheels;
     }else
     {
+        /*
         command->set_veltangent(veltangent);
         command->set_velnormal(velnormal);
         command->set_velangular(velangular);
+        */
+        wheel1 = 0;
+        wheel2 = 0;
+        wheel3 = 0;
+        wheel4 = 0;
     }
     //if(id == 0 && isYellow){
     //    packet.PrintDebugString();
     //}
     // Serialize
-    std::string packet_str;
+    sendCommand(isYellow,cur_time,id,kick_speed_x1,kick_speed_z1,veltangent,velnormal,
+        velangular,spinner,wheelsspeed1,wheel1,wheel2,wheel3,wheel4);
+    /*std::string packet_str;
     packet.SerializeToString(&packet_str);
 
     // Send protobuf message
@@ -221,7 +235,7 @@ void RobotFSM::send_Command(float cur_time)
         close(fd);
         return;
     }
-    close(fd);
+    close(fd);*/
     
     //printf("\nDONE\n");
 }
@@ -331,6 +345,8 @@ float RobotFSM::compute_ang_vel(float time1)
             break;
         }
     }
+    mtx_time.unlock();
+    mtx_robot_turn_state.unlock();
     return res;
 }
 
@@ -358,6 +374,7 @@ void wheel_velocities(float velnormal, float veltangent, float velangular, float
 	double phi_2 = 45*M_PI/180;
 	double R = 0.0289;
 	*/
+	
 	velnormal = -velnormal;
 	
 	//* This can also be correct

@@ -11,7 +11,6 @@ std::chrono::time_point<std::chrono::system_clock> RobotControls::start = std::c
 RobotControls::RobotControls()
 {
     // setup the robots   
-    
     for(int i = 0; i < 6; i++){
         yellowRobots[i].set_id(i);
         yellowRobots[i].set_isYellow(true);
