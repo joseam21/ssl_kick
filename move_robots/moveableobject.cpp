@@ -9,6 +9,8 @@ MoveableObject::MoveableObject(bool hasOrientation1):hasOrientation(hasOrientati
 void MoveableObject::update_geometry(float x1, float y1, float angle1, float time1, float confidence1){
     // assert base assumptions
     mtx_time.lock();
+    //printf("Object at pos %.3f, %.3f with angle %.3f at time %.3f with confidence %.3f\n",x1,y1,angle1,time1, confidence1);
+    //fflush(stdout);
     assert(x.size() == y.size());
     assert(y.size() == angle.size());
     assert(angle.size() == time.size());

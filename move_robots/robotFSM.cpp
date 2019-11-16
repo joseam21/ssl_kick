@@ -235,9 +235,9 @@ std::pair<float,float> RobotFSM::compute_plane_vel(float time1)
             // I'm wondering if a cube root function on the error calclulation would improve PID
             //printf("Y: %d, ID: %d ,angle: %f\n",isYellow?0:1,id,angle_diff);
             //fflush(stdout);
-            const float K_p = 3.0;
-            const float K_i = 0.06;
-            const float K_d = 0.02;
+            const float K_p = 2.0;
+            const float K_i = 0.03;
+            const float K_d = 1.7;
             float optimal_velocity = get_PID_result(new_error, time, move_error,K_p,K_i,K_d,-V_MAX,V_MAX);
             res = std::make_pair(cos(angle_diff*-1)*optimal_velocity,sin(angle_diff*-1)*optimal_velocity);
             break;
@@ -274,9 +274,9 @@ float RobotFSM::compute_ang_vel(float time1)
         case TURN_CONSTANT_DIRECTION:
         {
             float new_error = get_angle_diff(get_angle(),constant_direction_dir);
-            const float K_p = -3.5;
-            const float K_i = -0.06;
-            const float K_d = -0.001;
+            const float K_p = -2.5;
+            const float K_i = -0.03;
+            const float K_d = -0.7;
             res = get_PID_result(new_error,time,angle_error, K_p,K_i,K_d,-V_ANG_MAX,V_ANG_MAX);
             //res = 0;
             break;

@@ -68,13 +68,13 @@ void RobotControls::updateRobotsThread()
             if(packet.has_detection())
             {
                 float t = getTime();
-                printf("Packet Received at Time: %f\n", t);
-                fflush(stdout);
+                //printf("Packet Received at Time: %f\n", t);
+                //fflush(stdout);
                 SSL_DetectionFrame detection = packet.detection();
                 if(detection.balls_size() > 0)
                 {
                     SSL_DetectionBall dball = detection.balls(0);
-                    ball.update_geometry(dball.x()/1000,dball.y()/1000,0,dball.confidence(),t);
+                    ball.update_geometry(dball.x()/1000,dball.y()/1000,0,t,dball.confidence());
                 }
                 int num_blue_robots = detection.robots_blue_size();
                 int num_yellow_robots = detection.robots_yellow_size();
@@ -84,7 +84,7 @@ void RobotControls::updateRobotsThread()
                     int id = robot.robot_id();
                     assert(id < 6);
                     assert(id >= 0);
-                    blueRobots[id].update_geometry(robot.x()/1000,robot.y()/1000,robot.orientation(),robot.confidence(),t);
+                    blueRobots[id].update_geometry(robot.x()/1000,robot.y()/1000,robot.orientation(),t,robot.confidence());
                 }
                 for(int i = 0; i < num_yellow_robots; i++)
                 {
@@ -92,7 +92,7 @@ void RobotControls::updateRobotsThread()
                     int id = robot.robot_id();
                     assert(id < 6);
                     assert(id >= 0);
-                    yellowRobots[id].update_geometry(robot.x()/1000,robot.y()/1000,robot.orientation(),robot.confidence(),t);
+                    yellowRobots[id].update_geometry(robot.x()/1000,robot.y()/1000,robot.orientation(),t,robot.confidence());
                 }
             }
             // it's possible for the packet to have geometry information about the field, but for the most part we assume the field is correct and constant, so we have no use for the information
