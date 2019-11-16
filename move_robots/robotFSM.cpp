@@ -331,7 +331,7 @@ void wheel_velocities(float velnormal, float veltangent, float velangular, float
 	double phi_2 = 45*M_PI/180;
 	double R = 0.0289;
 	*/
-	
+	double scaling_factor = 3.5;
 	velnormal = -velnormal;
 	
 	//* This can also be correct
@@ -342,10 +342,10 @@ void wheel_velocities(float velnormal, float veltangent, float velangular, float
 	// Find out if the following code can be vectorized later
 	//* C
 	// Caused weird behaviour, probably different implementation in simulator
-    wheels[3] = (-sin(phi_1)*velnormal + cos(phi_1)*veltangent + R*velangular)/R;
-    wheels[0] = (-sin(phi_1)*velnormal - cos(phi_1)*veltangent + R*velangular)/R;
-    wheels[1] = (sin(phi_2)*velnormal - cos(phi_2)*veltangent + R*velangular)/R;
-    wheels[2] = (sin(phi_2)*velnormal + cos(phi_2)*veltangent + R*velangular)/R;
+    wheels[3] = (-sin(phi_1)*velnormal + cos(phi_1)*veltangent + R*velangular*scaling_factor)/R;
+    wheels[0] = (-sin(phi_1)*velnormal - cos(phi_1)*veltangent + R*velangular*scaling_factor)/R;
+    wheels[1] = (sin(phi_2)*velnormal - cos(phi_2)*veltangent + R*velangular*scaling_factor)/R;
+    wheels[2] = (sin(phi_2)*velnormal + cos(phi_2)*veltangent + R*velangular*scaling_factor)/R;
 	//*/
 	// We ARE SENDING ANGULAR VELOCITIES TO THE WHEELS
     return;
