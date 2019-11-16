@@ -15,6 +15,7 @@
 #include "grSim_Replacement.pb.h"
 #include "robotFSM.h"
 #include "network.h"
+#include "logger.h"
 #include <thread>
 #include <utility>
 #include <unistd.h>
@@ -31,14 +32,16 @@ public:
     static RobotFSM& getRobot(bool isYellow, int id); // IDs range from 0-5
     static std::pair<float,float> getCurrentBallLoc();
     static std::pair<float,float> getCurrentBallSpeed();
+    static void signalHandler(int signum);
 private:
     static const int size = 60;// size of the deque for the ball locations, approx 1 second at 60 fps
     
     static RobotFSM yellowRobots[];
     static RobotFSM blueRobots[];
-    static deque<std::pair<float,float>> ballloc;
-    static deque<float> balltime;
-    static std::chrono::time_point<std::chrono::system_clock> start;
+    // TODO: replace with MoveableObject
+    static MoveableObject ball;
+    static std::chrono::time_point<std::chrono::system_clock> start; // start time of program
+    static bool endsignal; // whether the program has been terminated or not
     
     static float getTime(); // returns time in seconds
     

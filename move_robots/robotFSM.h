@@ -98,6 +98,9 @@ public:
     // setters
     void set_id(int id1);
     void set_isYellow(bool isYellow1);
+    
+    // override base method for updating the geometry, mostly for debug purposes
+    void update_geometry(float x1, float y1, float angle1, float time1, float confidence1 = 1);
 private:
     // private data
     int id;

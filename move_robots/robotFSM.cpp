@@ -4,13 +4,14 @@
 #include "grSim_Replacement.pb.h"
 #include "messages_robocup_ssl_wrapper.pb.h"
 #include "network.h"
+#include "logger.h"
+#include <string>
 #include <iostream>
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <unistd.h>
 #include <math.h>
-
 
 float get_angle_diff(float angle1, float angle2);
 float get_PID_result(float new_error, std::deque<float> &time, std::deque<float> &error, float K_p, float K_i, float K_d, float min_result, float max_result);
@@ -189,6 +190,20 @@ void RobotFSM::set_id(int id1)
 void RobotFSM::set_isYellow(bool isYellow1)
 {
     isYellow = isYellow1;
+}
+struct datastruct{
+    float time2, x2, y2;
+};
+std::ostream& operator<< (std::ostream& os, const datastruct& ds){
+    return os << std::to_string(ds.time2) << ' ' << std::to_string(ds.x2) << ' ' << std::to_string(ds.y2) << '\n';
+}
+void RobotFSM::update_geometry(float x1, float y1, float angle1, float time1, float confidence1){
+    MoveableObject::update_geometry(x1,y1,angle1,time1,confidence1);
+    datastruct ds;
+    ds.time2 = time1;
+    ds.x2 = x1;
+    ds.y2 = y1;
+    Log((isYellow?"Y":"B")+std::to_string(id),ds);
 }
 
 void RobotFSM::reset_state_variables()
