@@ -27,7 +27,7 @@ bool sendCommand(bool isYellow, float timestamp, int id, float kickspeedx, float
     command->set_wheel2(wheel2);
     command->set_wheel3(wheel3);
     command->set_wheel4(wheel4);
-    packet.PrintDebugString();
+    //packet.PrintDebugString();
     // Serialize
     std::string packet_str;
     packet.SerializeToString(&packet_str);

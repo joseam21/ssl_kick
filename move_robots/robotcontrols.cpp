@@ -4,9 +4,9 @@
 
 RobotFSM RobotControls::yellowRobots[] = {RobotFSM(),RobotFSM(),RobotFSM(),RobotFSM(),RobotFSM(),RobotFSM()};
 RobotFSM RobotControls::blueRobots[]= {RobotFSM(),RobotFSM(),RobotFSM(),RobotFSM(),RobotFSM(),RobotFSM()};
-deque<std::pair<float,float>> RobotControls::ballloc = deque<std::pair<float,float>>();
-deque<float> RobotControls::balltime = deque<float>();
+MoveableObject RobotControls::ball(false);
 std::chrono::time_point<std::chrono::system_clock> RobotControls::start = std::chrono::system_clock::now();
+bool RobotControls::endsignal = false;
 
 RobotControls::RobotControls()
 {
@@ -42,13 +42,18 @@ RobotFSM& RobotControls::getRobot(bool isYellow, int id)
 
 std::pair<float,float> RobotControls::getCurrentBallLoc()
 {
-    return ballloc.front();
+    return std::make_pair(ball.get_x(),ball.get_y());
 }
 
 std::pair<float,float> RobotControls::getCurrentBallSpeed()
 {
-    return std::make_pair((ballloc[0].first-ballloc[1].first)/(balltime[0]-balltime[1]),
-            (ballloc[0].second-ballloc[1].second)/(balltime[0]-balltime[1]));
+    return ball.get_vel();
+}
+
+void RobotControls::signalHandler(int signum){
+    std::string s = "Interrupt Signal: " + std::to_string(signum) + " received\n";
+    Log("DEBUG",s);
+    endsignal = true;
 }
 
 void RobotControls::updateRobotsThread()
@@ -56,7 +61,7 @@ void RobotControls::updateRobotsThread()
     RoboCupSSLClient client;
     client.open(true);
     SSL_WrapperPacket packet;
-    while(true)
+    while(true && ! endsignal)
     {
         if(client.receive(packet))
         {
@@ -68,8 +73,8 @@ void RobotControls::updateRobotsThread()
                 SSL_DetectionFrame detection = packet.detection();
                 if(detection.balls_size() > 0)
                 {
-                    SSL_DetectionBall ball = detection.balls(0);
-                    ballloc.push_front(std::make_pair(ball.x(),ball.y()));
+                    SSL_DetectionBall dball = detection.balls(0);
+                    ball.update_geometry(dball.x()/1000,dball.y()/1000,0,t,dball.confidence());
                 }
                 int num_blue_robots = detection.robots_blue_size();
                 int num_yellow_robots = detection.robots_yellow_size();
@@ -79,7 +84,7 @@ void RobotControls::updateRobotsThread()
                     int id = robot.robot_id();
                     assert(id < 6);
                     assert(id >= 0);
-                    blueRobots[id].update_geometry(robot.x()/1000,robot.y()/1000,robot.orientation(),robot.confidence(),t);
+                    blueRobots[id].update_geometry(robot.x()/1000,robot.y()/1000,robot.orientation(),t,robot.confidence());
                 }
                 for(int i = 0; i < num_yellow_robots; i++)
                 {
@@ -87,7 +92,7 @@ void RobotControls::updateRobotsThread()
                     int id = robot.robot_id();
                     assert(id < 6);
                     assert(id >= 0);
-                    yellowRobots[id].update_geometry(robot.x()/1000,robot.y()/1000,robot.orientation(),robot.confidence(),t);
+                    yellowRobots[id].update_geometry(robot.x()/1000,robot.y()/1000,robot.orientation(),t,robot.confidence());
                 }
             }
             // it's possible for the packet to have geometry information about the field, but for the most part we assume the field is correct and constant, so we have no use for the information
@@ -97,7 +102,7 @@ void RobotControls::updateRobotsThread()
 
 void RobotControls::sendRobotCommandThread()
 {
-    while(true)
+    while(true && ! endsignal)
     {
         usleep(16000);// approx 60 times a second, which is approx how often we get info from vision
         for(int i = 0; i < 6; i++)
@@ -112,20 +117,22 @@ void RobotControls::sendRobotCommandThread()
 
 void RobotControls::setRobotStateThread()
 {
-    //printf("WOWWWWWW\n");
-    //fflush(stdout);
-    usleep(1000000); // in microseconds
-    for(int i = 0; i < 6; i++){
-        //yellowRobots[i].move_in_direction(0);
-        yellowRobots[i].move_to_location(std::make_pair(0,0));
+    vector<bool> sent(3,false);
+    while(true && ! endsignal){
+        usleep(1);
+        float time = getTime();
+        if(time > 1 && !sent[0]){
+            sent[0] = true;
+            for(int i = 0; i < 6; i++){
+                yellowRobots[i].move_to_location(std::make_pair(0,0));
+            }
+        }else if(time > 4 && !sent[1]){
+            sent[1] = true;
+            for(int i = 0; i < 6; i++){
+                yellowRobots[i].move_to_location(std::make_pair(0,i-2.5));
+            }
+        }
     }
-    //printf("WOWWWWWW\n");
-    //fflush(stdout);
-    usleep(5000000); // in microseconds
-    for(int i = 0; i < 6; i++){
-        yellowRobots[i].move_to_location(std::make_pair(0,i-2.5));
-    }
-    usleep(100000000);
 }
 
 float RobotControls::getTime(){
