@@ -54,6 +54,7 @@ void RobotControls::signalHandler(int signum){
     std::string s = "Interrupt Signal: " + std::to_string(signum) + " received\n";
     Log("DEBUG",s);
     endsignal = true;
+    usleep(100000000);
 }
 
 void RobotControls::updateRobotsThread()
@@ -61,7 +62,7 @@ void RobotControls::updateRobotsThread()
     RoboCupSSLClient client;
     client.open(true);
     SSL_WrapperPacket packet;
-    while(true && ! endsignal)
+    while(true && !endsignal)
     {
         if(client.receive(packet))
         {
@@ -102,7 +103,7 @@ void RobotControls::updateRobotsThread()
 
 void RobotControls::sendRobotCommandThread()
 {
-    while(true && ! endsignal)
+    while(true && (!endsignal))
     {
         usleep(16000);// approx 60 times a second, which is approx how often we get info from vision
         for(int i = 0; i < 6; i++)
@@ -118,7 +119,7 @@ void RobotControls::sendRobotCommandThread()
 void RobotControls::setRobotStateThread()
 {
     vector<bool> sent(3,false);
-    while(true && ! endsignal){
+    while(true && !endsignal){
         usleep(1);
         float time = getTime();
         if(time > 1 && !sent[0]){

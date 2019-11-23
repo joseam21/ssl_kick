@@ -10,6 +10,7 @@
 #define USE_WHEEL_VEL 0     // toggle whether or not to use wheel velocity 
 #define V_MAX 3
 #define V_ANG_MAX 2
+#define V_WHEEL_MAX 2
 
 #define SIZE 60
 
