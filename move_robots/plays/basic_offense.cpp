@@ -11,7 +11,7 @@ void BasicOffense::play(){
     RobotFSM attacker = controller.getRobot(true, posession);
 
     if (canScore()) {
-        attacker.kick(get<0>(goal_loc), get<1>(goal_loc), 1);
+        attacker.kick(goal_loc.first, goal_loc.second, 1);
     } else{
         int receiver = canPass();
         if (receiver != 7) {

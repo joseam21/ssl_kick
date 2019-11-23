@@ -5,14 +5,14 @@ Play::Play(RobotControls controls, int hasBall){
     controller = controls;
 }
 
-bool Play::clearPath(pose loc1, pose loc2){
+bool Play::clearPath(std::pair<float, float> loc1, std::pair<float, float> loc2){
     // check for enemy robots along line
-    float dist = pow(pow(get<0>(loc1) - get<0>(loc2), 2) + pow(get<1>(loc1) - get<1>(loc2), 2), 0.5);
-    float delta_y = get<1>(loc2) - get<1>(loc1);
-    float delta_x = get<0>(loc2) - get<0>(loc1);
+    float dist = pow(pow(loc1.first - loc2.first, 2) + pow(loc1.second - loc2.second, 2), 0.5);
+    float delta_y = loc2.second - loc1.second;
+    float delta_x = loc2.first - loc1.first;
     for (int n=0; n<6; n++){
         RobotFSM interceptor = controller.getRobot(false, n); 
-        float distFromLine = (delta_y*interceptor.get_x() - delta_x*interceptor.get_y() + get<0>(loc1)*get<1>(loc2) + get<1>(loc1)*get<0>(loc2)) / dist;
+        float distFromLine = (delta_y*interceptor.get_x() - delta_x*interceptor.get_y() + loc1.first*loc2.second + loc1.second*loc2.first) / dist;
         if (distFromLine < interference_distance)
             return false;
     }
@@ -24,8 +24,8 @@ bool Play::canScore(){
     RobotFSM withBall = controller.getRobot(true, posession);
     float x = withBall.get_x();
     float y = withBall.get_y();
-    float dist = pow(get<0>(goal_loc) - x, 2) + pow(get<1>(goal_loc) - y, 2);
-    pose shooter = std::make_tuple(x, y);
+    float dist = pow(goal_loc.first - x, 2) + pow(goal_loc.second - y, 2);
+    std::pair<float, float> shooter = std::make_pair(x, y);
     if (dist < posession_distance && clearPath(goal_loc, shooter))
         return true;
     return false;
@@ -36,7 +36,7 @@ int Play::canPass(){
     for (int n=0; n<6; n++){
         if (n != posession){
             RobotFSM receiver = controller.getRobot(true, n);
-            if (clearPath(std::make_tuple(receiver.get_x(), receiver.get_y()), std::make_tuple(withBall.get_x(), withBall.get_y())))
+            if (clearPath(std::make_pair(receiver.get_x(), receiver.get_y()), std::make_pair(withBall.get_x(), withBall.get_y())))
                 return n;
         }
     }
