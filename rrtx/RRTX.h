@@ -1,9 +1,9 @@
 //
-// Created by Ian Pérez on 10/21/19.
+// Created by Ian Pérez on 11/18/19.
 //
 
-#ifndef TESTINGRRTX_RRTX_H
-#define TESTINGRRTX_RRTX_H
+#ifndef RRTXOPTIMIZEDVISUALIZATION_RRTX_H
+#define RRTXOPTIMIZEDVISUALIZATION_RRTX_H
 
 
 #include "Node.h"
@@ -12,91 +12,24 @@
 #include <random>
 #include <tuple>
 #include <algorithm>
+#include <ompl/datastructures/NearestNeighborsGNAT.h>
+#include <boost/heap/fibonacci_heap.hpp>
 
-struct CompTuple{
-    float min;
-    float g;
-    Node* v;
-
-    CompTuple(float min, float g, Node* ve)
-    {
-        v = ve;
-        this->g = g;
-        this->min = min;
-    }
-
-    bool operator<(const CompTuple& tup){
-        if(this->min == tup.min){
-            return this->g < tup.g;
-        }
-        return this->min < tup.min;
-    }
-    bool operator>(const CompTuple& tup){
-        if(this->min == tup.min){
-            return this->g > tup.g;
-        }
-        return this->min > tup.min;
-    }
-    const bool operator==(const CompTuple& tup){
-        return this->min == tup.min && this->g == tup.g && this->v == tup.v;
-    }
-};
-
-struct CompareStructs{
-    bool operator() (CompTuple const& c1, CompTuple const& c2){
-        if(c1.min != c2.min){
-            return c1.min > c2.min;
-        }
-        else {
-            return c1.g > c2.g;
-        }
-    }
-};
-
-template<typename T>
-class MinHeap : public std::priority_queue<T, std::vector<T>, CompareStructs> //TODO: CHECK IF CUSTOM PQ WORKS
-{
-public:
-
-    bool remove(const T& value) {
-        auto it = std::find(this->c.begin(), this->c.end(), value);
-        if (it != this->c.end()) {
-            this->c.erase(it);
-            std::make_heap(this->c.begin(), this->c.end(), this->comp);
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-    bool find(const T& value) {
-        auto it = std::find(this->c.begin(), this->c.end(), value);
-        if (it != this->c.end()) {
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-    bool removeByNode(const Node& value) {
-        auto it = std::find_if(this->c.begin(), this->c.end(), [value](CompTuple s){return *s.v == value;});
-        if (it != this->c.end()) {
-            this->c.erase(it);
-            std::make_heap(this->c.begin(), this->c.end(), this->comp);
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-};
+using namespace boost;
 
 class RRTX {
+    typedef boost::heap::fibonacci_heap<Node *,
+            boost::heap::compare<node_compare> > Queue;
+    typedef Queue::handle_type handle_t;
+    typedef boost::unordered_map<Node *, handle_t> NodeMap;
+    typedef boost::unordered_map<Node *, bool> OrphanMap;
 public:
     RRTX(float width, float height);
     float eps;
     float delta;
     float r;
+    float gamd;
+    float lam;
 
     float map_width;
     float map_height;
@@ -105,12 +38,10 @@ public:
     Node* goal;
 
     std::vector<Node*> O;
-    std::vector<Node*> V;
-    std::vector<Node*> orphans;
-    MinHeap<CompTuple> Q;
-//    std::priority_queue<CompTuple, std::vector<CompTuple>, CompareStucts> Q;
-//    std::vector<CompTuple> Q_vect;
-    //void drawObstacles(); TODO: Implement drawing
+    ompl::NearestNeighborsGNAT<Node *> *V;
+    OrphanMap orphanHash;
+    Queue Q;
+    NodeMap nodeHash;
     Node* getRandomPoint();
     bool validNode(Node* q);
     void step();
@@ -119,7 +50,7 @@ public:
     void saturate(Node* v, Node* v_nearest);
     std::vector<Node*> near(Node* v, float r);
     void extend(Node* v, float r);
-
+    void removeNeighbors(std::vector<Node *> &neighbors, Node *toRemove);
     void cullNeighbors(Node* v, float r);
     void makeParentOf(Node* v, Node* u);
     float distance(Node* v, Node* u);
@@ -135,10 +66,16 @@ public:
     void addNewObstacle(Node* obs);
     void verifyQueue(Node* v);
     void updateLMC(Node* v);
+    void updateRadius();
+    void queueInsert(Node *v);
+    bool queueContains(Node *v);
+    void queueUpdate(Node *v);
+    void queueRemove(Node *v);
+    Node* queuePop();
+    void updateKey(Node *v);
+    void insertOrphanChildren(Node *v);
 
-    // add_goal_point
-    //drawTree
-    //drawPathToGoal
 };
 
-#endif //TESTINGRRTX_RRTX_H
+
+#endif //RRTXOPTIMIZEDVISUALIZATION_RRTX_H
