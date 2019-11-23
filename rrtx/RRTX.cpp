@@ -1,13 +1,19 @@
 //
+// Created by Ian Pérez on 11/18/19.
+//
+
+//
 // Created by Ian Pérez on 10/21/19.
 //
 
 #include "RRTX.h"
 
 RRTX::RRTX(float w, float h){
-    eps = 5.0;
-    delta = 10.0;
-    r = 2 * delta;
+    eps = 10.0; //TODO: Author suggests this to be width/2 or (safe distace)/2
+    delta = 20.0;
+    r = delta;
+    lam = 100000;
+    gamd = 1;
 
     std::random_device seeder;
     std::mt19937 engine(seeder());
@@ -20,15 +26,17 @@ RRTX::RRTX(float w, float h){
     goal = new Node(75.0, float((int)h / 2));
     goal->g = 0;
     goal->lmc = 0;
-
-    //Draw Yellow Circle of Start and End Goal
-
-    V = std::vector<Node*>();
-    V.push_back(goal);
-    orphans = std::vector<Node*>();
     O = std::vector<Node*>();
-    Q = MinHeap<CompTuple>();
+    V = new ompl::NearestNeighborsGNAT<Node*>();
+    V->setDistanceFunction([this](const Node *v, const Node *u){
+        return std::sqrt(((v->xcor - u->xcor) * (v->xcor - u->xcor)) + ((v->ycor - u->ycor) * (v->ycor - u->ycor)));
+    });
+    V->add(goal);
+    orphanHash = OrphanMap();
+    Q = Queue();
+    nodeHash = NodeMap();
 }
+
 ///Generates a random point that does not collide with an obstacle
 /// \returns A random valid Node
 Node* RRTX::getRandomPoint() {
@@ -57,36 +65,26 @@ bool RRTX::validNode(Node *q) {
     else return false;
 }
 
+void RRTX::updateRadius(){ //TODO: Verify Implementation
+    r = std::min(pow((lam/gamd) * log(std::max(1.0*V->size(), 2.0))/(1.0*V->size()), 1.0/2.0), 1.0*delta);
+}
+
+
 void RRTX::step() {
+    updateRadius();
     Node* v = getRandomPoint();
-    int s = V.size();
-    Node* v_nearest = nearest(v);
+    int s = V->size();
+    Node* v_nearest = V->nearest(v);
     if(v->distance(v_nearest) > delta){
         saturate(v, v_nearest);
     }
     if(validNode(v)){
         extend(v, r);
-    }
-    if(std::find(V.begin(), V.end(), v) != V.end()){
-        rewireNeightbors(v);
-        reduceInconsistency();
-    }
-}
-
-/// Finds the nearest node to the input node v
-/// \param v pointer to the input Node
-/// \return The nearest node
-Node* RRTX::nearest(Node* v) {
-    Node* nearest = NULL;
-    float best_dist = std::numeric_limits<float>::infinity();
-    for(Node* node : V){
-        float dist = v->distance(node);
-        if(nearest == NULL || v->distance(node) < best_dist){
-            nearest = node;
-            best_dist = v->distance(node);
+        if(v->parent != NULL){
+            rewireNeightbors(v);
+            reduceInconsistency();
         }
     }
-    return nearest;
 }
 
 /// Find's the best parent, as measured by lmc, for node v from the set of nodes U
@@ -161,55 +159,50 @@ void RRTX::saturate(Node* v, Node* v_nearest) {
     v->ycor = v_nearest->ycor + (delta * std::sin(heading));
 }
 
-/// Returns a set of all the nodes within radius r of node v
-/// \param v Referene to the input Node
-/// \param r Radius
-/// \return Set of nodes near v
-std::vector<Node*> RRTX::near(Node* v, float r) {
-    std::vector<Node*> near_nodes = std::vector<Node*>();
-    for(Node* node : V){
-        if(v->distance(node) <= r){
-            near_nodes.push_back(node);
-        }
-    }
-    return near_nodes;
-}
-
 /// First determines if v can be added to the RRT. If it can be added, it inserts v in to the RRT
 /// \param v pointer to the input Node
 /// \param r Radius
 void RRTX::extend(Node* v, float r) {
-    std::vector<Node*> V_near = near(v, r);
+    std::vector<Node *> V_near;
+    V->nearestR(v, r, V_near);
     findParent(v, V_near);
     if(v->parent == NULL){
         return;
     }
-    V.push_back(v);
+    V->add(v);
     v->parent->children.push_back(v);
 
     for(Node* u : V_near){
         if(possiblePath(v, u, O)){
             v->outgoing_0.push_back(u);
-            v->outgoing_r.push_back(u);
             u->incoming_r.push_back(v);
         }
         if(possiblePath(u, v, O)){
             u->outgoing_r.push_back(v);
             v->incoming_0.push_back(u);
-            v->incoming_r.push_back(u);
+        }
+    }
+}
+
+void RRTX::removeNeighbors(std::vector<Node *> &neighbors, Node *toRemove) {
+    for(auto it = neighbors.begin(); it != neighbors.end(); it++){
+        if(*(*it) == *toRemove){
+            neighbors.erase(it);
+            return;
         }
     }
 }
 
 void RRTX::cullNeighbors(Node* v, float r) { //Infinite Loop
-    std::vector<Node*> s = std::vector<Node*>();
-    for (auto p = v->outgoing_r.begin(); p != v->outgoing_r.end(); p++) {
-        s.push_back(*p);
-    }
-    for (Node* u : s) {
-        if(r < v->distance(u) && *(v->parent) != *u){
-            v->outgoing_r.erase(std::remove_if(v->outgoing_r.begin(), v->outgoing_r.end(), [u](Node* n){ return *n == *u; }), v->outgoing_r.end());
-            u->incoming_r.erase(std::remove_if(u->incoming_r.begin(), u->incoming_r.end(), [v](Node* n){ return *n == *v; }), u->incoming_r.end());
+    auto it = v->outgoing_r.begin();
+    while(it != v->outgoing_r.end()){
+        Node *u = *it;
+        if(v->parent != u && r < distance(v, u)){
+            it = v->outgoing_r.erase(it);
+            removeNeighbors(u->incoming_r, v);
+        }
+        else{
+            it++;
         }
     }
 }
@@ -226,19 +219,14 @@ void RRTX::makeParentOf(Node* v, Node* u) {
 void RRTX::rewireNeightbors(Node* v) {
     if(v->g - v->lmc > eps){
         cullNeighbors(v, r);
-        std::vector<Node*> newSet = std::vector<Node*>();
-        for(Node* uu : v->incoming_0){
-            newSet.push_back(uu);
-        }
-        for(Node* uu : v->incoming_r){
-            newSet.push_back(uu);
-        }
+        std::vector<Node*> inSet = v->inNeighbors();
         if(v->parent != NULL) {
-            newSet.erase(std::remove_if(newSet.begin(), newSet.end(), [v](Node *n) { return *n == *(v->parent); }),
-                         newSet.end());
+            inSet.erase(std::remove_if(inSet.begin(), inSet.end(), [v](Node *n) { return *n == *(v->parent); }),
+                         inSet.end());
         }
-        for(Node* u : newSet){
+        for(Node* u : inSet){
             if(u->lmc > distance(u, v) + v->lmc){
+                u->lmc = distance(u, v) + v->lmc; //TODO: Not in original Ask Why
                 makeParentOf(u, v);
                 if(u->g - u->lmc > eps){
                     verifyQueue(u);
@@ -249,17 +237,16 @@ void RRTX::rewireNeightbors(Node* v) {
 }
 
 bool RRTX::getBotCondition() {
-    CompTuple top = Q.top();
-    CompTuple robotKey = CompTuple{std::min(robot->g, robot->lmc), robot->g, robot};
-    bool botCondition = (robot->g != robot->lmc || robot->g == std::numeric_limits<float>::infinity() || Q.find(robotKey) || top < robotKey);
+    NodeKey top = Q.top()->key;
+    NodeKey robotKey = NodeKey(std::min(robot->g, robot->lmc), robot->g);
+    bool botCondition = (robot->g != robot->lmc || robot->g == std::numeric_limits<float>::infinity() || queueContains(robot) || top < robotKey);
     return botCondition;
 }
-
+//TODO: Change Queue to Boost:FibonacciHeap
+//TODO: Change V to be a NearestNeighborTree
 void RRTX::reduceInconsistency() {
     while(Q.size() > 0 && getBotCondition()){
-        CompTuple tup = Q.top();
-        Q.pop();
-        Node* v = tup.v;
+        Node *v = queuePop();
         if(v->g - v->lmc > eps){
             updateLMC(v);
             rewireNeightbors(v);
@@ -272,30 +259,16 @@ void RRTX::updateLMC(Node* v) {
     cullNeighbors(v, r);
     Node* p = NULL;
 
-    std::vector<Node*> newSet = std::vector<Node*>();
-    for(Node* uu : v->outgoing_0){
-        newSet.push_back(uu);
-    }
-    for(Node* uu : v->outgoing_r){
-        newSet.push_back(uu);
-    }
-    for(auto it = orphans.begin(); it != orphans.end(); it++){
-        auto res = std::find(newSet.begin(), newSet.end(), *it);
-        if(res != newSet.end()){
-            newSet.erase(res); //TODO: MIGHT NOT WORK
+    std::vector<Node*> outSet = v->outNeighbors();
+    for(Node *u : outSet){
+        if(orphanHash.find(u) != orphanHash.end() || u->parent == v)
+            continue;
+        if(v->lmc > distance(v, u) + u->lmc){
+            p = u;
         }
     }
-    for(Node* u : newSet){
-        if(u->parent != v){
-            if(v->lmc > distance(v, u) + u->lmc){
-                p = u;
-                break;
-            }
-        }
-    }
-    if(p != NULL){
+    if(p != NULL)
         makeParentOf(v, p);
-    }
 }
 
 void RRTX::updateObstacles(std::vector<Node*> removed, std::vector<Node*> added) {
@@ -316,7 +289,9 @@ void RRTX::updateObstacles(std::vector<Node*> removed, std::vector<Node*> added)
 
 void RRTX::removeObstacle(Node* obs) {
     std::vector<std::tuple<Node*, Node*>> E_obs = std::vector<std::tuple<Node*, Node*>>();
-    for(Node* v : V){
+    std::vector<Node*> nodes;
+    V->list(nodes);
+    for(auto v : nodes){
         for(Node* u : v->incoming_r){//near(v, r)){
             std::vector<Node*> newSet = {obs};
             if(!possiblePath(v, u, newSet)){
@@ -344,44 +319,45 @@ void RRTX::removeObstacle(Node* obs) {
         }
     }
 }
-
 void RRTX::verifyQueue(Node* v) {
-    CompTuple tup = CompTuple{ std::min(v->g, v->lmc), v->g, v};
-    if(Q.find(tup)){
-        bool found = false;
-        std::vector<CompTuple> removed = std::vector<CompTuple>();
-        while(!found){
-            CompTuple u = Q.top();
-            Q.pop();
-            if(u.v == v){
-                removed.push_back(tup);
-                found = true;
-            }
-            else{
-                removed.push_back(u);
-            }
-        }
-        for(CompTuple u : removed){
-            Q.push(u);
-        }
-    }
-    else{
-        Q.push(CompTuple{std::min(v->g, v->lmc), v->g, v});
-    }
+    if(queueContains(v)) queueUpdate(v);
+    else queueInsert(v);
+}
+
+void RRTX::queueInsert(Node *v) {
+    updateKey(v);
+    nodeHash[v] = Q.push(v);
+}
+bool RRTX::queueContains(Node *v) {
+    return nodeHash.find(v) != nodeHash.end();
+}
+void RRTX::queueUpdate(Node *v) {
+    updateKey(v);
+    Q.update(nodeHash[v]);
+}
+void RRTX::queueRemove(Node *v) {
+    Q.erase(nodeHash[v]);
+    nodeHash.erase(v);
+}
+Node* RRTX::queuePop() {
+    Node *toRmv = Q.top();
+    nodeHash.erase(toRmv);
+    Q.pop();
+    return toRmv;
+}
+void RRTX::updateKey(Node *v) {
+    v->key.k1 = std::min(v->g, v->lmc);
+    v->key.k2 = v->g;
 }
 
 void RRTX::addNewObstacle(Node* obs) {
     O.push_back(obs);
     std::vector<std::tuple<Node*, Node*>> E_obs = std::vector<std::tuple<Node*, Node*>>();
-    for(Node* v : V){
-        std::vector<Node*> newSet = std::vector<Node*>();
-        for(Node* uu : v->incoming_0){
-            newSet.push_back(uu);
-        }
-        for(Node* uu : v->incoming_r){
-            newSet.push_back(uu);
-        }
-        for(Node* u : newSet){
+    std::vector<Node*> nodes;
+    V->list(nodes);
+    for(auto v : nodes){
+        std::vector<Node*> inSet = v->inNeighbors();
+        for(Node* u : inSet){
             if(!possiblePath(v, u, O)){
                 E_obs.push_back(std::make_tuple(v, u));
             }
@@ -399,62 +375,50 @@ void RRTX::addNewObstacle(Node* obs) {
 }
 
 void RRTX::propagateDescendants() {
-    std::vector<Node*> stack;
-    for(auto it = orphans.begin(); it != orphans.end(); it++){
-        stack.push_back(*it);
+    std::vector<Node *> orphans;
+    orphans.reserve(orphanHash.size());
+    for(auto o: orphanHash){
+        orphans.push_back(o.first);
     }
-    while(stack.size() != 0){
-        std::vector<Node*> new_stack = std::vector<Node*>();
-        for(Node* orphan : stack){
-            for(Node* u : orphan->children){
-                orphans.push_back(u);
-                new_stack.push_back(u);
-            }
-        }
-        stack = new_stack;
+    for(auto v : orphans){
+        insertOrphanChildren(v);
     }
-    for(Node* v : orphans){
-        std::vector<Node*> newSet = std::vector<Node*>();
-        for(Node* uu : v->outgoing_0){
-            newSet.push_back(uu);
-        }
-        for(Node* uu : v->outgoing_r){
-            newSet.push_back(uu);
-        }
-        if(v->parent != NULL){
-            newSet.push_back(v->parent);
-        }
-        for(auto it = orphans.begin(); it != orphans.end(); it++){ //TODO: IMPROVE ALGORITHM, MORE EFFICIENT
-            auto res = std::find(newSet.begin(), newSet.end(), *it);//newSet.find(*it);
-            if(res != newSet.end()){
-                newSet.erase(res);
-            }
-        }
-        for(Node* u : newSet){
-            u->g = std::numeric_limits<float>::infinity();
-            verifyQueue(u);
+    orphans.clear();
+    orphans.reserve(orphanHash.size());
+    for(auto v : orphanHash){
+        orphans.push_back(v.first);
+    }
+    for(auto v : orphans){
+        std::vector<Node *> neighbors = v->outNeighbors();
+        if(v->parent != NULL) neighbors.push_back(v->parent);
+        for(auto n : neighbors){
+            if(orphanHash.find(n) != orphanHash.end()) continue;
+            n->g = std::numeric_limits<float>::infinity();
+            verifyQueue(n);
         }
     }
-
-    std::vector<Node*> orphanCopy;
-    for(auto it = orphans.begin(); it != orphans.end(); it++){
-        orphanCopy.push_back(*it);
-    }
-    for(Node* v : orphanCopy){
-        orphans.erase(std::remove(orphans.begin(), orphans.end(), v), orphans.end());
+    for(auto v : orphans){
         v->g = std::numeric_limits<float>::infinity();
         v->lmc = std::numeric_limits<float>::infinity();
         if(v->parent != NULL){
-            v->parent->children.erase(std::remove_if(v->parent->children.begin(), v->parent->children.end(), [v](Node* n){return *n == *v;}), v->parent->children.end());
+            auto &children = v->parent->children;
+            children.erase(std::remove_if(children.begin(), children.end(), [v](Node *c) {return v == c;}), children.end());
             v->parent = NULL;
         }
     }
+    orphanHash.clear();
 }
 
 void RRTX::verifyOrphan(Node* v) {
-    CompTuple key = { std::min(v->g, v->lmc), v->g, v};
-    if(Q.find(key)){
-        Q.remove(key);
+    if(queueContains(v)){
+        queueRemove(v);
     }
-    orphans.push_back(v);
+    orphanHash[v] = true;
+}
+
+void RRTX::insertOrphanChildren(Node *v) {
+    orphanHash[v] = true;
+    for(auto c : v->children){
+        insertOrphanChildren(c);
+    }
 }
