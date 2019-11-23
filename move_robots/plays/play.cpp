@@ -1,5 +1,10 @@
 #include "./play.h"
 
+Play::Play(RobotControls controls, int hasBall){
+    posession = hasBall;
+    controller = controls;
+}
+
 bool Play::clearPath(pose loc1, pose loc2){
     // check for enemy robots along line
     float dist = pow(pow(get<0>(loc1) - get<0>(loc2), 2) + pow(get<1>(loc1) - get<1>(loc2), 2), 0.5);

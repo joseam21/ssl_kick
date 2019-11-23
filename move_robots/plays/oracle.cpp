@@ -1,4 +1,9 @@
 #include "oracle.h"
+#include "basic_offense.h"
+
+Oracle::Oracle(RobotControls controls){
+    controller = controls;
+}
 
 int Oracle::find_posession(){
     pair<float, float> ball_loc = controller.getCurrentBallLoc();

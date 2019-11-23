@@ -2,6 +2,11 @@
 
 using namespace std;
 
+// BasicOffense (RobotControls controls, int hasBall) : Play(controls, hasBall){
+//             controller = controls;
+//             posession = hasBall;
+//         };
+
 void BasicOffense::play(){
     RobotFSM attacker = controller.getRobot(true, posession);
 

@@ -29,9 +29,4 @@ class Play {
         int guard(int);
 };
 
-Play::Play(RobotControls controls, int hasBall){
-    posession = hasBall;
-    controller = controls;
-}
-
 #endif //PLAY_H
