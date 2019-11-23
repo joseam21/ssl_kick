@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 2.8)
+cmake_minimum_required (VERSION 3.11)
 
 project (move_bots)
 
@@ -20,8 +20,7 @@ message ("PROTO_CPP = ${PROTO_CPP}")
 message ("PROTO_H = ${PROTO_H}")
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-add_executable(move_bots logger.cpp moveableobject.cpp move.cpp network.cpp robotFSM.cpp netraw.cpp robocup_ssl_client.cpp robotcontrols.cpp main.cpp ${PROTO_CPP} ${PROTO_H})
-
+add_executable(move_bots logger.cpp moveableobject.cpp move.cpp network.cpp robotFSM.cpp netraw.cpp robocup_ssl_client.cpp robotcontrols.cpp main.cpp plays/basic_offense.cpp plays/play.cpp plays/oracle.cpp ${PROTO_CPP} ${PROTO_H})
 target_include_directories(move_bots
     PUBLIC
     ${PROTOBUF_INCLUDE_DIRS}
