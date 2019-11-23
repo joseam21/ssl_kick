@@ -1,9 +1,10 @@
 //
-// Created by Ian Pérez on 10/29/19.
+// Created by Ian Pérez on 11/18/19.
 //
 
-#ifndef RRTXSIMPLEVISUALIZATION_VISUALIZER_H
-#define RRTXSIMPLEVISUALIZATION_VISUALIZER_H
+#ifndef RRTXOPTIMIZEDVISUALIZATION_VISUALIZER_H
+#define RRTXOPTIMIZEDVISUALIZATION_VISUALIZER_H
+
 
 #include <QDialog>
 #include <QtCore>
@@ -20,7 +21,7 @@ QT_END_NAMESPACE
 
 class Visualizer : public QMainWindow
 {
-    Q_OBJECT
+Q_OBJECT
 
 public:
     RRTX* rrtx;
@@ -46,4 +47,4 @@ private:
 };
 
 
-#endif //RRTXSIMPLEVISUALIZATION_VISUALIZER_H
+#endif //RRTXOPTIMIZEDVISUALIZATION_VISUALIZER_H
