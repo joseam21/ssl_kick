@@ -171,7 +171,7 @@ void RobotFSM::send_Command(float cur_time)
         wheel2 = *(wheels+1);
         wheel3 = *(wheels+2);
         wheel4 = *(wheels+3);
-	delete wheels;
+	delete [] wheels;
     }else
     {
         wheel1 = 0;
@@ -331,21 +331,68 @@ void wheel_velocities(float velnormal, float veltangent, float velangular, float
 	double phi_2 = 45*M_PI/180;
 	double R = 0.0289;
 	*/
-	double scaling_factor = 3.5;
+	double scaling_factor = 3.041667; // 0.073/0.024 according to config files
 	velnormal = -velnormal;
 	
 	//* This can also be correct
-	double phi_1 = 30*M_PI/180;
-	double phi_2 = 45*M_PI/180;
-	double R = 0.027;
+	double phi = 35*M_PI/180;
+	double R = 0.024;
 	//*/	
 	// Find out if the following code can be vectorized later
 	//* C
 	// Caused weird behaviour, probably different implementation in simulator
+	double max_wheel_ang = abs(velangular*scaling_factor); // wheel angular velocity contribution from angular movement
+	double max_wheel_tan = abs(veltangent/(R*cos(phi)));
+	double max_wheel_norm = abs(velnormal/(R*sin(phi)));
+	double polarity_ang = ((velangular*scaling_factor)>0)?1:-1;
+	double polarity_tan = ((veltangent/(R*cos(phi)))>0)?1:-1;
+	double polarity_norm = ((velnormal/(R*sin(phi)))>0)?1:-1;
+	// we want adj_wheel_ang + adj_wheel_tan + adj_wheel_norm to be less than 1 but as close to it as possible
+	if(max_wheel_ang + max_wheel_tan+max_wheel_norm > 1){
+	    if(max_wheel_tan + max_wheel_norm > 0.8 * V_WHEEL_MAX && max_wheel_ang < 0.6 * V_WHEEL_MAX){
+	        // movement takes precedence, unless we decide to adjust this cutoff later depending on priority of movement
+	        max_wheel_ang = std::min(max_wheel_ang, 0.2 * V_WHEEL_MAX); // cap at 0.2 
+	        if(max_wheel_tan > 0.8 * V_WHEEL_MAX && max_wheel_norm < 0.6 * V_WHEEL_MAX){
+	            // movement in the tangential direction takes precedence
+	            max_wheel_norm = std::min(max_wheel_norm,0.2*V_WHEEL_MAX);
+	            max_wheel_tan = 1 - (max_wheel_norm +max_wheel_ang);
+	        }else if(max_wheel_norm > 0.8 * V_WHEEL_MAX && max_wheel_tan < 0.6 * V_WHEEL_MAX){
+	            // movement in the normal direction takes precedence (strafing)
+	            max_wheel_tan = std::min(max_wheel_tan, 0.2*V_WHEEL_MAX);
+	            max_wheel_norm = 1 - (max_wheel_tan + max_wheel_ang);
+	        }else{
+	            // evenly distribute them
+	            double ratio = (1-max_wheel_ang)/(max_wheel_tan+max_wheel_norm);
+	            max_wheel_tan *= ratio;
+	            max_wheel_norm *= ratio;
+	        }
+	    }else if(max_wheel_ang > 0.8 * V_WHEEL_MAX && max_wheel_tan + max_wheel_norm < 0.6*V_WHEEL_MAX){
+	        //angling robot takes precedence
+	        max_wheel_ang = std::min(max_wheel_ang, 0.8*V_WHEEL_MAX);
+	        double ratio = (1-max_wheel_ang)/(max_wheel_tan+max_wheel_norm);
+	        max_wheel_tan *= ratio;
+	        max_wheel_norm *= ratio;
+	    }else{
+	        //evenly split all 3
+	        double ratio = 1/(max_wheel_tan+max_wheel_norm+max_wheel_ang);
+	        max_wheel_tan *= ratio;
+	        max_wheel_norm *= ratio;
+	        max_wheel_ang *= ratio;
+	    }
+	}
+	/*
     wheels[3] = (-sin(phi_1)*velnormal + cos(phi_1)*veltangent + R*velangular*scaling_factor)/R;
     wheels[0] = (-sin(phi_1)*velnormal - cos(phi_1)*veltangent + R*velangular*scaling_factor)/R;
     wheels[1] = (sin(phi_2)*velnormal - cos(phi_2)*veltangent + R*velangular*scaling_factor)/R;
     wheels[2] = (sin(phi_2)*velnormal + cos(phi_2)*veltangent + R*velangular*scaling_factor)/R;
+    */
+    max_wheel_ang *= polarity_ang;
+    max_wheel_tan *= polarity_tan;
+    max_wheel_norm *= polarity_norm;
+    wheels[0] = max_wheel_ang - max_wheel_tan - max_wheel_norm;
+    wheels[1] = max_wheel_ang - max_wheel_tan + max_wheel_norm;
+    wheels[2] = max_wheel_ang + max_wheel_tan + max_wheel_norm;
+    wheels[3] = max_wheel_ang + max_wheel_tan - max_wheel_norm;
 	//*/
 	// We ARE SENDING ANGULAR VELOCITIES TO THE WHEELS
     return;
