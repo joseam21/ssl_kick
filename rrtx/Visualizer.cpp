@@ -1,5 +1,5 @@
 //
-// Created by Ian Pérez on 10/29/19.
+// Created by Ian Pérez on 11/18/19.
 //
 
 #include "Visualizer.h"
@@ -27,11 +27,14 @@ Visualizer::Visualizer(QWidget *parent)
 }
 
 void Visualizer::handleStart() {
-    std::cout << "START" << std::endl;
-    for(int i = 0; i < 4500; i++){
+    auto t1 = std::chrono::high_resolution_clock::now();
+    for(int i = 0; i < 9000; i++){
         rrtx->step();
     }
-    Node* nearestToRobot = rrtx->nearest(rrtx->start);
+    auto t2 = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
+    std::cout << "TOTAL DURATION: " << duration << std::endl;
+    Node* nearestToRobot = rrtx->V->nearest(rrtx->start);
     rrtx->robot = new Node(nearestToRobot->xcor, nearestToRobot->ycor);
     rrtx->robot->parent = nearestToRobot->parent;
     std::cout << "END" << std::endl;
@@ -81,7 +84,9 @@ void Visualizer::drawTree(QPainter* qPainter) {
     QPen redPen(Qt::red);
     QBrush blackBrush(Qt::black);
     QBrush redBrush(Qt::red);
-    for(Node* node : rrtx->V){
+    std::vector<Node*> nodes;
+    rrtx->V->list(nodes);
+    for(auto node : nodes){
         int x, y;
         std::tie(x, y) = node->getIntCoords();
         if(node->parent != NULL){
@@ -128,7 +133,7 @@ void Visualizer::drawGoal(QPainter* qPainter){
     qPainter->drawEllipse(QPoint(x, y), 20, 20);
 }
 void Visualizer::drawPathToGoal(QPainter* qPainter){
-    if(rrtx->V.size() < 1000) return;
+    if(rrtx->V->size() < 1000) return;
     QPen p = QPen(Qt::magenta);
     p.setWidth(5);
     qPainter->setPen(p);
@@ -145,11 +150,8 @@ void Visualizer::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
     drawObstacles(&painter);
-    drawGoal(&painter);
-    drawRobot(&painter);
     drawPathToGoal(&painter);
     drawTree(&painter);
+    drawGoal(&painter);
+    drawRobot(&painter);
 }
-
-
-
