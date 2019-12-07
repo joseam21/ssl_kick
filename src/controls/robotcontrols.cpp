@@ -1,26 +1,28 @@
 #include "robotcontrols.h"
 
-
-
+void sampleSetRobotStateFunction(float time){
+    if(time > 1){
+        RobotControls::getRobot(true,0).move_to_location(std::make_pair(0,0));
+    }
+}
 RobotFSM RobotControls::yellowRobots[] = {RobotFSM(),RobotFSM(),RobotFSM(),RobotFSM(),RobotFSM(),RobotFSM()};
 RobotFSM RobotControls::blueRobots[]= {RobotFSM(),RobotFSM(),RobotFSM(),RobotFSM(),RobotFSM(),RobotFSM()};
 MoveableObject RobotControls::ball(false);
 std::chrono::time_point<std::chrono::system_clock> RobotControls::start = std::chrono::system_clock::now();
-bool RobotControls::endsignal = false;
+volatile bool RobotControls::endsignal = false;
+std::function<void(float)> RobotControls::setRobotStateFunction = sampleSetRobotStateFunction;
 
-RobotControls::RobotControls()
+RobotControls::RobotControls(){}
+
+void RobotControls::go(std::function<void(float)> setRobotStateFunction1)
 {
-    // setup the robots   
     for(int i = 0; i < 6; i++){
         yellowRobots[i].set_id(i);
         yellowRobots[i].set_isYellow(true);
         blueRobots[i].set_id(i);
         blueRobots[i].set_isYellow(false);
     }
-}
-
-void RobotControls::go()
-{
+    setRobotStateFunction = setRobotStateFunction1;
     std::thread t1(updateRobotsThread);
     std::thread t2(sendRobotCommandThread);
     std::thread t3(setRobotStateThread);
@@ -62,7 +64,7 @@ void RobotControls::updateRobotsThread()
     RoboCupSSLClient client;
     client.open(true);
     SSL_WrapperPacket packet;
-    while(true && !endsignal)
+    while(!endsignal)
     {
         if(client.receive(packet))
         {
@@ -103,7 +105,7 @@ void RobotControls::updateRobotsThread()
 
 void RobotControls::sendRobotCommandThread()
 {
-    while(true && (!endsignal))
+    while(!endsignal)
     {
         usleep(16000);// approx 60 times a second, which is approx how often we get info from vision
         for(int i = 0; i < 6; i++)
@@ -115,11 +117,11 @@ void RobotControls::sendRobotCommandThread()
         }
     }
 }
-
+/*
 void RobotControls::setRobotStateThread()
 {
     vector<bool> sent(3,false);
-    while(true && !endsignal){
+    while(!endsignal){
         usleep(1);
         float time = getTime();
         if(time > 1 && !sent[0]){
@@ -133,6 +135,12 @@ void RobotControls::setRobotStateThread()
                 yellowRobots[i].move_to_location(std::make_pair(0,i-2.5));
             }
         }
+    }
+}*/
+void RobotControls::setRobotStateThread()
+{
+    while(!endsignal){
+        setRobotStateFunction(getTime());
     }
 }
 
