@@ -20,15 +20,31 @@ message ("PROTO_CPP = ${PROTO_CPP}")
 message ("PROTO_H = ${PROTO_H}")
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-add_executable(move_bots logger.cpp moveableobject.cpp move.cpp network.cpp robotFSM.cpp netraw.cpp robocup_ssl_client.cpp robotcontrols.cpp main.cpp plays/basic_offense.cpp plays/play.cpp plays/oracle.cpp ${PROTO_CPP} ${PROTO_H})
-target_include_directories(move_bots
+
+include_directories(${PROJECT_SOURCE_DIR}/src/controls)
+
+set (CNTRLS_SRCS ${CNTRLS_SRCS}
+        src/controls/logger.cpp
+        src/controls/moveableobject.cpp
+        src/controls/network.cpp
+        src/controls/robotFSM.cpp
+        src/controls/netraw.cpp
+        src/controls/robocup_ssl_client.cpp
+        src/controls/robotcontrols.cpp
+        src/controls/logger.cpp
+)
+
+#executable for controls testing
+add_executable(controls_test src/controls/main.cpp ${CNTRLS_SRCS} ${PROTO_CPP} ${PROTO_H})
+target_include_directories(controls_test
     PUBLIC
     ${PROTOBUF_INCLUDE_DIRS}
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 # link the exe against the libraries
-target_link_libraries(move_bots
+target_link_libraries(controls_test
     PUBLIC
     ${PROTOBUF_LIBRARIES}
 )
+
