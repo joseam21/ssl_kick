@@ -8,10 +8,8 @@ Only works on linux
 4. `cmake ..`
 5. `make`
 6. `cd ../bin`
-7. `./run`
-open grsim first
-set to 6 robots - in the game tab on the left
-Go into the move_robots folder. cmake, make and run move_robots
+7. open grsim
+8. `./run`
 
 ## Structure
 * path_planner
