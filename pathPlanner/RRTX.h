@@ -24,7 +24,7 @@ class RRTX {
     typedef boost::unordered_map<Node *, handle_t> NodeMap;
     typedef boost::unordered_map<Node *, bool> OrphanMap;
 public:
-    RRTX(float width, float height);
+    RRTX(float width, float height, Node* starting, Node* goal);
     float eps;
     float delta;
     float r;
@@ -74,7 +74,7 @@ public:
     Node* queuePop();
     void updateKey(Node *v);
     void insertOrphanChildren(Node *v);
-
+    std::vector<Node*> getNextPoints(int num = 5);
 };
 
 

@@ -7,7 +7,8 @@
 Visualizer::Visualizer(QWidget *parent)
         : QMainWindow(parent)
 {
-    rrtx = new RRTX(800, 500);
+    Node* newGoal = new Node(75.0, 300);
+    rrtx = new RRTX(800, 500, NULL, newGoal);
 //    rrtx->robot = rrtx->nearest(rrtxx->robot);
     m_start = new QPushButton("Start Tree", this);
     m_start->setGeometry(350, 520, 100, 50);
@@ -76,6 +77,16 @@ void Visualizer::handleMoveRobot() {
     Node* newN = new Node(rrtx->robot->parent->xcor, rrtx->robot->parent->ycor);
     newN->parent = rrtx->robot->parent->parent;
     rrtx->robot = newN;
+
+    std::vector<Node*> nextNodes = std::vector<Node*>();
+    nextNodes = rrtx->getNextPoints();
+
+    std::cout << "Next 5 Points: " << std::endl;
+
+    for(Node* n : nextNodes){
+        n->display();
+    }
+
     this->repaint();
 }
 

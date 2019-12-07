@@ -8,7 +8,7 @@
 
 #include "RRTX.h"
 
-RRTX::RRTX(float w, float h){
+RRTX::RRTX(float w, float h, Node* starting, Node* goal){
     eps = 10.0; //TODO: Author suggests this to be width/2 or (safe distace)/2
     delta = 20.0;
     r = delta;
@@ -23,9 +23,9 @@ RRTX::RRTX(float w, float h){
     map_height = h;
     start = new Node(genW(engine), genH(engine)); // temporarily a random point
     robot = new Node(start->xcor, start->ycor);
-    goal = new Node(75.0, float((int)h / 2));
-    goal->g = 0;
-    goal->lmc = 0;
+    this->goal = goal;
+    this->goal->g = 0;
+    this->goal->lmc = 0;
     O = std::vector<Node*>();
     V = new ompl::NearestNeighborsGNAT<Node*>();
     V->setDistanceFunction([this](const Node *v, const Node *u){
@@ -422,3 +422,26 @@ void RRTX::insertOrphanChildren(Node *v) {
         insertOrphanChildren(c);
     }
 }
+
+
+/// Returns the next num nodes from the path of the robot
+/// \param num Number of points to return
+/// \return std::vector<Node*> with the nodes
+std::vector<Node*> RRTX::getNextPoints(int num) {
+    std::vector<Node*> result = std::vector<Node*>();
+    result.reserve(num);
+    Node* newN = new Node(robot->parent->xcor, robot->parent->ycor);
+    newN->parent = robot->parent->parent;
+    int i = 0;
+    while(newN->distance(goal) >= 20 && i < num){
+        result.push_back(newN);
+        ++i;
+        delete newN;
+        newN = new Node(newN->parent->xcor, newN->parent->ycor);
+        newN->parent = newN->parent->parent;
+    }
+    return result;
+}
+
+
+
