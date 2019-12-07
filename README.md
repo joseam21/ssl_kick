@@ -3,13 +3,11 @@
 ## Installation
 Only works on linux
 1. Install grsim through this [link](https://github.com/RoboCup-SSL/grSim/blob/master/INSTALL.md)
-2. `mkdir build`
-3. `cd build`
-4. `cmake ..`
-5. `make`
-6. `cd ../bin`
-7. open grsim
-8. `./run`
+2. `cd build`
+3. `cmake ..`
+4. `make`
+5. `./controls_test`
+6. open grsim
 
 ## Structure
 * path_planner
