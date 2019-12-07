@@ -2,7 +2,7 @@
 #define PLAY_H
 
 #include <iostream>
-#include "../robotcontrols.h"
+#include "robotcontrols.h"
 using namespace std;
 
 

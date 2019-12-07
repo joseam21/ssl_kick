@@ -34,8 +34,15 @@ set (CNTRLS_SRCS ${CNTRLS_SRCS}
         src/controls/logger.cpp
 )
 
-#executable for controls testing
+set (STRATEGY_SRCS ${STRATEGY_SRCS}
+  src/strategy/basic_offense.cpp
+  src/strategy/oracle.cpp
+  src/strategy/play.cpp
+)
+
+# executable for controls testing
 add_executable(controls_test src/controls/main.cpp ${CNTRLS_SRCS} ${PROTO_CPP} ${PROTO_H})
+
 target_include_directories(controls_test
     PUBLIC
     ${PROTOBUF_INCLUDE_DIRS}
@@ -44,6 +51,21 @@ target_include_directories(controls_test
 
 # link the exe against the libraries
 target_link_libraries(controls_test
+    PUBLIC
+    ${PROTOBUF_LIBRARIES}
+)
+
+# executable for strategy testing
+add_executable(strategy_test src/strategy/strategy_main.cpp ${STRATEGY_SRCS} ${CNTRLS_SRCS} ${PROTO_CPP} ${PROTO_H})
+
+target_include_directories(strategy_test
+    PUBLIC
+    ${PROTOBUF_INCLUDE_DIRS}
+    ${CMAKE_CURRENT_BINARY_DIR}
+)
+
+# link the exe against the libraries
+target_link_libraries(strategy_test
     PUBLIC
     ${PROTOBUF_LIBRARIES}
 )
