@@ -1,5 +1,6 @@
 #include "oracle.h"
 #include "basic_offense.h"
+#include <math.h>
 
 Oracle::Oracle(RobotControls controls){
     controller = controls;
