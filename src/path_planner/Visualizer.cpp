@@ -8,7 +8,7 @@ Visualizer::Visualizer(QWidget *parent)
         : QMainWindow(parent)
 {
     Node* newGoal = new Node(75.0, 300);
-    rrtx = new RRTX(800, 500, NULL, newGoal);
+    rrtx = new RRTX(0, 800, 0, 500, new Node(750.0, 50.0), newGoal);
 //    rrtx->robot = rrtx->nearest(rrtxx->robot);
     m_start = new QPushButton("Start Tree", this);
     m_start->setGeometry(350, 520, 100, 50);
@@ -35,7 +35,7 @@ void Visualizer::handleStart() {
     auto t2 = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
     std::cout << "TOTAL DURATION: " << duration << std::endl;
-    Node* nearestToRobot = rrtx->V->nearest(rrtx->start);
+    Node* nearestToRobot = rrtx->V->nearest(rrtx->initial);
     rrtx->robot = new Node(nearestToRobot->xcor, nearestToRobot->ycor);
     rrtx->robot->parent = nearestToRobot->parent;
     std::cout << "END" << std::endl;
@@ -44,11 +44,11 @@ void Visualizer::handleStart() {
 
 void Visualizer::handleAddObstacle() {
     Node* point = rrtx->getRandomPoint();
-    while(!rrtx->validNode(point) && point->distance(rrtx->start) < 30 && point->distance(rrtx->goal) < 30){
+    while(!rrtx->validNode(point) && point->distance(rrtx->initial) < 30 && point->distance(rrtx->goal) < 30){
         delete point;
         point = rrtx->getRandomPoint();
     }
-    if(point->distance(rrtx->start) > 30 && point->distance(rrtx->goal) > 30){
+    if(point->distance(rrtx->initial) > 30 && point->distance(rrtx->goal) > 30){
         rrtx->updateObstacles(std::vector<Node*>(), std::vector<Node*>{point});
     }
     this->repaint();

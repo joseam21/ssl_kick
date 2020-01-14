@@ -8,24 +8,34 @@
 
 #include "RRTX.h"
 
-RRTX::RRTX(float w, float h, Node* starting, Node* goal){
+RRTX::RRTX(float xmin, float xmax, float ymin, float ymax, Node* start, Node* goal){
+    // Initializing hyper-parameters
     eps = 10.0; //TODO: Author suggests this to be width/2 or (safe distace)/2
     delta = 20.0;
     r = delta;
     lam = 100000;
     gamd = 1;
 
+    // Initializing random point generator for map
     std::random_device seeder;
     std::mt19937 engine(seeder());
-    std::uniform_real_distribution<float> genW(0, w);
-    std::uniform_real_distribution<float> genH(0, h);
-    map_width = w;
-    map_height = h;
-    start = new Node(genW(engine), genH(engine)); // temporarily a random point
-    robot = new Node(start->xcor, start->ycor);
+    std::uniform_real_distribution<float> genW(xmin, xmax);
+    std::uniform_real_distribution<float> genH(ymin, ymax);
+    initial = start;
+    robot = start;
+    map_width = xmax - xmin;
+    map_height = ymax - ymin;
+    x_min = xmin;
+    x_max = xmax;
+    y_min = ymin;
+    y_max = ymax;
+
+    // Initializing goal node as root of tree
     this->goal = goal;
     this->goal->g = 0;
     this->goal->lmc = 0;
+
+    // Initializing necessary data structures
     O = std::vector<Node*>();
     V = new ompl::NearestNeighborsGNAT<Node*>();
     V->setDistanceFunction([this](const Node *v, const Node *u){
@@ -35,13 +45,13 @@ RRTX::RRTX(float w, float h, Node* starting, Node* goal){
     orphanHash = OrphanMap();
     Q = Queue();
     nodeHash = NodeMap();
-    auto t1 = std::chrono::high_resolution_clock::now();
-    for(int i = 0; i < 9000; ++i) {
+
+    // Creating tree to fill space
+    for(int i = 0; i < 1000; ++i) {
         step();
     }
-    auto t2 = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
-    std::cout << "TOTAL DURATION: " << duration << std::endl;
+
+    initial = start;
     Node* nearestToRobot = V->nearest(start);
     robot = new Node(nearestToRobot->xcor, nearestToRobot->ycor);
     robot->parent = nearestToRobot->parent;
@@ -52,8 +62,8 @@ RRTX::RRTX(float w, float h, Node* starting, Node* goal){
 Node* RRTX::getRandomPoint() {
     std::random_device seeder;
     std::mt19937 engine(seeder());
-    std::uniform_real_distribution<float> genW(0, map_width);
-    std::uniform_real_distribution<float> genH(0, map_height);
+    std::uniform_real_distribution<float> genW(x_min, x_max);
+    std::uniform_real_distribution<float> genH(y_min, y_max);
     Node* counter = new Node(genW(engine), genH(engine));;
     while(!validNode(counter)){
         delete counter;
