@@ -62,7 +62,7 @@ void RobotControls::signalHandler(int signum){
 void RobotControls::updateRobotsThread()
 {
     RoboCupSSLClient client;
-    client.open(true);
+    client.open(false);
     SSL_WrapperPacket packet;
     while(!endsignal)
     {
