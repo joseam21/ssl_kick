@@ -63,6 +63,13 @@ float MoveableObject::get_time(){
     return time[0];
 }
 
+bool MoveableObject::has_loc() {
+    if (x.empty()) {
+        return false;
+    }
+    return true;
+}
+
 std::pair<float,float> MoveableObject::get_vel(int num){
     mtx_x.lock(); // safe to access multiple x elements
     mtx_y.lock(); // safe to access multiple y elements
