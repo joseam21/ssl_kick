@@ -450,17 +450,19 @@ void RRTX::insertOrphanChildren(Node *v) {
 std::vector<Node*> RRTX::getNextPoints(int num) {
     std::vector<Node*> result = std::vector<Node*>();
     result.reserve(num);
-//    Node* newN = new Node(robot->parent->xcor, robot->parent->ycor);
-////    newN->parent = robot->parent->parent;
-    Node* newN = robot->parent->parent;
+
+    Node* newN = robot->parent;
+    if (newN == NULL) {
+        return result;
+    }
+
     int i = 0;
-    while(newN->distance(goal) >= 20 && i < num){
+    while (newN != NULL && i < num){
         result.push_back(newN);
         ++i;
         newN = newN->parent;
-//        newN = new Node(newN->parent->xcor, newN->parent->ycor);
-//        newN->parent = newN->parent->parent;
     }
+
     return result;
 }
 
