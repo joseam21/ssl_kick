@@ -27,7 +27,17 @@ if (NOT OMPL_FOUND)
     message(SEND_ERROR "Failed to find OMPL! Install OMPL and try again!")
 endif ()
 
-include_directories(${PROJECT_SOURCE_DIR}/src/controls)
+# Eigen library
+find_package(Eigen3 REQUIRED)
+if (NOT Eigen3_FOUND)
+    message (SEND_ERROR "Failed to find Eigen3! Install Eigen3 and try again!")
+endif()
+
+include_directories(
+    ${PROJECT_SOURCE_DIR}/src/controls
+    ${EIGEN3_INCLUDE_DIRS}
+    ${OMPL_INCLUDE_DIRS}
+)
 
 set (CNTRLS_SRCS ${CNTRLS_SRCS}
         src/controls/logger.cpp
