@@ -1,19 +1,32 @@
+#include <math.h>
+#include <signal.h>
 #include "robotcontrols.h"
 #include "RRTX.h"
 
-void setRobotPath(float time) {
-  // Print locations of the robots
-  // TODO: add these as obstacles
-  for (int i=0; i<6; i++) {
-    float x = RobotControls::getRobot(true, i).get_x();
-    float y = RobotControls::getRobot(true, i).get_y();
-    float theta = RobotControls::getRobot(true, i).get_angle();
-    std::cout << "Yellow robot id " << i << "(" << x << " " << y << " " << theta << std::endl;
-  }
+void moveRobotToPoint(bool isYellow, int robot_id, float target_x, float target_y) {
+    bool commandsent = false;
+    float threshold = 0.05;
 
-  // TODO: go to waypoints with the following command
-  // RobotControls::getRobot(true, i).move_to_location(std::make_pair(x, y);
-  // TODO: need to have a flag for when the waypoint is reached
+    auto setRobotState = [&] (float time) {
+      if (!commandsent) {
+        RobotControls::getRobot(isYellow, robot_id).move_to_location(std::make_pair(target_x, target_y));
+        commandsent = true;
+      }
+
+      if (!RobotControls::getRobot(isYellow, robot_id).has_loc()) {
+        return;
+      }
+
+      float dist_to_goal_sq = pow(RobotControls::getRobot(isYellow, robot_id).get_x() - target_x, 2) +
+                              pow(RobotControls::getRobot(isYellow, robot_id).get_y() - target_y, 2);
+
+      if (pow(dist_to_goal_sq, 0.5) <= threshold) {
+        RobotControls::getRobot(isYellow, robot_id).move_pause();
+        RobotControls::endsignal = true;
+      }
+    };
+
+    RobotControls::go(setRobotState);
 }
 
 int main(int argc, char *argv[]) {
@@ -22,6 +35,13 @@ int main(int argc, char *argv[]) {
   signal(SIGINT, RobotControls::signalHandler);
   printf("Running\n");
   fflush(stdout);
-  RobotControls::go(setRobotPath);
+
+  if (argc == 1) {
+    moveRobotToPoint(true, 0, 0.0, 0.0);
+  } else {
+    moveRobotToPoint(strcmp(argv[1], "true") == 0,
+                     std::stoi(argv[2]),
+                     std::stof(argv[3]), std::stof(argv[4]));
+  }
   return 0;
 }
