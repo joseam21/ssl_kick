@@ -77,7 +77,7 @@ target_link_libraries(controls_test
 )
 
 # executable for strategy testing
-add_executable(strategy_test src/strategy/strategy_main.cpp ${STRATEGY_SRCS} ${CNTRLS_SRCS} ${PROTO_CPP} ${PROTO_H})
+add_executable(strategy_test src/strategy/strategy_main.cpp ${STRATEGY_SRCS} ${PLANNING_SRCS} ${CNTRLS_SRCS} ${PROTO_CPP} ${PROTO_H})
 
 target_include_directories(strategy_test
     PUBLIC
@@ -89,6 +89,7 @@ target_include_directories(strategy_test
 target_link_libraries(strategy_test
     PUBLIC
     ${PROTOBUF_LIBRARIES}
+    ${OMPL_LIBRARIES}
 )
 
 # executable for path planning testing

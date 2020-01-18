@@ -10,13 +10,12 @@ class Play {
     public:
         const double posession_distance = 0.2;
         const double interference_distance = 1;
-        const std::pair<float, float> goal_loc = std::make_pair(0, 0);
+        const std::pair<float, float> goal_loc = std::make_pair(-6, 0);
         int posession; 
-        RobotControls controller;
 
     public: 
         // constructor to set which robot has the ball
-        Play (RobotControls, int);
+        Play (int);
         // check if robot with posession can score
         bool canScore();
         // check if robot with posession can pass

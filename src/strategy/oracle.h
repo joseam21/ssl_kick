@@ -9,9 +9,8 @@ using namespace std;
 
 class Oracle{
     public:
-        RobotControls controller;
         //constructor
-        Oracle (RobotControls);
+        Oracle ();
         // determine who is in posession of the ball
         int find_posession();
         // choose what play to perform
