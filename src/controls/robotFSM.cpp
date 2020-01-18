@@ -22,6 +22,7 @@ RobotFSM::RobotFSM()
     id = -1;
     robot_move_state = MOVE_PAUSE;
     kick_tries = 0;
+    constant_direction_dir = 0;
     spinner = false;
 }
 
@@ -30,6 +31,7 @@ RobotFSM::RobotFSM(const RobotFSM& robotFSM)
     id = -1;
     robot_move_state = MOVE_PAUSE;
     kick_tries = 0;
+    constant_direction_dir = 0;
     spinner = false;
 }
 
@@ -37,6 +39,7 @@ RobotFSM::RobotFSM(int id1, bool isYellow1) : id(id1),isYellow(isYellow1)
 {
     robot_move_state = MOVE_PAUSE;
     kick_tries = 0;
+    constant_direction_dir = 0;
     spinner = false;
 }
 
@@ -66,21 +69,22 @@ void RobotFSM::move_pause()
     mtx_robot_move_state.unlock();
 }
 
-void RobotFSM::move_to_intercept(std::pair<float,float> * loc)
+void RobotFSM::move_to_intercept(std::function<std::pair<float,float>(void)> loc_func)
 {
     mtx_robot_move_state.lock();
     robot_move_state = MOVE_VARIABLE_LOCATION_INTERCEPT;
     reset_state_variables();
-    variable_location_loc = loc;
+    variable_location_loc_func = loc_func;
     mtx_robot_move_state.unlock();
 }
 
-void RobotFSM::move_to_track(std::pair<float,float> * loc)
+void RobotFSM::move_to_track(std::function<std::pair<float,float>(void)> loc_func)
 {
     mtx_robot_move_state.lock();
     robot_move_state = MOVE_VARIABLE_LOCATION_TRACK;
+    std::cout << "  " <<  id << std::endl;
     reset_state_variables();
-    variable_location_loc = loc;
+    variable_location_loc_func = loc_func;
     mtx_robot_move_state.unlock();
 }
 
@@ -102,21 +106,21 @@ void RobotFSM::rotate_to_location(std::pair<float,float> loc)
     mtx_robot_turn_state.unlock();
 }
 
-void RobotFSM::rotate_to_variable_direction(float * dir)
+void RobotFSM::rotate_to_variable_direction(std::function<float(void)> dir_func)
 {
     mtx_robot_turn_state.lock();
     robot_turn_state = TURN_VARIABLE_DIRECTION;
     reset_state_variables();
-    variable_direction_dir = dir;
+    variable_direction_dir_func = dir_func;
     mtx_robot_turn_state.unlock();
 }
 
-void RobotFSM::rotate_to_variable_location(std::pair<float,float> * loc)
+void RobotFSM::rotate_to_variable_location(std::function<std::pair<float,float>(void)> loc_func)
 {
     mtx_robot_turn_state.lock();
     robot_turn_state = TURN_VARIABLE_LOCATION;
     reset_state_variables();
-    variable_location_loc = loc;
+    variable_location_loc_func = loc_func;
     mtx_robot_turn_state.unlock();
 }
 
@@ -217,6 +221,9 @@ std::pair<float,float> RobotFSM::compute_plane_vel(float time1)
     mtx_robot_move_state.lock();
     mtx_time.lock();
     std::pair<float,float> res;
+    if(id == 2){
+		std::cout << robot_move_state << std::endl;
+	}
     switch(robot_move_state)
     {
         case MOVE_CONSTANT_DIRECTION:
@@ -235,9 +242,9 @@ std::pair<float,float> RobotFSM::compute_plane_vel(float time1)
             // I'm wondering if a cube root function on the error calclulation would improve PID
             //printf("Y: %d, ID: %d ,angle: %f\n",isYellow?0:1,id,angle_diff);
             //fflush(stdout);
-            const float K_p = 2.0;
-            const float K_i = 0.03;
-            const float K_d = 1.7;
+            const float K_p = 7.0;
+            const float K_i = 0.0;
+            const float K_d = 1.5;
             float optimal_velocity = get_PID_result(new_error, time, move_error,K_p,K_i,K_d,-V_MAX,V_MAX);
             res = std::make_pair(cos(angle_diff*-1)*optimal_velocity,sin(angle_diff*-1)*optimal_velocity);
             break;
@@ -254,7 +261,22 @@ std::pair<float,float> RobotFSM::compute_plane_vel(float time1)
         }
         case MOVE_VARIABLE_LOCATION_TRACK:
         {
-            res= std::make_pair(0,0);
+			std::pair<float,float> v_loc = variable_location_loc_func();
+            float xdif = v_loc.first - get_x();
+            float ydif = v_loc.second - get_y();
+            float angle1 = atan2(ydif,xdif);
+            float angle_diff = get_angle_diff(get_angle(), angle1);
+            float new_error = sqrt(pow(xdif,2)+pow(ydif,2));
+            // I'm wondering if a cube root function on the error calclulation would improve PID
+            //printf("Y: %d, ID: %d ,angle: %f\n",isYellow?0:1,id,angle_diff);
+            //fflush(stdout);
+            const float K_p = 7.0;
+            const float K_i = 0.0;
+            const float K_d = 1.5;
+            float optimal_velocity = get_PID_result(new_error, time, move_error,K_p,K_i,K_d,-V_MAX,V_MAX);
+            res = std::make_pair(cos(angle_diff*-1)*optimal_velocity,sin(angle_diff*-1)*optimal_velocity);
+           	printf("%i %f %f\n", id, res.first,res.second);
+           	fflush(stdout);
             break;
         }
     
@@ -288,12 +310,22 @@ float RobotFSM::compute_ang_vel(float time1)
         }
         case TURN_VARIABLE_DIRECTION:
         {
-            res = 0;
+            float new_error = get_angle_diff(get_angle(),variable_direction_dir_func());
+            const float K_p = -2.5;
+            const float K_i = -0.03;
+            const float K_d = -0.7;
+            res = get_PID_result(new_error,time,angle_error, K_p,K_i,K_d,-V_ANG_MAX,V_ANG_MAX);
             break;
         }
         case TURN_VARIABLE_LOCATION:
         {
-            res = 0;
+			std::pair<float,float> v_loc = variable_location_loc_func();
+			float new_angle = atan2(v_loc.first - get_x(), v_loc.second-get_y());
+            float new_error = get_angle_diff(get_angle(),new_angle);
+            const float K_p = -2.5;
+            const float K_i = -0.03;
+            const float K_d = -0.7;
+            res = get_PID_result(new_error,time,angle_error, K_p,K_i,K_d,-V_ANG_MAX,V_ANG_MAX);
             break;
         }
         case TURN_DIRECTION_OF_MOVEMENT:

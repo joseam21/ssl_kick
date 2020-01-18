@@ -35,6 +35,7 @@ public:
     static std::pair<float,float> getCurrentBallSpeed();
     static void signalHandler(int signum);
     static volatile bool endsignal; // whether the program has been terminated or not
+    static void sendRobotToBall(bool isYellow, int id);
 private:
     static const int size = 60;// size of the deque for the ball locations, approx 1 second at 60 fps
     

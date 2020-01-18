@@ -1,20 +1,31 @@
 #include "robotcontrols.h"
 #include <signal.h> 
 
-vector<bool> sent(3,false);
+vector<bool> sent(4,false);
 void setRobotStateFunction(float time)
 {
-    if(time > 1 && !sent[0]){
+	if(time > 0 && !sent[2]){
+		sent[2] = true;
+		for(int i = 0; i < 6; i++){
+			RobotControls::getRobot(false,i).move_to_location({-4,i-2.5});
+		}
+	}
+    if(time > 0 && !sent[0]){
         sent[0] = true;
         for(int i = 0; i < 6; i++){
-            RobotControls::getRobot(true,i).move_to_location(std::make_pair(0,0));
+            RobotControls::getRobot(true,i).move_to_location(std::make_pair(-3,i-2.5));
         }
-    }else if(time > 4 && !sent[1]){
+    }else if(time > 5 && !sent[1]){
         sent[1] = true;
         for(int i = 0; i < 6; i++){
-            RobotControls::getRobot(true,i).move_to_location(std::make_pair(0,i-2.5));
+            RobotControls::getRobot(true,i).move_to_location(std::make_pair(-2+i,i-2.5));
         }
-    }
+    }else if(time > 8 && !sent[3]){
+		sent[3] = true;
+		printf("WOW\n");
+		fflush(stdout);
+		RobotControls::sendRobotToBall(true,1);
+	}
 }
 
 int main(int argc, char *argv[])
