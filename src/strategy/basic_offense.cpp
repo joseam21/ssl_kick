@@ -11,10 +11,12 @@ void BasicOffense::play(){
     RobotFSM attacker = RobotControls::getRobot(true, posession);
 
     if (canScore()) {
+	GetPossession();
+	rotate_to_direction(PI);
         attacker.kick(goal_loc.first, goal_loc.second, 1);
     } else{
         int receiver = canPass();
-        if (receiver != 7) {
+        if (receiver != -1) {
             RobotFSM receiver_loc = RobotControls::getRobot(true, receiver);
             attacker.kick(receiver_loc.get_x(), receiver_loc.get_y(), 1);
         } else {

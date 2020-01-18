@@ -33,14 +33,17 @@ bool Play::canScore(){
 
 int Play::canPass(){
     RobotFSM withBall = RobotControls::getRobot(true, posession);
+    float x = withBall.get_x();
+    float y = withBall.get_y();
     for (int n=0; n<6; n++){
         if (n != posession){
             RobotFSM receiver = RobotControls::getRobot(true, n);
-            if (clearPath(std::make_pair(receiver.get_x(), receiver.get_y()), std::make_pair(withBall.get_x(), withBall.get_y())))
+	    float dist = pow(pow(receiver.get_x() - x, 2) + pow(receiver.get_y() - y, 2), 0.5);
+            if (clearPath(std::make_pair(receiver.get_x(), receiver.get_y()), std::make_pair(withBall.get_x(), withBall.get_y())) && dist < 1)
                 return n;
         }
     }
-    return 7;
+    return -1;
 }
 
 int Play::guard(int robo){
@@ -54,6 +57,7 @@ int Play::guard(int robo){
         float enemy_x = enemy.get_x();
         float enemy_y = enemy.get_y();
         float dist = pow(enemy_x - x, 2) + pow(enemy_y - y, 2);
+
         if (dist < min_dist) {
             min_dist = dist;
             nearest = n;

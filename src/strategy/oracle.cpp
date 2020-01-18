@@ -21,10 +21,23 @@ int Oracle::find_posession(){
             closest_robot = n;
         }
     }
-    return closest_robot;
+    if(dist < .3){
+        return closest_robot;
+    }
+    else{
+        return -1;
+    }
 }
 
 Play Oracle::choose_play(){
     int hasball = find_posession();
-    return BasicOffense(hasball);
+    if(hasball < 6){
+    	return BasicOffense(hasball);
+    }
+    /*else if(hasball == -1){
+	    return GetPossession(hasball);
+    }
+    else{
+	    return BasicDefense(hasball);
+    }*/
 }
