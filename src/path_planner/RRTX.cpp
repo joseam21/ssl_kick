@@ -10,11 +10,11 @@
 
 RRTX::RRTX(float xmin, float xmax, float ymin, float ymax, Node* start, Node* goal){
     // Initializing hyper-parameters
-    eps = 10.0; //TODO: Author suggests this to be width/2 or (safe distace)/2
-    delta = 20.0;
+    eps = 0.073; //TODO: Author suggests this to be width/2 or (safe distace)/2
+    delta = 2.75;
     r = delta;
-    lam = 100000;
-    gamd = 1;
+    lam = 1300;
+    gamd = 100;
 
     // Initializing random point generator for map
     std::random_device seeder;
@@ -46,10 +46,10 @@ RRTX::RRTX(float xmin, float xmax, float ymin, float ymax, Node* start, Node* go
     Q = Queue();
     nodeHash = NodeMap();
 
-    // Creating tree to fill space
-    for(int i = 0; i < 1000; ++i) {
-        step();
-    }
+    //// Creating tree to fill space
+    //for(int i = 0; i < 2000; ++i) {
+    //    step();
+    //}
 
     initial = start;
     Node* nearestToRobot = V->nearest(start);
@@ -78,7 +78,7 @@ Node* RRTX::getRandomPoint() {
 bool RRTX::validNode(Node *q) {
     if(0 <= q->xcor  && q->xcor < map_width && 0 <= q->ycor && q->ycor < map_height){
         for(Node* obstacle : O){
-            if(q->distance(obstacle) <= 30) return false;
+            if(q->distance(obstacle) <= 0.146) return false;
         }
         return true;
     }
@@ -131,7 +131,7 @@ bool RRTX::possiblePath(Node* v, Node* u, std::vector<Node*> obstacles) {
     std::tie(x1, y1) = v->getCoords();
     std::tie(x2, y2) = u->getCoords();
     for(Node* obstacle : obstacles){
-        if(v->distance(obstacle) <= 30 || u->distance(obstacle) <= 30){
+        if(v->distance(obstacle) <= 0.146 || u->distance(obstacle) <= 0.146){
             return false;
         }
 
@@ -151,7 +151,7 @@ bool RRTX::possiblePath(Node* v, Node* u, std::vector<Node*> obstacles) {
         if(v->distance(qD) > v->distance(u)){
             continue;
         }
-        if(obstacle->distance(qD) <= 30){
+        if(obstacle->distance(qD) <= 0.146){
             return false;
         }
         delete qD;
