@@ -1,5 +1,5 @@
 #include "robotcontrols.h"
-
+#include "math.h"
 void sampleSetRobotStateFunction(float time){
     if(time > 1){
         RobotControls::getRobot(true,0).move_to_location(std::make_pair(0,0));
@@ -148,4 +148,20 @@ float RobotControls::getTime(){
     auto cur = std::chrono::system_clock::now();
     std::chrono::duration<float> diff = cur - RobotControls::start;
     return diff.count();
+}
+
+void RobotControls::sendRobotToBall(bool isYellow, int id){
+	RobotControls::getRobot(isYellow,id).dribble();
+	RobotControls::getRobot(isYellow,id).rotate_to_variable_location([&](){return RobotControls::getCurrentBallLoc();});
+	RobotControls::getRobot(isYellow,id).move_to_track([&, id](){
+		std::pair<float,float> ball_loc = RobotControls::getCurrentBallLoc(); 
+		RobotFSM& robot = getRobot(isYellow,id);
+		std::pair<float,float> robot_loc = getRobot(isYellow,id).get_loc(); 
+		float angle = atan2(robot_loc.second-ball_loc.second,robot_loc.first-ball_loc.first);
+		std::pair<float,float> ideal_loc = {ball_loc.first+.08*cos(angle),ball_loc.second+.08*sin(angle)};
+		return ideal_loc;
+		}
+	);
+	printf("WOW\n");
+	fflush(stdout);
 }
