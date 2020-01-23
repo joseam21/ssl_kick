@@ -3,7 +3,7 @@
 
 vector<bool> sent(4,false);
 void setRobotStateFunction(float time)
-{
+{	
 	if(time > 0 && !sent[2]){
 		sent[2] = true;
 		for(int i = 0; i < 6; i++){

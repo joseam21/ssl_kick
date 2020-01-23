@@ -82,7 +82,7 @@ void RobotFSM::move_to_track(std::function<std::pair<float,float>(void)> loc_fun
 {
     mtx_robot_move_state.lock();
     robot_move_state = MOVE_VARIABLE_LOCATION_TRACK;
-    std::cout << "  " <<  id << std::endl;
+    //std::cout << "  " <<  id << std::endl;
     reset_state_variables();
     variable_location_loc_func = loc_func;
     mtx_robot_move_state.unlock();
@@ -194,6 +194,9 @@ void RobotFSM::set_id(int id1)
 void RobotFSM::set_isYellow(bool isYellow1)
 {
     isYellow = isYellow1;
+    if(isYellow){
+        constant_direction_dir = PI-0.00001;
+    }
 }
 struct datastruct{
     float time2, x2, y2;
@@ -221,9 +224,6 @@ std::pair<float,float> RobotFSM::compute_plane_vel(float time1)
     mtx_robot_move_state.lock();
     mtx_time.lock();
     std::pair<float,float> res;
-    if(id == 2){
-		std::cout << robot_move_state << std::endl;
-	}
     switch(robot_move_state)
     {
         case MOVE_CONSTANT_DIRECTION:
@@ -275,7 +275,7 @@ std::pair<float,float> RobotFSM::compute_plane_vel(float time1)
             const float K_d = 1.5;
             float optimal_velocity = get_PID_result(new_error, time, move_error,K_p,K_i,K_d,-V_MAX,V_MAX);
             res = std::make_pair(cos(angle_diff*-1)*optimal_velocity,sin(angle_diff*-1)*optimal_velocity);
-           	printf("%i %f %f\n", id, res.first,res.second);
+           	//printf("%i %f %f\n", id, res.first,res.second);
            	fflush(stdout);
             break;
         }
@@ -296,11 +296,10 @@ float RobotFSM::compute_ang_vel(float time1)
         case TURN_CONSTANT_DIRECTION:
         {
             float new_error = get_angle_diff(get_angle(),constant_direction_dir);
-            const float K_p = -2.5;
-            const float K_i = -0.03;
-            const float K_d = -0.7;
+            const float K_p = -7.5;
+            const float K_i = -0.00;
+            const float K_d = -1.5;
             res = get_PID_result(new_error,time,angle_error, K_p,K_i,K_d,-V_ANG_MAX,V_ANG_MAX);
-            //res = 0;
             break;
         }
         case TURN_CONSTANT_LOCATION:
@@ -440,17 +439,18 @@ float get_PID_result(float new_error, std::deque<float> &time, std::deque<float>
     if(error.size() > 1 && time.size() > 1)
     {
         error_derivative = (new_error - error.front())/(time[0]-time[1]);
-        /*if(error_derivative < -0.5){
-            printf("New: %f    Old: %f    NewT: %f    OldT: %f\n",new_error,error.front(),time[0],time[1]);
-            fflush(stdout);
-        }*/
         for(int i = 0; i < error.size(); i++)
         {
             error_integral += error[i];
         }
     }
-    if(!isnormal(error_derivative))
+    if(!isfinite(error_derivative))
     {
+        std::cerr << "Bad Calculation Detected! " << new_error << ' ' << error.front() << std::endl;
+        for(int i = 0; i < 10; i++){
+            std::cerr << time[i] << "   ";
+        }
+        std::cerr << std::endl;
         error_derivative = (new_error-error.front()*60);
     }
     error.push_front(new_error);
@@ -458,6 +458,7 @@ float get_PID_result(float new_error, std::deque<float> &time, std::deque<float>
     {
         error.pop_back();
     }
+    //std::cout << K_p << ' ' << new_error << ' ' << error_integral << ' ' << error_derivative << std::endl;
     float result = K_p*new_error+K_i*error_integral+K_d*error_derivative;
     /*if(result < -0.5){
         printf("P: %f,  I: %f,  D:  %f,  res: %f  \n",K_p*new_error,K_i*error_integral,
