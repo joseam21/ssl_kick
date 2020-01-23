@@ -224,7 +224,6 @@ std::pair<float,float> RobotFSM::compute_plane_vel(float time1)
     mtx_time.lock();
     std::pair<float,float> res;
     if(id == 2){
-		std::cout << robot_move_state << std::endl;
 	}
     switch(robot_move_state)
     {

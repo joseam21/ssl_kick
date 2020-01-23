@@ -19,6 +19,10 @@ bool Play::clearPath(std::pair<float, float> loc1, std::pair<float, float> loc2)
     return true;
 }
 
+void Play::goToGoal() {
+  RobotControls::getRobot(true, posession).move_to_location(std::make_pair(-5, 0));
+}
+
 bool Play::canScore(){
     // get robot with ball
     RobotFSM withBall = RobotControls::getRobot(true, posession);

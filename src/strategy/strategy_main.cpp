@@ -3,14 +3,22 @@
 #include "basic_offense.h"
 #include "play.h"
 #include <signal.h> 
+#include <math.h>
 
-vector<bool> sent(3,false);
+vector<bool> sent(8, false);
 void setRobotStateFunction(float time)
 {
   Oracle oracle = Oracle();
-  printf("Possession: %d\n", oracle.find_posession());
-  Play offense = oracle.choose_play();
-  printf("Can score %d\n", offense.canScore());
+  if (time > 1 && !sent[0]) {
+    std::cout << "Going" << std::endl;
+    sent[0] = true;
+    Play offense = oracle.choose_play();
+  } else if (time > 9 && !sent[2]) {
+    std::cout << "Kicking" << std::endl;
+    sent[2] = true;
+    int robot = oracle.closest_yellow_robot();
+    RobotControls::getRobot(true, robot).kick(3, 1, 4);
+  }
 }
 
 int main(int argc, char *argv[])

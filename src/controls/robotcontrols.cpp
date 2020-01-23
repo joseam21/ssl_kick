@@ -142,6 +142,4 @@ void RobotControls::sendRobotToBall(bool isYellow, int id){
 		return ideal_loc;
 		}
 	);
-	printf("WOW\n");
-	fflush(stdout);
 }

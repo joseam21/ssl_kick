@@ -24,6 +24,7 @@ class Play {
         bool clearPath(std::pair<float, float>, std::pair<float, float>);
         // find closest enemy for robot to guard
         int guard(int);
+        void goToGoal();
 };
 
 #endif //PLAY_H

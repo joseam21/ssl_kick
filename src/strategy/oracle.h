@@ -13,6 +13,7 @@ class Oracle{
         Oracle ();
         // determine who is in posession of the ball
         int find_posession();
+        int closest_yellow_robot();
         // choose what play to perform
         Play choose_play();
 };
