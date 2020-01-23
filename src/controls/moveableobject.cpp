@@ -103,8 +103,7 @@ float MoveableObject::get_ang_vel(int num){
 }
 
 std::pair<float,float> MoveableObject::get_loc(){
-    assert(x.size() == y.size());
-    if(!x.empty()){
+    if(!x.empty() && !y.empty()){
         return std::make_pair(x[0],y[0]);
     }else{
         return std::make_pair(0,0);

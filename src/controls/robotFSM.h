@@ -4,6 +4,7 @@
 #include<utility>
 #include<deque>
 #include<mutex>
+#include<functional>
 #include "moveableobject.h"
 
 #define PI 3.1415926535897
@@ -53,8 +54,8 @@ public:
      */
     void move_pause();
     
-    void move_to_intercept(std::pair<float,float> * loc);
-    void move_to_track(std::pair<float,float> * loc);
+    void move_to_intercept(std::function<std::pair<float,float>(void)> loc_func);
+    void move_to_track(std::function<std::pair<float,float>(void)> loc_func);
     // 5 rotational methods
     /**
      * Tells to robot to rotate to a specific direction indefinitely
@@ -66,8 +67,8 @@ public:
      * @param pair of floats specifying position, in radians from -PI to PI
      */
     void rotate_to_location(std::pair<float,float> loc);
-    void rotate_to_variable_direction(float * dir);
-    void rotate_to_variable_location(std::pair<float,float> * loc);
+    void rotate_to_variable_direction(std::function<float(void)> dir_func);
+    void rotate_to_variable_location(std::function<std::pair<float,float>(void)> loc_func);
     /**
      * Tells to robot to rotate to face its direction of movement indefinitely
      * Rotation will probably have higher priority than Movement in Wheel Velocity
@@ -115,9 +116,9 @@ private:
     RobotTurnState robot_turn_state = TURN_CONSTANT_DIRECTION;
     // Variables for each robot state
     float constant_direction_dir;
-    float * variable_direction_dir;
+    std::function<float(void)> variable_direction_dir_func;
     std::pair<float,float> constant_location_loc;   // first is x, second is y for all location pairs
-    std::pair<float,float> * variable_location_loc;
+    std::function<std::pair<float,float>(void)> variable_location_loc_func;
     // thread stuff
     mutable std::mutex mtx_robot_move_state, mtx_robot_turn_state; // used for mutex lock due to threading, lock for x,y,angle, and robot_state
     // storing errors for PID alogrithm
