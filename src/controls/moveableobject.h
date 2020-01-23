@@ -32,6 +32,9 @@ public:
     // returns the last updated angle of the robot in radians from -PI to PI
     float get_angle();
     float get_time();
+
+    // Returns true if location was initialized, false otherwise
+    bool has_loc();
     
     // returns the last received x and y position as a pair
     std::pair<float,float> get_loc();

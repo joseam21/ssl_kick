@@ -7,6 +7,7 @@
 
 
 #include "Node.h"
+#include <chrono>
 #include <queue>
 #include <vector>
 #include <random>
@@ -24,18 +25,19 @@ class RRTX {
     typedef boost::unordered_map<Node *, handle_t> NodeMap;
     typedef boost::unordered_map<Node *, bool> OrphanMap;
 public:
-    RRTX(float width, float height, Node* starting, Node* goal);
+    RRTX(float xmin, float xmax, float ymin, float ymax, Node* start, Node* goal);
     float eps;
     float delta;
     float r;
     float gamd;
     float lam;
 
+    float x_min, x_max, y_min, y_max;
     float map_width;
     float map_height;
-    Node* start;
     Node* robot;
     Node* goal;
+    Node* initial;
 
     std::vector<Node*> O;
     ompl::NearestNeighborsGNAT<Node *> *V;
