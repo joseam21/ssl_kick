@@ -318,7 +318,7 @@ float RobotFSM::compute_ang_vel(float time1)
         case TURN_VARIABLE_LOCATION:
         {
 			std::pair<float,float> v_loc = variable_location_loc_func();
-			float new_angle = atan2(v_loc.first - get_x(), v_loc.second-get_y());
+			float new_angle =atan2(-get_y()+v_loc.second,v_loc.first-get_x());
             float new_error = get_angle_diff(get_angle(),new_angle);
             const float K_p = -2.5;
             const float K_i = -0.03;
@@ -443,7 +443,7 @@ float get_PID_result(float new_error, std::deque<float> &time, std::deque<float>
             error_integral += error[i];
         }
     }
-    if(!isfinite(error_derivative))
+    if(!std::isfinite(error_derivative))
     {
         std::cerr << "Bad Calculation Detected! " << new_error << ' ' << error.front() << std::endl;
         for(int i = 0; i < 10; i++){
