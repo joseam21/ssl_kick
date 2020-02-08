@@ -123,10 +123,11 @@ private:
     RobotMoveState robot_move_state = MOVE_PAUSE;
     RobotTurnState robot_turn_state = TURN_CONSTANT_DIRECTION;
     // Variables for each robot state
-    float constant_direction_dir;
-    std::function<float(void)> variable_direction_dir_func;
-    std::pair<float,float> constant_location_loc;   // first is x, second is y for all location pairs
-    std::function<std::pair<float,float>(void)> variable_location_loc_func;
+     // first is x, second is y for all location pairs
+    float planar_constant_direction_dir, angular_constant_direction_dir;
+    std::function<float(void)> variable_direction_dir_func;                 // only used for rotation
+    std::pair<float,float> planar_constant_location_loc, angular_constant_location_loc;
+    std::function<std::pair<float,float>(void)> planar_variable_location_loc_func, angular_variable_location_loc_func;
     // thread stuff
     mutable std::mutex mtx_robot_move_state, mtx_robot_turn_state; // used for mutex lock due to threading, lock for x,y,angle, and robot_state
     // storing errors for PID alogrithm

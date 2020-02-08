@@ -20,23 +20,26 @@ void wheel_velocities(float velnormal, float veltangent, float velangular, float
 RobotFSM::RobotFSM(){
     id = -1;
     robot_move_state = MOVE_PAUSE;
+    robot_turn_state = TURN_CONSTANT_DIRECTION;
     kick_tries = 0;
-    constant_direction_dir = 0;
+    angular_constant_direction_dir = 0;
     spinner = false;
 }
 
 RobotFSM::RobotFSM(const RobotFSM& robotFSM){
     id = -1;
     robot_move_state = MOVE_PAUSE;
+    robot_turn_state = TURN_CONSTANT_DIRECTION;
     kick_tries = 0;
-    constant_direction_dir = 0;
+    angular_constant_direction_dir = 0;
     spinner = false;
 }
 
 RobotFSM::RobotFSM(int id1, bool isYellow1) : id(id1),isYellow(isYellow1){
     robot_move_state = MOVE_PAUSE;
+    robot_turn_state = TURN_CONSTANT_DIRECTION;
     kick_tries = 0;
-    constant_direction_dir = 0;
+    angular_constant_direction_dir = 0;
     spinner = false;
 }
 
@@ -44,7 +47,7 @@ void RobotFSM::move_in_direction(float dir){
     mtx_robot_move_state.lock();
     robot_move_state = MOVE_CONSTANT_DIRECTION;
     reset_state_variables();
-    constant_direction_dir = dir;
+    planar_constant_direction_dir = dir;
     mtx_robot_move_state.unlock();
 }
 
@@ -52,7 +55,7 @@ void RobotFSM::move_to_location(std::pair<float,float> loc){
     mtx_robot_move_state.lock();
     robot_move_state = MOVE_CONSTANT_LOCATION;
     reset_state_variables();
-    constant_location_loc = std::pair<float,float>(loc);
+    planar_constant_location_loc = std::pair<float,float>(loc);
     mtx_robot_move_state.unlock();
 }
 
@@ -67,7 +70,7 @@ void RobotFSM::move_to_intercept(std::function<std::pair<float,float>(void)> loc
     mtx_robot_move_state.lock();
     robot_move_state = MOVE_VARIABLE_LOCATION_INTERCEPT;
     reset_state_variables();
-    variable_location_loc_func = loc_func;
+    planar_variable_location_loc_func = loc_func;
     mtx_robot_move_state.unlock();
 }
 
@@ -75,7 +78,7 @@ void RobotFSM::move_to_track(std::function<std::pair<float,float>(void)> loc_fun
     mtx_robot_move_state.lock();
     robot_move_state = MOVE_VARIABLE_LOCATION_TRACK;
     reset_state_variables();
-    variable_location_loc_func = loc_func;
+    planar_variable_location_loc_func = loc_func;
     mtx_robot_move_state.unlock();
 }
 
@@ -83,7 +86,7 @@ void RobotFSM::rotate_to_direction(float dir){
     mtx_robot_turn_state.lock();
     robot_turn_state = TURN_CONSTANT_DIRECTION;
     reset_state_variables();
-    constant_direction_dir = dir;
+    angular_constant_direction_dir = dir;
     mtx_robot_turn_state.unlock();
 }
 
@@ -91,7 +94,7 @@ void RobotFSM::rotate_to_location(std::pair<float,float> loc){
     mtx_robot_turn_state.lock();
     robot_turn_state = TURN_CONSTANT_LOCATION;
     reset_state_variables();
-    constant_location_loc = loc;
+    angular_constant_location_loc = loc;
     mtx_robot_turn_state.unlock();
 }
 
@@ -107,7 +110,7 @@ void RobotFSM::rotate_to_variable_location(std::function<std::pair<float,float>(
     mtx_robot_turn_state.lock();
     robot_turn_state = TURN_VARIABLE_LOCATION;
     reset_state_variables();
-    variable_location_loc_func = loc_func;
+    angular_variable_location_loc_func = loc_func;
     mtx_robot_turn_state.unlock();
 }
 
@@ -174,7 +177,7 @@ void RobotFSM::set_id(int id1){
 void RobotFSM::set_isYellow(bool isYellow1){
     isYellow = isYellow1;
     if(isYellow){
-        constant_direction_dir = PI-0.00001;
+        angular_constant_direction_dir = PI-0.00001;
     }
 }
 void RobotFSM::set_max_ang_vel(float new_max_ang_vel){
@@ -217,13 +220,13 @@ std::pair<float,float> RobotFSM::compute_plane_vel(float time1){
     std::pair<float,float> res;
     switch(robot_move_state) {
         case MOVE_CONSTANT_DIRECTION: {
-            float angle_diff = get_angle_diff(get_angle(), constant_direction_dir);
+            float angle_diff = get_angle_diff(get_angle(), planar_constant_direction_dir);
             res = std::make_pair(cos(angle_diff*-1)*max_plane_vel,sin(angle_diff*-1)*max_plane_vel);
             break;
         }
         case MOVE_CONSTANT_LOCATION: {
-            float xdif = constant_location_loc.first - get_x();
-            float ydif = constant_location_loc.second - get_y();
+            float xdif = planar_constant_location_loc.first - get_x();
+            float ydif = planar_constant_location_loc.second - get_y();
             float angle1 = atan2(ydif,xdif);
             float angle_diff = get_angle_diff(get_angle(), angle1);
             float new_error = sqrt(pow(xdif,2)+pow(ydif,2));
@@ -246,7 +249,7 @@ std::pair<float,float> RobotFSM::compute_plane_vel(float time1){
             break;
         }
         case MOVE_VARIABLE_LOCATION_TRACK:  {
-            std::pair<float,float> v_loc = variable_location_loc_func();
+            std::pair<float,float> v_loc = planar_variable_location_loc_func();
             float xdif = v_loc.first - get_x();
             float ydif = v_loc.second - get_y();
             float angle1 = atan2(ydif,xdif);
@@ -274,7 +277,7 @@ float RobotFSM::compute_ang_vel(float time1){
     float res;
     switch(robot_turn_state) {
         case TURN_CONSTANT_DIRECTION:  {
-            float new_error = get_angle_diff(get_angle(),constant_direction_dir);
+            float new_error = get_angle_diff(get_angle(),angular_constant_direction_dir);
             const float K_p = -7.5;
             const float K_i = -0.00;
             const float K_d = -1.5;
@@ -282,29 +285,29 @@ float RobotFSM::compute_ang_vel(float time1){
             break;
         }
         case TURN_CONSTANT_LOCATION:  {
-            float new_angle = atan2(constant_location_loc.second-get_y(),constant_location_loc.first-get_x());
+            float new_angle = atan2(angular_constant_location_loc.second-get_y(),angular_constant_location_loc.first-get_x());
             float new_error = get_angle_diff(get_angle(),new_angle);
-            const float K_p = -2.5;
-            const float K_i = -0.03;
-            const float K_d = -0.7;
+            const float K_p = -7.5;
+            const float K_i = -0.00;
+            const float K_d = -1.5;
             res = get_PID_result(new_error,time,angle_error, K_p,K_i,K_d,-max_ang_vel,max_ang_vel);
             break;
         }
         case TURN_VARIABLE_DIRECTION: {
             float new_error = get_angle_diff(get_angle(),variable_direction_dir_func());
-            const float K_p = -2.5;
-            const float K_i = -0.03;
-            const float K_d = -0.7;
+            const float K_p = -7.5;
+            const float K_i = -0.00;
+            const float K_d = -1.5;
             res = get_PID_result(new_error,time,angle_error, K_p,K_i,K_d,-max_ang_vel,max_ang_vel);
             break;
         }
         case TURN_VARIABLE_LOCATION:  {
-            std::pair<float,float> v_loc = variable_location_loc_func();
-            float new_angle =atan2(-get_y()+v_loc.second,v_loc.first-get_x());
+            std::pair<float,float> v_loc = angular_variable_location_loc_func();
+            float new_angle = atan2(-get_y()+v_loc.second,v_loc.first-get_x());
             float new_error = get_angle_diff(get_angle(),new_angle);
-            const float K_p = -2.5;
-            const float K_i = -0.03;
-            const float K_d = -0.7;
+            const float K_p = -7.5;
+            const float K_i = -0.00;
+            const float K_d = -1.5;
             res = get_PID_result(new_error,time,angle_error, K_p,K_i,K_d,-max_ang_vel,max_ang_vel);
             break;
         }
