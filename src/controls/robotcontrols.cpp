@@ -85,16 +85,18 @@ void RobotControls::updateRobotsThread()
                 {
                     const SSL_DetectionRobot& robot = detection.robots_blue(i);
                     int id = robot.robot_id();
-                    assert(id < 6);
-                    assert(id >= 0);
+                    if(id >=6 || id < 0){
+                      std::cerr << "Invalid ID: PLEASE CHECK THAT SIMULATOR HAS 6 ROBOTS" << std::endl;
+                    }
                     blueRobots[id].update_geometry(robot.x()/1000,robot.y()/1000,robot.orientation(),t,robot.confidence());
                 }
                 for(int i = 0; i < num_yellow_robots; i++)
                 {
                     const SSL_DetectionRobot& robot = detection.robots_yellow(i);
                     int id = robot.robot_id();
-                    assert(id < 6);
-                    assert(id >= 0);
+                    if(id >=6 || id < 0){
+                      std::cerr << "Invalid ID: PLEASE CHECK THAT SIMULATOR HAS 6 ROBOTS" << std::endl;
+                    }
                     yellowRobots[id].update_geometry(robot.x()/1000,robot.y()/1000,robot.orientation(),t,robot.confidence());
                 }
             }
@@ -134,9 +136,9 @@ void RobotControls::sendRobotToBall(bool isYellow, int id){
 	RobotControls::getRobot(isYellow,id).dribble();
 	RobotControls::getRobot(isYellow,id).rotate_to_variable_location([&](){return RobotControls::getCurrentBallLoc();});
 	RobotControls::getRobot(isYellow,id).move_to_track([&, isYellow, id](){
-		std::pair<float,float> ball_loc = RobotControls::getCurrentBallLoc(); 
+		std::pair<float,float> ball_loc = RobotControls::getCurrentBallLoc();
 		RobotFSM& robot = getRobot(isYellow,id);
-		std::pair<float,float> robot_loc = getRobot(isYellow,id).get_loc(); 
+		std::pair<float,float> robot_loc = getRobot(isYellow,id).get_loc();
 		float angle = atan2(robot_loc.second-ball_loc.second,robot_loc.first-ball_loc.first);
 		std::pair<float,float> ideal_loc = {ball_loc.first+.08*cos(angle),ball_loc.second+.08*sin(angle)};
 		return ideal_loc;

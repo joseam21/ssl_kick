@@ -15,7 +15,7 @@
 
 float get_angle_diff(float angle1, float angle2);
 float get_PID_result(float new_error, std::deque<float> &time, std::deque<float> &error, float K_p, float K_i, float K_d, float min_result, float max_result);
-void wheel_velocities(float velnormal, float veltangent, float velangular, float *wheels);
+void wheel_velocities(float velnormal, float veltangent, float velangular, float *wheels, float max_wheel_vel);
 
 RobotFSM::RobotFSM()
 {
@@ -168,13 +168,13 @@ void RobotFSM::send_Command(float cur_time)
     velnormal = vels.second;
     velangular = compute_ang_vel(cur_time);
     if(USE_WHEEL_VEL){
-        float * wheels = new float[4]; 
-	    wheel_velocities(velnormal,veltangent,velangular, wheels);
+        float * wheels = new float[4];
+      wheel_velocities(velnormal,veltangent,velangular, wheels,max_wheel_vel);
         wheel1 = *wheels;
         wheel2 = *(wheels+1);
         wheel3 = *(wheels+2);
         wheel4 = *(wheels+3);
-	delete [] wheels;
+  delete [] wheels;
     }else
     {
         wheel1 = 0;
@@ -196,6 +196,20 @@ void RobotFSM::set_isYellow(bool isYellow1)
     if(isYellow){
         constant_direction_dir = PI-0.00001;
     }
+}
+void RobotFSM::set_max_ang_vel(float new_max_ang_vel){
+  max_ang_vel = new_max_ang_vel;
+}
+void RobotFSM::set_max_plane_vel(float new_max_plane_vel){
+  max_plane_vel = new_max_plane_vel;
+}
+void RobotFSM::set_max_wheel_vel(float new_max_wheel_vel){
+  max_wheel_vel = new_max_wheel_vel;
+}
+void RobotFSM::reset_max_vel_variables(){
+  max_ang_vel = 2;
+  max_plane_vel = 3;
+  max_wheel_vel = 2;
 }
 struct datastruct{
     float time2, x2, y2;
@@ -224,13 +238,13 @@ std::pair<float,float> RobotFSM::compute_plane_vel(float time1)
     mtx_time.lock();
     std::pair<float,float> res;
     if(id == 2){
-	}
+  }
     switch(robot_move_state)
     {
         case MOVE_CONSTANT_DIRECTION:
         {
             float angle_diff = get_angle_diff(get_angle(), constant_direction_dir);
-            res = std::make_pair(cos(angle_diff*-1)*V_MAX,sin(angle_diff*-1)*V_MAX);
+            res = std::make_pair(cos(angle_diff*-1)*max_plane_vel,sin(angle_diff*-1)*max_plane_vel);
             break;
         }
         case MOVE_CONSTANT_LOCATION:
@@ -246,7 +260,7 @@ std::pair<float,float> RobotFSM::compute_plane_vel(float time1)
             const float K_p = 7.0;
             const float K_i = 0.0;
             const float K_d = 1.5;
-            float optimal_velocity = get_PID_result(new_error, time, move_error,K_p,K_i,K_d,-V_MAX,V_MAX);
+            float optimal_velocity = get_PID_result(new_error, time, move_error,K_p,K_i,K_d,-max_plane_vel,max_plane_vel);
             res = std::make_pair(cos(angle_diff*-1)*optimal_velocity,sin(angle_diff*-1)*optimal_velocity);
             break;
         }
@@ -262,7 +276,7 @@ std::pair<float,float> RobotFSM::compute_plane_vel(float time1)
         }
         case MOVE_VARIABLE_LOCATION_TRACK:
         {
-			std::pair<float,float> v_loc = variable_location_loc_func();
+  std::pair<float,float> v_loc = variable_location_loc_func();
             float xdif = v_loc.first - get_x();
             float ydif = v_loc.second - get_y();
             float angle1 = atan2(ydif,xdif);
@@ -274,11 +288,11 @@ std::pair<float,float> RobotFSM::compute_plane_vel(float time1)
             const float K_p = 7.0;
             const float K_i = 0.0;
             const float K_d = 1.5;
-            float optimal_velocity = get_PID_result(new_error, time, move_error,K_p,K_i,K_d,-V_MAX,V_MAX);
+            float optimal_velocity = get_PID_result(new_error, time, move_error,K_p,K_i,K_d,-max_plane_vel,max_plane_vel);
             res = std::make_pair(cos(angle_diff*-1)*optimal_velocity,sin(angle_diff*-1)*optimal_velocity);
             break;
         }
-    
+
     }
     mtx_time.unlock();
     mtx_robot_move_state.unlock();
@@ -298,12 +312,17 @@ float RobotFSM::compute_ang_vel(float time1)
             const float K_p = -7.5;
             const float K_i = -0.00;
             const float K_d = -1.5;
-            res = get_PID_result(new_error,time,angle_error, K_p,K_i,K_d,-V_ANG_MAX,V_ANG_MAX);
+            res = get_PID_result(new_error,time,angle_error, K_p,K_i,K_d,-max_ang_vel,max_ang_vel);
             break;
         }
         case TURN_CONSTANT_LOCATION:
         {
-            res = 0;
+            float new_angle = atan2(constant_location_loc.second-get_y(),constant_location_loc.first-get_x());
+            float new_error = get_angle_diff(get_angle(),new_angle);
+            const float K_p = -2.5;
+            const float K_i = -0.03;
+            const float K_d = -0.7;
+            res = get_PID_result(new_error,time,angle_error, K_p,K_i,K_d,-max_ang_vel,max_ang_vel);
             break;
         }
         case TURN_VARIABLE_DIRECTION:
@@ -312,18 +331,18 @@ float RobotFSM::compute_ang_vel(float time1)
             const float K_p = -2.5;
             const float K_i = -0.03;
             const float K_d = -0.7;
-            res = get_PID_result(new_error,time,angle_error, K_p,K_i,K_d,-V_ANG_MAX,V_ANG_MAX);
+            res = get_PID_result(new_error,time,angle_error, K_p,K_i,K_d,-max_ang_vel,max_ang_vel);
             break;
         }
         case TURN_VARIABLE_LOCATION:
         {
-			std::pair<float,float> v_loc = variable_location_loc_func();
-			float new_angle =atan2(-get_y()+v_loc.second,v_loc.first-get_x());
+            std::pair<float,float> v_loc = variable_location_loc_func();
+            float new_angle =atan2(-get_y()+v_loc.second,v_loc.first-get_x());
             float new_error = get_angle_diff(get_angle(),new_angle);
             const float K_p = -2.5;
             const float K_i = -0.03;
             const float K_d = -0.7;
-            res = get_PID_result(new_error,time,angle_error, K_p,K_i,K_d,-V_ANG_MAX,V_ANG_MAX);
+            res = get_PID_result(new_error,time,angle_error, K_p,K_i,K_d,-max_ang_vel,max_ang_vel);
             break;
         }
         case TURN_DIRECTION_OF_MOVEMENT:
@@ -350,67 +369,67 @@ float get_angle_diff(float angle1, float angle2)
 }
 
 
-void wheel_velocities(float velnormal, float veltangent, float velangular, float * wheels){
-	// velnormal  is positive to the right of the robot 
-	// veltangent is positvite straight forward
-	// velangular is the angular velocity in rads/s (positive counter clockwise)
+void wheel_velocities(float velnormal, float veltangent, float velangular, float * wheels, float max_wheel_vel){
+  // velnormal  is positive to the right of the robot
+  // veltangent is positvite straight forward
+  // velangular is the angular velocity in rads/s (positive counter clockwise)
 
-	// NB! The following three variables are the ones used the simulator
-	/*
-	double phi_1 = 33*M_PI/180;
-	double phi_2 = 45*M_PI/180;
-	double R = 0.0289;
-	*/
-	double scaling_factor = 3.041667; // 0.073/0.024 according to config files
-	velnormal = -velnormal;
-	
-	//* This can also be correct
-	double phi = 35*M_PI/180;
-	double R = 0.024;
-	//*/	
-	// Find out if the following code can be vectorized later
-	//* C
-	// Caused weird behaviour, probably different implementation in simulator
-	double max_wheel_ang = abs(velangular*scaling_factor); // wheel angular velocity contribution from angular movement
-	double max_wheel_tan = abs(veltangent/(R*cos(phi)));
-	double max_wheel_norm = abs(velnormal/(R*sin(phi)));
-	double polarity_ang = ((velangular*scaling_factor)>0)?1:-1;
-	double polarity_tan = ((veltangent/(R*cos(phi)))>0)?1:-1;
-	double polarity_norm = ((velnormal/(R*sin(phi)))>0)?1:-1;
-	// we want adj_wheel_ang + adj_wheel_tan + adj_wheel_norm to be less than 1 but as close to it as possible
-	if(max_wheel_ang + max_wheel_tan+max_wheel_norm > 1){
-	    if(max_wheel_tan + max_wheel_norm > 0.8 * V_WHEEL_MAX && max_wheel_ang < 0.6 * V_WHEEL_MAX){
-	        // movement takes precedence, unless we decide to adjust this cutoff later depending on priority of movement
-	        max_wheel_ang = std::min(max_wheel_ang, 0.2 * V_WHEEL_MAX); // cap at 0.2 
-	        if(max_wheel_tan > 0.8 * V_WHEEL_MAX && max_wheel_norm < 0.6 * V_WHEEL_MAX){
-	            // movement in the tangential direction takes precedence
-	            max_wheel_norm = std::min(max_wheel_norm,0.2*V_WHEEL_MAX);
-	            max_wheel_tan = 1 - (max_wheel_norm +max_wheel_ang);
-	        }else if(max_wheel_norm > 0.8 * V_WHEEL_MAX && max_wheel_tan < 0.6 * V_WHEEL_MAX){
-	            // movement in the normal direction takes precedence (strafing)
-	            max_wheel_tan = std::min(max_wheel_tan, 0.2*V_WHEEL_MAX);
-	            max_wheel_norm = 1 - (max_wheel_tan + max_wheel_ang);
-	        }else{
-	            // evenly distribute them
-	            double ratio = (1-max_wheel_ang)/(max_wheel_tan+max_wheel_norm);
-	            max_wheel_tan *= ratio;
-	            max_wheel_norm *= ratio;
-	        }
-	    }else if(max_wheel_ang > 0.8 * V_WHEEL_MAX && max_wheel_tan + max_wheel_norm < 0.6*V_WHEEL_MAX){
-	        //angling robot takes precedence
-	        max_wheel_ang = std::min(max_wheel_ang, 0.8*V_WHEEL_MAX);
-	        double ratio = (1-max_wheel_ang)/(max_wheel_tan+max_wheel_norm);
-	        max_wheel_tan *= ratio;
-	        max_wheel_norm *= ratio;
-	    }else{
-	        //evenly split all 3
-	        double ratio = 1/(max_wheel_tan+max_wheel_norm+max_wheel_ang);
-	        max_wheel_tan *= ratio;
-	        max_wheel_norm *= ratio;
-	        max_wheel_ang *= ratio;
-	    }
-	}
-	/*
+  // NB! The following three variables are the ones used the simulator
+  /*
+  double phi_1 = 33*M_PI/180;
+  double phi_2 = 45*M_PI/180;
+  double R = 0.0289;
+  */
+  double scaling_factor = 3.041667; // 0.073/0.024 according to config files
+  velnormal = -velnormal;
+
+  //* This can also be correct
+  double phi = 35*M_PI/180;
+  double R = 0.024;
+  //*/
+  // Find out if the following code can be vectorized later
+  //* C
+  // Caused weird behaviour, probably different implementation in simulator
+  double max_wheel_ang = abs(velangular*scaling_factor); // wheel angular velocity contribution from angular movement
+  double max_wheel_tan = abs(veltangent/(R*cos(phi)));
+  double max_wheel_norm = abs(velnormal/(R*sin(phi)));
+  double polarity_ang = ((velangular*scaling_factor)>0)?1:-1;
+  double polarity_tan = ((veltangent/(R*cos(phi)))>0)?1:-1;
+  double polarity_norm = ((velnormal/(R*sin(phi)))>0)?1:-1;
+  // we want adj_wheel_ang + adj_wheel_tan + adj_wheel_norm to be less than 1 but as close to it as possible
+  if(max_wheel_ang + max_wheel_tan+max_wheel_norm > 1){
+      if(max_wheel_tan + max_wheel_norm > 0.8 * max_wheel_vel && max_wheel_ang < 0.6 * max_wheel_vel){
+          // movement takes precedence, unless we decide to adjust this cutoff later depending on priority of movement
+          max_wheel_ang = std::min(max_wheel_ang, 0.2 * max_wheel_vel); // cap at 0.2
+          if(max_wheel_tan > 0.8 * max_wheel_vel && max_wheel_norm < 0.6 * max_wheel_vel){
+              // movement in the tangential direction takes precedence
+              max_wheel_norm = std::min(max_wheel_norm,0.2*max_wheel_vel);
+              max_wheel_tan = 1 - (max_wheel_norm +max_wheel_ang);
+          }else if(max_wheel_norm > 0.8 * max_wheel_vel && max_wheel_tan < 0.6 * max_wheel_vel){
+              // movement in the normal direction takes precedence (strafing)
+              max_wheel_tan = std::min(max_wheel_tan, 0.2*max_wheel_vel);
+              max_wheel_norm = 1 - (max_wheel_tan + max_wheel_ang);
+          }else{
+              // evenly distribute them
+              double ratio = (1-max_wheel_ang)/(max_wheel_tan+max_wheel_norm);
+              max_wheel_tan *= ratio;
+              max_wheel_norm *= ratio;
+          }
+      }else if(max_wheel_ang > 0.8 * max_wheel_vel && max_wheel_tan + max_wheel_norm < 0.6*max_wheel_vel){
+          //angling robot takes precedence
+          max_wheel_ang = std::min(max_wheel_ang, 0.8*max_wheel_vel);
+          double ratio = (1-max_wheel_ang)/(max_wheel_tan+max_wheel_norm);
+          max_wheel_tan *= ratio;
+          max_wheel_norm *= ratio;
+      }else{
+          //evenly split all 3
+          double ratio = 1/(max_wheel_tan+max_wheel_norm+max_wheel_ang);
+          max_wheel_tan *= ratio;
+          max_wheel_norm *= ratio;
+          max_wheel_ang *= ratio;
+      }
+  }
+  /*
     wheels[3] = (-sin(phi_1)*velnormal + cos(phi_1)*veltangent + R*velangular*scaling_factor)/R;
     wheels[0] = (-sin(phi_1)*velnormal - cos(phi_1)*veltangent + R*velangular*scaling_factor)/R;
     wheels[1] = (sin(phi_2)*velnormal - cos(phi_2)*veltangent + R*velangular*scaling_factor)/R;
@@ -423,14 +442,14 @@ void wheel_velocities(float velnormal, float veltangent, float velangular, float
     wheels[1] = max_wheel_ang - max_wheel_tan + max_wheel_norm;
     wheels[2] = max_wheel_ang + max_wheel_tan + max_wheel_norm;
     wheels[3] = max_wheel_ang + max_wheel_tan - max_wheel_norm;
-	//*/
-	// We ARE SENDING ANGULAR VELOCITIES TO THE WHEELS
+  //*/
+  // We ARE SENDING ANGULAR VELOCITIES TO THE WHEELS
     return;
 }
 
 
 
-float get_PID_result(float new_error, std::deque<float> &time, std::deque<float> &error, 
+float get_PID_result(float new_error, std::deque<float> &time, std::deque<float> &error,
           float K_p, float K_i, float K_d, float min_result = -99, float max_result = 99)
 {
     float error_integral = 0;
