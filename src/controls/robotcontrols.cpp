@@ -117,26 +117,6 @@ void RobotControls::sendRobotCommandThread()
         }
     }
 }
-/*
-void RobotControls::setRobotStateThread()
-{
-    vector<bool> sent(3,false);
-    while(!endsignal){
-        usleep(1);
-        float time = getTime();
-        if(time > 1 && !sent[0]){
-            sent[0] = true;
-            for(int i = 0; i < 6; i++){
-                yellowRobots[i].move_to_location(std::make_pair(0,0));
-            }
-        }else if(time > 4 && !sent[1]){
-            sent[1] = true;
-            for(int i = 0; i < 6; i++){
-                yellowRobots[i].move_to_location(std::make_pair(0,i-2.5));
-            }
-        }
-    }
-}*/
 void RobotControls::setRobotStateThread()
 {
     while(!endsignal){
@@ -153,7 +133,7 @@ float RobotControls::getTime(){
 void RobotControls::sendRobotToBall(bool isYellow, int id){
 	RobotControls::getRobot(isYellow,id).dribble();
 	RobotControls::getRobot(isYellow,id).rotate_to_variable_location([&](){return RobotControls::getCurrentBallLoc();});
-	RobotControls::getRobot(isYellow,id).move_to_track([&, id](){
+	RobotControls::getRobot(isYellow,id).move_to_track([&, isYellow, id](){
 		std::pair<float,float> ball_loc = RobotControls::getCurrentBallLoc(); 
 		RobotFSM& robot = getRobot(isYellow,id);
 		std::pair<float,float> robot_loc = getRobot(isYellow,id).get_loc(); 
