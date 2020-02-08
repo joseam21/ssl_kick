@@ -56,7 +56,6 @@ void RobotControls::signalHandler(int signum){
     std::string s = "Interrupt Signal: " + std::to_string(signum) + " received\n";
     Log("DEBUG",s);
     endsignal = true;
-    usleep(100000000);
 }
 
 void RobotControls::updateRobotsThread()
@@ -109,19 +108,18 @@ void RobotControls::sendRobotCommandThread()
 {
     while(!endsignal)
     {
-        usleep(16000);// approx 60 times a second, which is approx how often we get info from vision
+        std::this_thread::sleep_for(std::chrono::milliseconds(16));
         for(int i = 0; i < 6; i++)
         {
-            float t1 = (float)(getTime());
-            yellowRobots[i].send_Command(t1);
-            float t2 = (float)(getTime());
-            blueRobots[i].send_Command(t2);
+            yellowRobots[i].send_Command(getTime());
+            blueRobots[i].send_Command(getTime());
         }
     }
 }
 void RobotControls::setRobotStateThread()
 {
     while(!endsignal){
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
         setRobotStateFunction(getTime());
     }
 }
