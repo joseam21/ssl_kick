@@ -82,7 +82,6 @@ void RobotFSM::move_to_track(std::function<std::pair<float,float>(void)> loc_fun
 {
     mtx_robot_move_state.lock();
     robot_move_state = MOVE_VARIABLE_LOCATION_TRACK;
-    //std::cout << "  " <<  id << std::endl;
     reset_state_variables();
     variable_location_loc_func = loc_func;
     mtx_robot_move_state.unlock();
@@ -224,6 +223,9 @@ std::pair<float,float> RobotFSM::compute_plane_vel(float time1)
     mtx_robot_move_state.lock();
     mtx_time.lock();
     std::pair<float,float> res;
+    if(id == 2){
+		std::cout << robot_move_state << std::endl;
+	}
     switch(robot_move_state)
     {
         case MOVE_CONSTANT_DIRECTION:
@@ -275,8 +277,6 @@ std::pair<float,float> RobotFSM::compute_plane_vel(float time1)
             const float K_d = 1.5;
             float optimal_velocity = get_PID_result(new_error, time, move_error,K_p,K_i,K_d,-V_MAX,V_MAX);
             res = std::make_pair(cos(angle_diff*-1)*optimal_velocity,sin(angle_diff*-1)*optimal_velocity);
-           	//printf("%i %f %f\n", id, res.first,res.second);
-           	fflush(stdout);
             break;
         }
     
