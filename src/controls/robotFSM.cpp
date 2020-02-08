@@ -17,8 +17,7 @@ float get_angle_diff(float angle1, float angle2);
 float get_PID_result(float new_error, std::deque<float> &time, std::deque<float> &error, float K_p, float K_i, float K_d, float min_result, float max_result);
 void wheel_velocities(float velnormal, float veltangent, float velangular, float *wheels, float max_wheel_vel);
 
-RobotFSM::RobotFSM()
-{
+RobotFSM::RobotFSM(){
     id = -1;
     robot_move_state = MOVE_PAUSE;
     kick_tries = 0;
@@ -26,8 +25,7 @@ RobotFSM::RobotFSM()
     spinner = false;
 }
 
-RobotFSM::RobotFSM(const RobotFSM& robotFSM)
-{
+RobotFSM::RobotFSM(const RobotFSM& robotFSM){
     id = -1;
     robot_move_state = MOVE_PAUSE;
     kick_tries = 0;
@@ -35,16 +33,14 @@ RobotFSM::RobotFSM(const RobotFSM& robotFSM)
     spinner = false;
 }
 
-RobotFSM::RobotFSM(int id1, bool isYellow1) : id(id1),isYellow(isYellow1)
-{
+RobotFSM::RobotFSM(int id1, bool isYellow1) : id(id1),isYellow(isYellow1){
     robot_move_state = MOVE_PAUSE;
     kick_tries = 0;
     constant_direction_dir = 0;
     spinner = false;
 }
 
-void RobotFSM::move_in_direction(float dir)
-{
+void RobotFSM::move_in_direction(float dir){
     mtx_robot_move_state.lock();
     robot_move_state = MOVE_CONSTANT_DIRECTION;
     reset_state_variables();
@@ -52,8 +48,7 @@ void RobotFSM::move_in_direction(float dir)
     mtx_robot_move_state.unlock();
 }
 
-void RobotFSM::move_to_location(std::pair<float,float> loc)
-{
+void RobotFSM::move_to_location(std::pair<float,float> loc){
     mtx_robot_move_state.lock();
     robot_move_state = MOVE_CONSTANT_LOCATION;
     reset_state_variables();
@@ -61,16 +56,14 @@ void RobotFSM::move_to_location(std::pair<float,float> loc)
     mtx_robot_move_state.unlock();
 }
 
-void RobotFSM::move_pause()
-{
+void RobotFSM::move_pause(){
     mtx_robot_move_state.lock();
     robot_move_state = MOVE_PAUSE;
     reset_state_variables();
     mtx_robot_move_state.unlock();
 }
 
-void RobotFSM::move_to_intercept(std::function<std::pair<float,float>(void)> loc_func)
-{
+void RobotFSM::move_to_intercept(std::function<std::pair<float,float>(void)> loc_func){
     mtx_robot_move_state.lock();
     robot_move_state = MOVE_VARIABLE_LOCATION_INTERCEPT;
     reset_state_variables();
@@ -78,8 +71,7 @@ void RobotFSM::move_to_intercept(std::function<std::pair<float,float>(void)> loc
     mtx_robot_move_state.unlock();
 }
 
-void RobotFSM::move_to_track(std::function<std::pair<float,float>(void)> loc_func)
-{
+void RobotFSM::move_to_track(std::function<std::pair<float,float>(void)> loc_func){
     mtx_robot_move_state.lock();
     robot_move_state = MOVE_VARIABLE_LOCATION_TRACK;
     reset_state_variables();
@@ -87,8 +79,7 @@ void RobotFSM::move_to_track(std::function<std::pair<float,float>(void)> loc_fun
     mtx_robot_move_state.unlock();
 }
 
-void RobotFSM::rotate_to_direction(float dir)
-{
+void RobotFSM::rotate_to_direction(float dir){
     mtx_robot_turn_state.lock();
     robot_turn_state = TURN_CONSTANT_DIRECTION;
     reset_state_variables();
@@ -96,8 +87,7 @@ void RobotFSM::rotate_to_direction(float dir)
     mtx_robot_turn_state.unlock();
 }
 
-void RobotFSM::rotate_to_location(std::pair<float,float> loc)
-{
+void RobotFSM::rotate_to_location(std::pair<float,float> loc){
     mtx_robot_turn_state.lock();
     robot_turn_state = TURN_CONSTANT_LOCATION;
     reset_state_variables();
@@ -105,8 +95,7 @@ void RobotFSM::rotate_to_location(std::pair<float,float> loc)
     mtx_robot_turn_state.unlock();
 }
 
-void RobotFSM::rotate_to_variable_direction(std::function<float(void)> dir_func)
-{
+void RobotFSM::rotate_to_variable_direction(std::function<float(void)> dir_func){
     mtx_robot_turn_state.lock();
     robot_turn_state = TURN_VARIABLE_DIRECTION;
     reset_state_variables();
@@ -114,8 +103,7 @@ void RobotFSM::rotate_to_variable_direction(std::function<float(void)> dir_func)
     mtx_robot_turn_state.unlock();
 }
 
-void RobotFSM::rotate_to_variable_location(std::function<std::pair<float,float>(void)> loc_func)
-{
+void RobotFSM::rotate_to_variable_location(std::function<std::pair<float,float>(void)> loc_func){
     mtx_robot_turn_state.lock();
     robot_turn_state = TURN_VARIABLE_LOCATION;
     reset_state_variables();
@@ -123,33 +111,28 @@ void RobotFSM::rotate_to_variable_location(std::function<std::pair<float,float>(
     mtx_robot_turn_state.unlock();
 }
 
-void RobotFSM::rotate_to_movement()
-{
+void RobotFSM::rotate_to_movement(){
     mtx_robot_turn_state.lock();
     robot_turn_state = TURN_DIRECTION_OF_MOVEMENT;
     reset_state_variables();
     mtx_robot_turn_state.unlock();
 }
 
-void RobotFSM::dribble()
-{
+void RobotFSM::dribble(){
     spinner = true;
 }
 
-void RobotFSM::stop_dribble()
-{
+void RobotFSM::stop_dribble(){
     spinner = false;
 }
 
-void RobotFSM::kick(float kick_speed_x1, float kick_speed_z1, int kick_tries1)
-{
+void RobotFSM::kick(float kick_speed_x1, float kick_speed_z1, int kick_tries1){
     kick_speed_x = kick_speed_x1;
     kick_speed_z = kick_speed_z1;
     kick_tries = kick_tries1;
 }
 
-void RobotFSM::send_Command(float cur_time)
-{
+void RobotFSM::send_Command(float cur_time){
     bool wheelsspeed1;
     float kick_speed_x1, kick_speed_z1, wheel1,wheel2,wheel3,wheel4;
     wheelsspeed1 = USE_WHEEL_VEL == 1;
@@ -175,8 +158,7 @@ void RobotFSM::send_Command(float cur_time)
         wheel3 = *(wheels+2);
         wheel4 = *(wheels+3);
   delete [] wheels;
-    }else
-    {
+    }else {
         wheel1 = 0;
         wheel2 = 0;
         wheel3 = 0;
@@ -186,12 +168,10 @@ void RobotFSM::send_Command(float cur_time)
         velangular,spinner,wheelsspeed1,wheel1,wheel2,wheel3,wheel4);
 }
 
-void RobotFSM::set_id(int id1)
-{
+void RobotFSM::set_id(int id1){
     id = id1;
 }
-void RobotFSM::set_isYellow(bool isYellow1)
-{
+void RobotFSM::set_isYellow(bool isYellow1){
     isYellow = isYellow1;
     if(isYellow){
         constant_direction_dir = PI-0.00001;
@@ -226,29 +206,22 @@ void RobotFSM::update_geometry(float x1, float y1, float angle1, float time1, fl
     Log((isYellow?"Y":"B")+std::to_string(id),ds);
 }
 
-void RobotFSM::reset_state_variables()
-{
+void RobotFSM::reset_state_variables(){
     move_error.clear();
     angle_error.clear();
 }
 
-std::pair<float,float> RobotFSM::compute_plane_vel(float time1)
-{
+std::pair<float,float> RobotFSM::compute_plane_vel(float time1){
     mtx_robot_move_state.lock();
     mtx_time.lock();
     std::pair<float,float> res;
-    if(id == 2){
-  }
-    switch(robot_move_state)
-    {
-        case MOVE_CONSTANT_DIRECTION:
-        {
+    switch(robot_move_state) {
+        case MOVE_CONSTANT_DIRECTION: {
             float angle_diff = get_angle_diff(get_angle(), constant_direction_dir);
             res = std::make_pair(cos(angle_diff*-1)*max_plane_vel,sin(angle_diff*-1)*max_plane_vel);
             break;
         }
-        case MOVE_CONSTANT_LOCATION:
-        {
+        case MOVE_CONSTANT_LOCATION: {
             float xdif = constant_location_loc.first - get_x();
             float ydif = constant_location_loc.second - get_y();
             float angle1 = atan2(ydif,xdif);
@@ -264,19 +237,16 @@ std::pair<float,float> RobotFSM::compute_plane_vel(float time1)
             res = std::make_pair(cos(angle_diff*-1)*optimal_velocity,sin(angle_diff*-1)*optimal_velocity);
             break;
         }
-        case MOVE_PAUSE:
-        {
+        case MOVE_PAUSE: {
             res= std::make_pair(0,0);
             break;
         }
-        case MOVE_VARIABLE_LOCATION_INTERCEPT:
-        {
+        case MOVE_VARIABLE_LOCATION_INTERCEPT:  {
             res= std::make_pair(0,0);
             break;
         }
-        case MOVE_VARIABLE_LOCATION_TRACK:
-        {
-  std::pair<float,float> v_loc = variable_location_loc_func();
+        case MOVE_VARIABLE_LOCATION_TRACK:  {
+            std::pair<float,float> v_loc = variable_location_loc_func();
             float xdif = v_loc.first - get_x();
             float ydif = v_loc.second - get_y();
             float angle1 = atan2(ydif,xdif);
@@ -292,22 +262,18 @@ std::pair<float,float> RobotFSM::compute_plane_vel(float time1)
             res = std::make_pair(cos(angle_diff*-1)*optimal_velocity,sin(angle_diff*-1)*optimal_velocity);
             break;
         }
-
     }
     mtx_time.unlock();
     mtx_robot_move_state.unlock();
     return res;
 }
 
-float RobotFSM::compute_ang_vel(float time1)
-{
+float RobotFSM::compute_ang_vel(float time1){
     mtx_robot_turn_state.lock();
     mtx_time.lock();
     float res;
-    switch(robot_turn_state)
-    {
-        case TURN_CONSTANT_DIRECTION:
-        {
+    switch(robot_turn_state) {
+        case TURN_CONSTANT_DIRECTION:  {
             float new_error = get_angle_diff(get_angle(),constant_direction_dir);
             const float K_p = -7.5;
             const float K_i = -0.00;
@@ -315,8 +281,7 @@ float RobotFSM::compute_ang_vel(float time1)
             res = get_PID_result(new_error,time,angle_error, K_p,K_i,K_d,-max_ang_vel,max_ang_vel);
             break;
         }
-        case TURN_CONSTANT_LOCATION:
-        {
+        case TURN_CONSTANT_LOCATION:  {
             float new_angle = atan2(constant_location_loc.second-get_y(),constant_location_loc.first-get_x());
             float new_error = get_angle_diff(get_angle(),new_angle);
             const float K_p = -2.5;
@@ -325,8 +290,7 @@ float RobotFSM::compute_ang_vel(float time1)
             res = get_PID_result(new_error,time,angle_error, K_p,K_i,K_d,-max_ang_vel,max_ang_vel);
             break;
         }
-        case TURN_VARIABLE_DIRECTION:
-        {
+        case TURN_VARIABLE_DIRECTION: {
             float new_error = get_angle_diff(get_angle(),variable_direction_dir_func());
             const float K_p = -2.5;
             const float K_i = -0.03;
@@ -334,8 +298,7 @@ float RobotFSM::compute_ang_vel(float time1)
             res = get_PID_result(new_error,time,angle_error, K_p,K_i,K_d,-max_ang_vel,max_ang_vel);
             break;
         }
-        case TURN_VARIABLE_LOCATION:
-        {
+        case TURN_VARIABLE_LOCATION:  {
             std::pair<float,float> v_loc = variable_location_loc_func();
             float new_angle =atan2(-get_y()+v_loc.second,v_loc.first-get_x());
             float new_error = get_angle_diff(get_angle(),new_angle);
@@ -345,8 +308,7 @@ float RobotFSM::compute_ang_vel(float time1)
             res = get_PID_result(new_error,time,angle_error, K_p,K_i,K_d,-max_ang_vel,max_ang_vel);
             break;
         }
-        case TURN_DIRECTION_OF_MOVEMENT:
-        {
+        case TURN_DIRECTION_OF_MOVEMENT: {
             res = 0;
             break;
         }
@@ -357,17 +319,13 @@ float RobotFSM::compute_ang_vel(float time1)
 }
 
 // Helper Functions below
-
-float get_angle_diff(float angle1, float angle2)
-{
+float get_angle_diff(float angle1, float angle2){
     float diff = angle1 - angle2 + 4*PI;
-    while(diff > PI)
-    {
+    while(diff > PI)    {
         diff -= 2*PI;
     }
     return diff;
 }
-
 
 void wheel_velocities(float velnormal, float veltangent, float velangular, float * wheels, float max_wheel_vel){
   // velnormal  is positive to the right of the robot
@@ -447,23 +405,17 @@ void wheel_velocities(float velnormal, float veltangent, float velangular, float
     return;
 }
 
-
-
 float get_PID_result(float new_error, std::deque<float> &time, std::deque<float> &error,
-          float K_p, float K_i, float K_d, float min_result = -99, float max_result = 99)
-{
+          float K_p, float K_i, float K_d, float min_result = -99, float max_result = 99){
     float error_integral = 0;
     float error_derivative = 0;
-    if(error.size() > 1 && time.size() > 1)
-    {
+    if(error.size() > 1 && time.size() > 1)    {
         error_derivative = (new_error - error.front())/(time[0]-time[1]);
-        for(int i = 0; i < error.size(); i++)
-        {
+        for(int i = 0; i < error.size(); i++)        {
             error_integral += error[i];
         }
     }
-    if(!std::isfinite(error_derivative))
-    {
+    if(!std::isfinite(error_derivative))    {
         std::cerr << "Bad Calculation Detected! " << new_error << ' ' << error.front() << std::endl;
         for(int i = 0; i < 10; i++){
             std::cerr << time[i] << "   ";
@@ -472,8 +424,7 @@ float get_PID_result(float new_error, std::deque<float> &time, std::deque<float>
         error_derivative = (new_error-error.front()*60);
     }
     error.push_front(new_error);
-    while(error.size() > SIZE)
-    {
+    while(error.size() > SIZE)    {
         error.pop_back();
     }
     //std::cout << K_p << ' ' << new_error << ' ' << error_integral << ' ' << error_derivative << std::endl;
@@ -482,12 +433,10 @@ float get_PID_result(float new_error, std::deque<float> &time, std::deque<float>
         printf("P: %f,  I: %f,  D:  %f,  res: %f  \n",K_p*new_error,K_i*error_integral,
         K_d*error_derivative,result);
     }*/
-    if(result > max_result)
-    {
+    if(result > max_result)    {
         result = max_result;
     }
-    if(result < min_result)
-    {
+    if(result < min_result)    {
         result = min_result;
     }
     return result;
