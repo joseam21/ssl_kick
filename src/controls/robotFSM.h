@@ -15,7 +15,7 @@
 // NOTE: Robots accelerate at approx 150 rad/s^2 and 5.2 m/s
 
 enum RobotMoveState{
-    MOVE_CONSTANT_DIRECTION=1,   // uses constant_direction_dir
+    MOVE_CONSTANT_DIRECTION=1,   // uses planar_constant_direction_dir
     MOVE_CONSTANT_LOCATION=2,
     MOVE_VARIABLE_LOCATION_TRACK=3,
     MOVE_VARIABLE_LOCATION_INTERCEPT=4,
@@ -106,6 +106,8 @@ public:
 
     // override base method for updating the geometry, mostly for debug purposes
     void update_geometry(float x1, float y1, float angle1, float time1, float confidence1 = 1);
+
+    std::string to_str();
 private:
     // private data
     int id;

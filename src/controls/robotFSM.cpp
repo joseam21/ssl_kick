@@ -15,7 +15,7 @@
 
 float get_angle_diff(float angle1, float angle2);
 float get_PID_result(float new_error, std::deque<float> &time, std::deque<float> &error, float K_p, float K_i, float K_d, float min_result, float max_result);
-void wheel_velocities(float velnormal, float veltangent, float velangular, float *wheels, float max_wheel_vel);
+std::tuple<float,float,float,float> wheel_velocities(float velnormal, float veltangent, float velangular, float max_wheel_vel);
 
 RobotFSM::RobotFSM(){
     id = -1;
@@ -154,13 +154,11 @@ void RobotFSM::send_Command(float cur_time){
     velnormal = vels.second;
     velangular = compute_ang_vel(cur_time);
     if(USE_WHEEL_VEL){
-        float * wheels = new float[4];
-      wheel_velocities(velnormal,veltangent,velangular, wheels,max_wheel_vel);
-        wheel1 = *wheels;
-        wheel2 = *(wheels+1);
-        wheel3 = *(wheels+2);
-        wheel4 = *(wheels+3);
-  delete [] wheels;
+        std::tuple<float,float,float,float> wheel_vels = wheel_velocities(velnormal,veltangent,velangular,max_wheel_vel);
+        wheel1 = std::get<0>(wheel_vels);
+        wheel2 = std::get<1>(wheel_vels);
+        wheel3 = std::get<2>(wheel_vels);
+        wheel4 = std::get<3>(wheel_vels);
     }else {
         wheel1 = 0;
         wheel2 = 0;
@@ -250,6 +248,7 @@ std::pair<float,float> RobotFSM::compute_plane_vel(float time1){
         }
         case MOVE_VARIABLE_LOCATION_TRACK:  {
             std::pair<float,float> v_loc = planar_variable_location_loc_func();
+            planar_constant_location_loc = v_loc;
             float xdif = v_loc.first - get_x();
             float ydif = v_loc.second - get_y();
             float angle1 = atan2(ydif,xdif);
@@ -294,7 +293,9 @@ float RobotFSM::compute_ang_vel(float time1){
             break;
         }
         case TURN_VARIABLE_DIRECTION: {
-            float new_error = get_angle_diff(get_angle(),variable_direction_dir_func());
+            float new_angle = variable_direction_dir_func();
+            angular_constant_direction_dir = new_angle;
+            float new_error = get_angle_diff(get_angle(),new_angle);
             const float K_p = -7.5;
             const float K_i = -0.00;
             const float K_d = -1.5;
@@ -303,6 +304,7 @@ float RobotFSM::compute_ang_vel(float time1){
         }
         case TURN_VARIABLE_LOCATION:  {
             std::pair<float,float> v_loc = angular_variable_location_loc_func();
+            angular_constant_location_loc = v_loc;
             float new_angle = atan2(-get_y()+v_loc.second,v_loc.first-get_x());
             float new_error = get_angle_diff(get_angle(),new_angle);
             const float K_p = -7.5;
@@ -321,6 +323,26 @@ float RobotFSM::compute_ang_vel(float time1){
     return res;
 }
 
+std::string RobotFSM::to_str(){
+  std::string moveStatusString, turnStatusString;
+  switch(robot_move_state){
+    case MOVE_PAUSE: moveStatusString = ", Movement Paused "; break;
+    case MOVE_CONSTANT_LOCATION: moveStatusString = ", Movement to loc " + std::to_string(planar_constant_location_loc.first) +"," + std::to_string(planar_constant_location_loc.second); break;
+    case MOVE_CONSTANT_DIRECTION: moveStatusString = ", Movement toward " + std::to_string(planar_constant_direction_dir); break;
+    case MOVE_VARIABLE_LOCATION_TRACK: moveStatusString = ", Movement to vloc "+ std::to_string(planar_constant_location_loc.first) +"," + std::to_string(planar_constant_location_loc.second); break;
+    case MOVE_VARIABLE_LOCATION_INTERCEPT: moveStatusString = ", Movement int. vloc " + std::to_string(planar_constant_location_loc.first) +"," + std::to_string(planar_constant_location_loc.second); break;
+    default: moveStatusString = "Error: No Movement Status!"; break;
+  }
+  switch(robot_turn_state){
+    case TURN_CONSTANT_DIRECTION: turnStatusString = ", Turning towards " + std::to_string(angular_constant_direction_dir); break;
+    case TURN_CONSTANT_LOCATION: turnStatusString = ", Turning to loc " + std::to_string(angular_constant_location_loc.first) + "," + std::to_string(angular_constant_location_loc.second); break;
+    case TURN_VARIABLE_LOCATION: turnStatusString = ", Turning to vloc " + std::to_string(angular_constant_location_loc.first) + "," + std::to_string(angular_constant_location_loc.second); break;
+    case TURN_VARIABLE_DIRECTION: turnStatusString = ", Turning to vdir " + std::to_string(angular_constant_direction_dir); break;
+    case TURN_DIRECTION_OF_MOVEMENT: turnStatusString = ", Turning towards movement "; break;
+  }
+  return (isYellow?"Y":"B") + std::to_string(id) + " x: " + std::to_string(get_x()) +" y: " + std::to_string(get_y()) + moveStatusString + turnStatusString;
+}
+
 // Helper Functions below
 float get_angle_diff(float angle1, float angle2){
     float diff = angle1 - angle2 + 4*PI;
@@ -330,7 +352,7 @@ float get_angle_diff(float angle1, float angle2){
     return diff;
 }
 
-void wheel_velocities(float velnormal, float veltangent, float velangular, float * wheels, float max_wheel_vel){
+std::tuple<float,float,float,float> wheel_velocities(float velnormal, float veltangent, float velangular, float max_wheel_vel){
   // velnormal  is positive to the right of the robot
   // veltangent is positvite straight forward
   // velangular is the angular velocity in rads/s (positive counter clockwise)
@@ -399,13 +421,10 @@ void wheel_velocities(float velnormal, float veltangent, float velangular, float
     max_wheel_ang *= polarity_ang;
     max_wheel_tan *= polarity_tan;
     max_wheel_norm *= polarity_norm;
-    wheels[0] = max_wheel_ang - max_wheel_tan - max_wheel_norm;
-    wheels[1] = max_wheel_ang - max_wheel_tan + max_wheel_norm;
-    wheels[2] = max_wheel_ang + max_wheel_tan + max_wheel_norm;
-    wheels[3] = max_wheel_ang + max_wheel_tan - max_wheel_norm;
-  //*/
-  // We ARE SENDING ANGULAR VELOCITIES TO THE WHEELS
-    return;
+    return std::make_tuple( max_wheel_ang - max_wheel_tan - max_wheel_norm,
+                            max_wheel_ang - max_wheel_tan + max_wheel_norm,
+                            max_wheel_ang + max_wheel_tan + max_wheel_norm,
+                            max_wheel_ang + max_wheel_tan - max_wheel_norm);
 }
 
 float get_PID_result(float new_error, std::deque<float> &time, std::deque<float> &error,
@@ -414,7 +433,7 @@ float get_PID_result(float new_error, std::deque<float> &time, std::deque<float>
     float error_derivative = 0;
     if(error.size() > 1 && time.size() > 1)    {
         error_derivative = (new_error - error.front())/(time[0]-time[1]);
-        for(int i = 0; i < error.size(); i++)        {
+        for(int i = 0; i < error.size(); i++)    {
             error_integral += error[i];
         }
     }
