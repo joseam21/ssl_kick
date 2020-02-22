@@ -8,14 +8,16 @@ using namespace std;
 //         };
 
 void BasicOffense::play(){
-    RobotFSM attacker = controller.getRobot(true, posession);
+  /*
+    RobotFSM attacker = RobotControls::getRobot(true, posession);
 
     if (canScore()) {
-        attacker.kick(goal_loc.first, goal_loc.second, 1);
+      RobotControls::sendRobotToBall(true, posession);
+      attacker.kick(goal_loc.first, goal_loc.second, 1);
     } else{
         int receiver = canPass();
-        if (receiver != 7) {
-            RobotFSM receiver_loc = controller.getRobot(true, receiver);
+        if (receiver != -1) {
+            RobotFSM receiver_loc = RobotControls::getRobot(true, receiver);
             attacker.kick(receiver_loc.get_x(), receiver_loc.get_y(), 1);
         } else {
             attacker.dribble();
@@ -23,12 +25,12 @@ void BasicOffense::play(){
     }
     // rest of the robots should guard nearest enemy
     for (int n=6; n<6; n++){
-        if (n != posession){
-            RobotFSM guarder = controller.getRobot(true, n);
-            int nearest = guard(n);
-            RobotFSM other = controller.getRobot(false, nearest);
-            std::pair<float, float> location = std::make_pair(other.get_x(), other.get_y());
-            guarder.move_to_track(&location);
-        }
-    }
+      if (n != posession){
+        RobotFSM guarder = RobotControls::getRobot(true, n);
+        int nearest = guard(n);
+        RobotFSM other = RobotControls::getRobot(false, nearest);
+        std::pair<float, float> location = std::make_pair(other.get_x(), other.get_y());
+        guarder.move_to_track(&location);
+      }
+    }*/
 }

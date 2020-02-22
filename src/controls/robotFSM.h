@@ -8,18 +8,15 @@
 #include "moveableobject.h"
 
 #define PI 3.1415926535897
-#define USE_WHEEL_VEL 0     // toggle whether or not to use wheel velocity 
-#define V_MAX 3
-#define V_ANG_MAX 2
-#define V_WHEEL_MAX 2
+#define USE_WHEEL_VEL 0     // toggle whether or not to use wheel velocity
 
 #define SIZE 60
 
 // NOTE: Robots accelerate at approx 150 rad/s^2 and 5.2 m/s
 
 enum RobotMoveState{
-    MOVE_CONSTANT_DIRECTION=1,   // uses constant_direction_dir
-    MOVE_CONSTANT_LOCATION=2,    
+    MOVE_CONSTANT_DIRECTION=1,   // uses planar_constant_direction_dir
+    MOVE_CONSTANT_LOCATION=2,
     MOVE_VARIABLE_LOCATION_TRACK=3,
     MOVE_VARIABLE_LOCATION_INTERCEPT=4,
     MOVE_PAUSE=5
@@ -53,7 +50,7 @@ public:
      * Tells to robot to pause indefinitely
      */
     void move_pause();
-    
+
     void move_to_intercept(std::function<std::pair<float,float>(void)> loc_func);
     void move_to_track(std::function<std::pair<float,float>(void)> loc_func);
     // 5 rotational methods
@@ -100,14 +97,27 @@ public:
     // setters
     void set_id(int id1);
     void set_isYellow(bool isYellow1);
-    
+
+    //movement variable setters
+    void set_max_ang_vel(float new_max_ang_vel);
+    void set_max_plane_vel(float new_max_plane_vel);
+    void set_max_wheel_vel(float new_max_wheel_vel);
+    void reset_max_vel_variables();
+
     // override base method for updating the geometry, mostly for debug purposes
     void update_geometry(float x1, float y1, float angle1, float time1, float confidence1 = 1);
+
+    std::string to_str();
 private:
     // private data
     int id;
     bool isYellow;
     float velangular,velnormal,veltangent;
+    // movement setting Variables
+    float max_ang_vel = 2;
+    float max_plane_vel = 3;
+    // TODO: fuse angular and wheel velocity maximums
+    float max_wheel_vel = 2;
     //ball manipulation variables
     float kick_speed_x, kick_speed_z, kick_tries; // kick_speed_z is chip
     bool spinner;
@@ -115,10 +125,11 @@ private:
     RobotMoveState robot_move_state = MOVE_PAUSE;
     RobotTurnState robot_turn_state = TURN_CONSTANT_DIRECTION;
     // Variables for each robot state
-    float constant_direction_dir;
-    std::function<float(void)> variable_direction_dir_func;
-    std::pair<float,float> constant_location_loc;   // first is x, second is y for all location pairs
-    std::function<std::pair<float,float>(void)> variable_location_loc_func;
+     // first is x, second is y for all location pairs
+    float planar_constant_direction_dir, angular_constant_direction_dir;
+    std::function<float(void)> variable_direction_dir_func;                 // only used for rotation
+    std::pair<float,float> planar_constant_location_loc, angular_constant_location_loc;
+    std::function<std::pair<float,float>(void)> planar_variable_location_loc_func, angular_variable_location_loc_func;
     // thread stuff
     mutable std::mutex mtx_robot_move_state, mtx_robot_turn_state; // used for mutex lock due to threading, lock for x,y,angle, and robot_state
     // storing errors for PID alogrithm
@@ -126,7 +137,7 @@ private:
     // private functions
     // resets varaibles so it doesn't interfere with state changes
     void reset_state_variables();
-    
+
     std::pair<float,float> compute_plane_vel(float time1);
     float compute_ang_vel(float time1);
 };

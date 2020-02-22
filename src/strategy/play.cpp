@@ -1,9 +1,8 @@
 #include "play.h"
 #include <math.h>
 
-Play::Play(RobotControls controls, int hasBall){
+Play::Play(int hasBall){
     posession = hasBall;
-    controller = controls;
 }
 
 bool Play::clearPath(std::pair<float, float> loc1, std::pair<float, float> loc2){
@@ -12,7 +11,7 @@ bool Play::clearPath(std::pair<float, float> loc1, std::pair<float, float> loc2)
     float delta_y = loc2.second - loc1.second;
     float delta_x = loc2.first - loc1.first;
     for (int n=0; n<6; n++){
-        RobotFSM interceptor = controller.getRobot(false, n); 
+        RobotFSM interceptor = RobotControls::getRobot(false, n); 
         float distFromLine = (delta_y*interceptor.get_x() - delta_x*interceptor.get_y() + loc1.first*loc2.second + loc1.second*loc2.first) / dist;
         if (distFromLine < interference_distance)
             return false;
@@ -20,9 +19,13 @@ bool Play::clearPath(std::pair<float, float> loc1, std::pair<float, float> loc2)
     return true;
 }
 
+void Play::goToGoal() {
+  RobotControls::getRobot(true, posession).move_to_location(std::make_pair(-5, 0));
+}
+
 bool Play::canScore(){
     // get robot with ball
-    RobotFSM withBall = controller.getRobot(true, posession);
+    RobotFSM withBall = RobotControls::getRobot(true, posession);
     float x = withBall.get_x();
     float y = withBall.get_y();
     float dist = pow(goal_loc.first - x, 2) + pow(goal_loc.second - y, 2);
@@ -33,28 +36,32 @@ bool Play::canScore(){
 }
 
 int Play::canPass(){
-    RobotFSM withBall = controller.getRobot(true, posession);
+    RobotFSM withBall = RobotControls::getRobot(true, posession);
+    float x = withBall.get_x();
+    float y = withBall.get_y();
     for (int n=0; n<6; n++){
         if (n != posession){
-            RobotFSM receiver = controller.getRobot(true, n);
-            if (clearPath(std::make_pair(receiver.get_x(), receiver.get_y()), std::make_pair(withBall.get_x(), withBall.get_y())))
+            RobotFSM receiver = RobotControls::getRobot(true, n);
+	    float dist = pow(pow(receiver.get_x() - x, 2) + pow(receiver.get_y() - y, 2), 0.5);
+            if (clearPath(std::make_pair(receiver.get_x(), receiver.get_y()), std::make_pair(withBall.get_x(), withBall.get_y())) && dist < 1)
                 return n;
         }
     }
-    return 7;
+    return -1;
 }
 
 int Play::guard(int robo){
     float min_dist = 1000000;
     int nearest;
-    RobotFSM robot = controller.getRobot(true, robo);
+    RobotFSM robot = RobotControls::getRobot(true, robo);
     float x = robot.get_x();
     float y = robot.get_y();
     for (int n=0; n<6; n++){
-        RobotFSM enemy = controller.getRobot(false, n);
+        RobotFSM enemy = RobotControls::getRobot(false, n);
         float enemy_x = enemy.get_x();
         float enemy_y = enemy.get_y();
         float dist = pow(enemy_x - x, 2) + pow(enemy_y - y, 2);
+
         if (dist < min_dist) {
             min_dist = dist;
             nearest = n;

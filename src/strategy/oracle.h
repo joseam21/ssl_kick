@@ -9,11 +9,11 @@ using namespace std;
 
 class Oracle{
     public:
-        RobotControls controller;
         //constructor
-        Oracle (RobotControls);
+        Oracle ();
         // determine who is in posession of the ball
         int find_posession();
+        int closest_yellow_robot();
         // choose what play to perform
         Play choose_play();
 };
