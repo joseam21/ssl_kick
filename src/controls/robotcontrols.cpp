@@ -138,7 +138,7 @@ void RobotControls::sendRobotToBall(bool isYellow, int id){
 		RobotFSM& robot = getRobot(isYellow,id);
 		std::pair<float,float> robot_loc = getRobot(isYellow,id).get_loc();
 		float angle = atan2(robot_loc.second-ball_loc.second,robot_loc.first-ball_loc.first);
-		std::pair<float,float> ideal_loc = {ball_loc.first+.08*cos(angle),ball_loc.second+.08*sin(angle)};
+		std::pair<float,float> ideal_loc = {ball_loc.first+.085 *cos(angle),ball_loc.second+.085*sin(angle)};
 		return ideal_loc;
 		}
 	);

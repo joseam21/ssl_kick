@@ -41,19 +41,21 @@ int Oracle::closest_yellow_robot() {
     float dist = pow(ball_loc.first - x, 2) + pow(ball_loc.second - y, 2);
     distances.push_back(dist);
   }
-  
+
   auto it = std::min_element(distances.begin(), distances.end());
   return it - distances.begin();
 }
 
 Play Oracle::choose_play(){
   int hasball = find_posession();
-  std::cout << "Choosing play"  << hasball << std::endl;
+  //std::cout << "Choosing play"  << hasball << std::endl;
   if (hasball == -1) {
     int closest = closest_yellow_robot();
+    std::cout << "Ball not in our posession, sending robot " << closest << " to ball" << std::endl;
     RobotControls::sendRobotToBall(true, closest);
     return BasicOffense(closest);
   } else if(hasball < 6){
+    std::cout << "Ball in our posession!" << std::endl;
   	return BasicOffense(hasball);
   }/*
   else{

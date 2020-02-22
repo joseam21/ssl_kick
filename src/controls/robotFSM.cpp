@@ -12,9 +12,10 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include <math.h>
+#include <algorithm>
 
 float get_angle_diff(float angle1, float angle2);
-float get_PID_result(float new_error, std::deque<float> &time, std::deque<float> &error, float K_p, float K_i, float K_d, float min_result, float max_result);
+float get_PID_result(float new_error, std::deque<float> &time, std::deque<float> &error, float K_p, float K_i, float K_d, float min_result, float max_result,bool out = false);
 std::tuple<float,float,float,float> wheel_velocities(float velnormal, float veltangent, float velangular, float max_wheel_vel);
 
 RobotFSM::RobotFSM(){
@@ -278,8 +279,8 @@ float RobotFSM::compute_ang_vel(float time1){
         case TURN_CONSTANT_DIRECTION:  {
             float new_error = get_angle_diff(get_angle(),angular_constant_direction_dir);
             const float K_p = -7.5;
-            const float K_i = -0.00;
-            const float K_d = -1.5;
+            const float K_i = -0.1;
+            const float K_d = -0.8;
             res = get_PID_result(new_error,time,angle_error, K_p,K_i,K_d,-max_ang_vel,max_ang_vel);
             break;
         }
@@ -287,8 +288,8 @@ float RobotFSM::compute_ang_vel(float time1){
             float new_angle = atan2(angular_constant_location_loc.second-get_y(),angular_constant_location_loc.first-get_x());
             float new_error = get_angle_diff(get_angle(),new_angle);
             const float K_p = -7.5;
-            const float K_i = -0.00;
-            const float K_d = -1.5;
+            const float K_i = -0.1;
+            const float K_d = -0.8;
             res = get_PID_result(new_error,time,angle_error, K_p,K_i,K_d,-max_ang_vel,max_ang_vel);
             break;
         }
@@ -297,8 +298,8 @@ float RobotFSM::compute_ang_vel(float time1){
             angular_constant_direction_dir = new_angle;
             float new_error = get_angle_diff(get_angle(),new_angle);
             const float K_p = -7.5;
-            const float K_i = -0.00;
-            const float K_d = -1.5;
+            const float K_i = -0.1;
+            const float K_d = -0.8;
             res = get_PID_result(new_error,time,angle_error, K_p,K_i,K_d,-max_ang_vel,max_ang_vel);
             break;
         }
@@ -308,8 +309,8 @@ float RobotFSM::compute_ang_vel(float time1){
             float new_angle = atan2(-get_y()+v_loc.second,v_loc.first-get_x());
             float new_error = get_angle_diff(get_angle(),new_angle);
             const float K_p = -7.5;
-            const float K_i = -0.00;
-            const float K_d = -1.5;
+            const float K_i = -0.1;
+            const float K_d = -0.8;
             res = get_PID_result(new_error,time,angle_error, K_p,K_i,K_d,-max_ang_vel,max_ang_vel);
             break;
         }
@@ -321,6 +322,10 @@ float RobotFSM::compute_ang_vel(float time1){
     mtx_time.unlock();
     mtx_robot_turn_state.unlock();
     return res;
+}
+
+float dist(std::pair<float,float> p1, std::pair<float,float>p2){
+  return sqrt(pow(p1.first-p2.first,2)+pow(p1.second-p2.second,2));
 }
 
 std::string RobotFSM::to_str(){
@@ -335,8 +340,10 @@ std::string RobotFSM::to_str(){
   }
   switch(robot_turn_state){
     case TURN_CONSTANT_DIRECTION: turnStatusString = ", Turning towards " + std::to_string(angular_constant_direction_dir); break;
-    case TURN_CONSTANT_LOCATION: turnStatusString = ", Turning to loc " + std::to_string(angular_constant_location_loc.first) + "," + std::to_string(angular_constant_location_loc.second); break;
-    case TURN_VARIABLE_LOCATION: turnStatusString = ", Turning to vloc " + std::to_string(angular_constant_location_loc.first) + "," + std::to_string(angular_constant_location_loc.second); break;
+    //case TURN_CONSTANT_LOCATION: turnStatusString = ", Turning to loc " + std::to_string(angular_constant_location_loc.first) + "," + std::to_string(angular_constant_location_loc.second); break;
+    case TURN_CONSTANT_LOCATION: turnStatusString = ", Turning to loc " + std::to_string(cos(get_angle())*dist(get_loc(),angular_constant_location_loc)+get_x()-angular_constant_location_loc.first) + "," + std::to_string(sin(get_angle())*dist(get_loc(),angular_constant_location_loc)+get_y()-angular_constant_location_loc.second); break;
+    //case TURN_VARIABLE_LOCATION: turnStatusString = ", Turning to vloc " + std::to_string(angular_constant_location_loc.first) + "," + std::to_string(angular_constant_location_loc.second); break;
+    case TURN_VARIABLE_LOCATION: turnStatusString = ", Turning to vloc " + std::to_string(cos(get_angle())*dist(get_loc(),angular_constant_location_loc)+get_x()-angular_constant_location_loc.first) + "," + std::to_string(sin(get_angle())*dist(get_loc(),angular_constant_location_loc)+get_y()-angular_constant_location_loc.second); break;
     case TURN_VARIABLE_DIRECTION: turnStatusString = ", Turning to vdir " + std::to_string(angular_constant_direction_dir); break;
     case TURN_DIRECTION_OF_MOVEMENT: turnStatusString = ", Turning towards movement "; break;
   }
@@ -428,12 +435,39 @@ std::tuple<float,float,float,float> wheel_velocities(float velnormal, float velt
 }
 
 float get_PID_result(float new_error, std::deque<float> &time, std::deque<float> &error,
-          float K_p, float K_i, float K_d, float min_result = -99, float max_result = 99){
+          float K_p, float K_i, float K_d, float min_result = -99, float max_result = 99,bool out){
+    // AT THIS POINT IN TIME, the time deque should be updated while the error deque is NOT
     float error_integral = 0;
+    std::vector<float> error_derivative_vector;
     float error_derivative = 0;
-    if(error.size() > 1 && time.size() > 1)    {
-        error_derivative = (new_error - error.front())/(time[0]-time[1]);
-        for(int i = 0; i < error.size(); i++)    {
+    if(out){
+        std::cout << "ERR: " << new_error << std::endl;
+    }
+    if(error.size() > 1 && time.size() > 2){
+        error_derivative_vector.push_back((new_error - error.front())/(time[0]-time[1]));
+        int maxsize = std::min((int)(time.size()-2),4);
+        for (int i = 0; i < maxsize; i++){
+            error_derivative_vector.push_back((error[i]-error[i+1])/(time[i+1] - time[i+2]));
+        }
+        std::sort(error_derivative_vector.begin(),error_derivative_vector.end());
+        if(out){
+            for(auto i : error_derivative_vector){
+                std::cout <<  i  << ' ';
+            }
+            std::cout << std::endl;
+            if(time.size() > 6 && error.size() > 6){
+                for(int i = 0; i < 5; i++){
+                  std::cout <<error[i] << ' '<< time[i] << "     ";
+                }
+                std::cout << std::endl;
+            }
+        }
+        //pick the median for lolz
+        error_derivative = error_derivative_vector[error_derivative_vector.size()/2];
+        if(out){
+            std::cout << error_derivative << std::endl;
+        }
+        for(int i = 0; i < std::min((int)(error.size()),20); i++)    {
             error_integral += error[i];
         }
     }
@@ -449,8 +483,11 @@ float get_PID_result(float new_error, std::deque<float> &time, std::deque<float>
     while(error.size() > SIZE)    {
         error.pop_back();
     }
-    //std::cout << K_p << ' ' << new_error << ' ' << error_integral << ' ' << error_derivative << std::endl;
     float result = K_p*new_error+K_i*error_integral+K_d*error_derivative;
+    if(out && K_p > -7.6 && K_p < -7.4){
+        std::cout << "RES: " << result << ' '  << K_p * new_error << ' ' << K_i * error_integral << ' ' << K_d *error_derivative << std::endl;
+    }
+    //std::cout << K_p << ' ' << new_error << ' ' << error_integral << ' ' << error_derivative << std::endl;
     /*if(result < -0.5){
         printf("P: %f,  I: %f,  D:  %f,  res: %f  \n",K_p*new_error,K_i*error_integral,
         K_d*error_derivative,result);
