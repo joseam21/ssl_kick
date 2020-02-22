@@ -10,8 +10,8 @@ void setRobotStateFunction(float time)
 {
   Oracle oracle = Oracle();
   int posession = oracle.find_posession();
-  if(posession >= 0 && posession < 6 )
-    std::cout << RobotControls::getRobot(true,oracle.find_posession()).to_str() << std::endl;
+  //if(posession >= 0 && posession < 6 )
+  //  std::cout << RobotControls::getRobot(true,oracle.find_posession()).to_str() << std::endl;
   if (time > 1 && !sent[0]) {
     std::cout << "Going" << std::endl;
     sent[0] = true;
