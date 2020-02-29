@@ -7,7 +7,7 @@ First, install Eigen 3 with the following command: `sudo apt install libeigen3-d
 Download install script from https://ompl.kavrakilab.org/install-ompl-ubuntu.sh and run the following command
 `chmod u+x install-ompl-ubuntu.sh` and then `./install-ompl-ubuntu.sh`
 
-If that doesn't work then try `apt-get install libompl-dev ompl-demos`
+If that doesn't work then try `sudo apt-get install libompl-dev ompl-demos`
 
 ## MacOS 
 
