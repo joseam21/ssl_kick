@@ -10,6 +10,9 @@ Only works on linux
 6. `./controls_test`
 7. open grsim
 
+
+(NOTE: if `make` fails, you likely need to install OMPL. Follow the README here: https://github.mit.edu/MIT-Robotics-Team/robocup_soccer_2020/tree/master/src/path_planner)
+
 ## Structure
 * path_planner
   * GetPath(state, goal, path)
