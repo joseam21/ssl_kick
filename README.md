@@ -1,4 +1,4 @@
-# robocup_soccer_2020
+# kick_dev
 
 ## Installation
 Only works on linux
@@ -24,3 +24,4 @@ Only works on linux
   * TrackTrajectory(path)
 * vision
   * TBD
+* kick_dev
